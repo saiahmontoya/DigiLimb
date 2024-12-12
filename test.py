@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import bcrypt
 
 # Connect to MongoDB
 client = MongoClient('mongodb+srv://ryangallagher01:FtTgpOQcUsDo01o7@cluster0.7mcrx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
@@ -27,14 +28,37 @@ def search_entity():
     if not found:
         print("No matching entity found.")
 
+
+# Hash a user-entered password
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt)
+
+
 # Function to add an entity
 def add_entity():
     """Add a new entity to the collection."""
     username = input("Enter username: ")
     password = input("Enter password: ")
-    new_entity = {"username": username, "password": password}
+
+    if collection.find_one({"username": username}):
+        print("Username already exists.")
+        return
+
+    password_hash = hash_password(password)
+    new_entity = {"username": username, "password_hash": password_hash}
     result = collection.insert_one(new_entity)
     print(f"Entity added with ID: {result.inserted_id}")
+
+
+# Function to log in
+def verify_user(username, password):
+    user = collection.find_one({"username": username})
+    if user and bcrypt.checkpw(password.encode('utf-8'), user["password_hash"]):
+        print("Login Successful")
+    else:
+        print("Invalid login credentials.")
+
 
 # Function to remove an entity
 def remove_entity():
@@ -48,6 +72,7 @@ def remove_entity():
     else:
         print("No matching entity found.")
 
+
 # Main menu function
 def main_menu():
     """Display the menu and handle user input."""
@@ -57,6 +82,7 @@ def main_menu():
         print("2. Search for an entity")
         print("4. Add an entity")
         print("5. Remove an entity")
+        print("6. Login")
         print("0. Exit")
         choice = input("Enter your choice: ")
 
@@ -68,6 +94,10 @@ def main_menu():
             add_entity()
         elif choice == '5':
             remove_entity()
+        elif choice == '6':
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            verify_user(username, password)
         elif choice == '0':
             print("Exiting the system. Goodbye!")
             break
