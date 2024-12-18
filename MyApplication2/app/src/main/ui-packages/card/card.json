@@ -1,0 +1,552 @@
+{
+  "name": "card",
+  "version": 33,
+  "source-key": {
+    "type": "figma",
+    "file": "noSXUSf3OcPYoanWTrkG4k",
+    "node": "1:458",
+    "version": "2161907183826476885",
+    "component-id": "2256f7285d2843b887837107d4730b50d63c4874"
+  },
+  "default": "Card",
+  "design": {
+    "atoms": [
+      {
+        "type": "group",
+        "id": "top_level",
+        "root": "true"
+      },
+      {
+        "type": "group",
+        "id": "Card"
+      },
+      {
+        "type": "group",
+        "id": "Info"
+      },
+      {
+        "type": "group",
+        "id": "Body"
+      },
+      {
+        "type": "vector",
+        "id": "Icon"
+      },
+      {
+        "type": "group",
+        "id": "Text"
+      },
+      {
+        "type": "group",
+        "id": "Button Group"
+      },
+      {
+        "type": "text",
+        "id": "Title"
+      },
+      {
+        "type": "text",
+        "id": "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story."
+      },
+      {
+        "type": "group",
+        "id": "Button"
+      },
+      {
+        "type": "group",
+        "id": "Button1"
+      },
+      {
+        "type": "group",
+        "id": "Star"
+      },
+      {
+        "type": "text",
+        "id": "Button2"
+      },
+      {
+        "type": "group",
+        "id": "X"
+      },
+      {
+        "type": "vector",
+        "id": "Icon1"
+      },
+      {
+        "type": "vector",
+        "id": "Icon2"
+      },
+      {
+        "type": "group",
+        "id": "Star1"
+      },
+      {
+        "type": "text",
+        "id": "Button3"
+      },
+      {
+        "type": "group",
+        "id": "X1"
+      },
+      {
+        "type": "vector",
+        "id": "Icon3"
+      },
+      {
+        "type": "vector",
+        "id": "Icon4"
+      }
+    ],
+    "modes": {
+      "Card": {
+        "rules": [
+          {
+            "id": "top_level",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Card"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Card",
+            "padding": 24.0,
+            "border-radius": 8.0,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 440.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "stroke-width": 1.0,
+            "stroke-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.8509803921568627
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Info",
+              "Body"
+            ],
+            "item-spacing": 24.0,
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 1.0
+            },
+            "clip-content": false
+          },
+          {
+            "id": "Info",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 32.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 32.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Icon"
+            ]
+          },
+          {
+            "id": "Body",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Text",
+              "Button Group"
+            ],
+            "item-spacing": 16.0,
+            "clip-content": false
+          },
+          {
+            "id": "Icon",
+            "margin": {
+              "left": 2.666656494140625,
+              "top": 2.666656494140625,
+              "right": 2.666675567626953,
+              "bottom": 2.666675567626953
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -1.5
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -1.5
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "icon.svg"
+          },
+          {
+            "id": "Text",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Title",
+              "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story."
+            ],
+            "item-spacing": 8.0,
+            "clip-content": false
+          },
+          {
+            "id": "Button Group",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "children": [
+              "Button",
+              "Button1"
+            ],
+            "item-spacing": 16.0,
+            "clip-content": false
+          },
+          {
+            "id": "Title",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "font-weight": 600.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.11764705882352941
+            },
+            "text-content": "Title",
+            "overflow": "visible",
+            "max-lines": -1,
+            "text-align": "left",
+            "text-size": 24.0,
+            "letter-spacing": -0.48,
+            "line-height": 1.2000000762939453,
+            "typeface": "Inter"
+          },
+          {
+            "id": "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.4588235294117647
+            },
+            "text-content": "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story. ",
+            "overflow": "visible",
+            "max-lines": -1,
+            "text-align": "left",
+            "text-size": 16.0,
+            "line-height": 1.4,
+            "typeface": "Inter"
+          },
+          {
+            "id": "Button",
+            "presence": false,
+            "padding": 12.0,
+            "border-radius": 8.0,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "children": [
+              "Star",
+              "Button2",
+              "X"
+            ],
+            "item-spacing": 8.0
+          },
+          {
+            "id": "Button1",
+            "padding": 12.0,
+            "border-radius": 8.0,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "stroke-width": 1.0,
+            "stroke-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.4627450980392157
+            },
+            "arrangement": "row",
+            "children": [
+              "Star1",
+              "Button3",
+              "X1"
+            ],
+            "item-spacing": 8.0,
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.8901960784313725
+            }
+          },
+          {
+            "id": "Star",
+            "presence": false,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 16.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 16.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Icon1"
+            ]
+          },
+          {
+            "id": "Button2",
+            "color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.18823529411764706
+            },
+            "text-content": "Button",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-size": 16.0,
+            "typeface": "Inter"
+          },
+          {
+            "id": "X",
+            "presence": false,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 16.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 16.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Icon2"
+            ]
+          },
+          {
+            "id": "Icon1",
+            "margin": {
+              "left": 1.3333282470703125,
+              "top": 1.3333282470703125,
+              "right": 1.333338737487793,
+              "bottom": 1.9866714477539062
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "Icon2",
+            "margin": 4.0,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "Star1",
+            "presence": false,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 16.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 16.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Icon3"
+            ]
+          },
+          {
+            "id": "Button3",
+            "color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.11764705882352941
+            },
+            "text-content": "Button",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-size": 16.0,
+            "typeface": "Inter"
+          },
+          {
+            "id": "X1",
+            "presence": false,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 16.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 16.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Icon4"
+            ]
+          },
+          {
+            "id": "Icon3",
+            "margin": {
+              "left": 1.3333282470703125,
+              "top": 1.3333282470703125,
+              "right": 1.333338737487793,
+              "bottom": 1.9866714477539062
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "Icon4",
+            "margin": 4.0,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "previews": [
+    {
+      "design": "Card",
+      "size": {
+        "width": 440.0,
+        "height": 207.0
+      }
+    }
+  ],
+  "adin-component-search-paths": [],
+  "image-search-paths": [],
+  "vector-search-paths": []
+}
