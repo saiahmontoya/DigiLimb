@@ -84,16 +84,6 @@ namespace DigiLimbv1
             this.Size = new Size(800, 600);
             this.StartPosition = FormStartPosition.CenterScreen;
 
-            try
-            {
-                this.BackgroundImage = Image.FromFile("F:\\Users\\thego\\source\\repos\\DigiLimbv1\\DigiLimbv1\\Resources\\background.jpg");
-            }
-            catch
-            {
-                MessageBox.Show("Background image not found. Using default background.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                this.BackgroundImage = null;
-            }
-            this.BackgroundImageLayout = ImageLayout.Stretch;
 
             Panel titlePanel = new Panel
             {
@@ -279,10 +269,8 @@ namespace DigiLimbv1
 
                     // Navigate to dashboard without disposing LoginForm
                     this.Hide();
-                    using (var dashboard = new DashboardForm())
-                    {
-                        dashboard.ShowDialog();
-                    }
+                    DashboardForm dashboardForm = new DashboardForm(email);
+                    dashboardForm.ShowDialog();
                     this.Show(); // Show LoginForm again if returning
                 }
                 else

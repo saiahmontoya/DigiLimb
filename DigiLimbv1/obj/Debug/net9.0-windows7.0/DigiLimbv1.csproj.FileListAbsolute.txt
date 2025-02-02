@@ -1,0 +1,12 @@
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.csproj.AssemblyReference.cache
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.Connections.resources
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.DashboardForm.resources
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.LoginForm.resources
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.Properties.Resources.resources
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.UserSettings.resources
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.csproj.GenerateResource.cache
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.AssemblyInfoInputs.cache
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.AssemblyInfo.cs
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.csproj.CoreCompileInputs.cache
+C:\Users\peyto\Source\Repos\DigiLimbTest\DigiLimbv1\obj\Debug\net9.0-windows7.0\DigiLimbv1.sourcelink.json

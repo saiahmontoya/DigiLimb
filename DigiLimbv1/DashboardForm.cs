@@ -7,9 +7,11 @@ namespace DigiLimbv1
 {
     public partial class DashboardForm : Form
     {
-        public DashboardForm()
+        private string _email;
+        public DashboardForm(string email)
         {
             InitializeComponent();
+            _email = email;
             CustomizeDashboard(); // Apply sci-fi customization
         }
 
@@ -17,18 +19,6 @@ namespace DigiLimbv1
         {
             this.Text = "Dashboard";
             this.Size = new Size(800, 600);
-            this.BackColor = Color.Black;
-
-            // Background Image Debug
-            try
-            {
-                this.BackgroundImage = Image.FromFile("F:\\Users\\thego\\source\\repos\\DigiLimbv1\\DigiLimbv1\\Resources\\scifi_background.jpg");
-                this.BackgroundImageLayout = ImageLayout.Stretch;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading background image: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
 
             // Create a panel for the 3D title
             Panel titlePanel = new Panel
@@ -120,8 +110,20 @@ namespace DigiLimbv1
                 var result = MessageBox.Show("Are you sure you want to quit?", "Confirm Quit", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    Application.Exit(); // Quit the application
+                    this.Close(); // Back to login
                 }
+            };
+
+            btnConnections.Click += (sender, e) =>
+            {
+                Connections connections = new Connections();
+                connections.Show();
+            };
+
+            btnModifications.Click += (sender, e) =>
+            {
+                UserSettings userSettings = new UserSettings(_email);
+                userSettings.Show();
             };
 
             // Add buttons to the form
@@ -175,5 +177,9 @@ namespace DigiLimbv1
             }
         }
 
+        private void DashboardForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

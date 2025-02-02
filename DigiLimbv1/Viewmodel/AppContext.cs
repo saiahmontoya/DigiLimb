@@ -3,8 +3,10 @@ using System.Windows.Forms;
 
 namespace DigiLimbv1
 {
+    
     public class AppContext : ApplicationContext
     {
+        private string _email;
         public AppContext()
         {
             // Start with the LoginForm
@@ -18,7 +20,7 @@ namespace DigiLimbv1
             if (sender is LoginForm loginForm && loginForm.DialogResult == DialogResult.OK)
             {
                 // Open DashboardForm if login was successful
-                DashboardForm dashboardForm = new DashboardForm();
+                DashboardForm dashboardForm = new DashboardForm(_email);
                 dashboardForm.FormClosed += (s, args) => ExitThread(); // Exit app when DashboardForm is closed
                 dashboardForm.Show();
             }
