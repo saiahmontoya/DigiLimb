@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DigiLimbDesktop.MainPage">
+             x:Class="DigiLimbDesktop.MainPage"
+			 Title="Main Menu">
 
     <ScrollView>
         <VerticalStackLayout
@@ -30,6 +31,12 @@
                 SemanticProperties.Hint="Counts the number of times you click"
                 Clicked="OnCounterClicked"
                 HorizontalOptions="Fill" />
+			
+            <Button Text="Connections" Clicked="OnConnectionsClicked"/>
+			
+            <Button Text="Settings" Clicked="OnSettingsClicked"/>
+			
+            <Button Text="Emulation" Clicked="OnEmulationClicked"/>
         </VerticalStackLayout>
     </ScrollView>
 

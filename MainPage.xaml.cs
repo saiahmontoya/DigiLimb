@@ -20,6 +20,21 @@
 
             SemanticScreenReader.Announce(CounterBtn.Text);
         }
+
+        private async void OnConnectionsClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new ConnectionsPage());
+        }
+
+        private async void OnSettingsClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new SettingsPage());
+        }
+
+        private async void OnEmulationClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new EmulationPage());
+        }
     }
 
 }

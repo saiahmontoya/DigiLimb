@@ -1,15 +1,29 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     x:Class="DigiLimbDesktop.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:DigiLimbDesktop"
-    Shell.FlyoutBehavior="Flyout"
-    Title="DigiLimbDesktop">
+    Shell.FlyoutBehavior="Flyout">
 
     <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
+
+    <ShellContent
+        Title="Connections"
+        ContentTemplate="{DataTemplate local:ConnectionsPage}"
+        Route="ConnectionsPage" />
+
+    <ShellContent
+        Title="Settings"
+        ContentTemplate="{DataTemplate local:SettingsPage}"
+        Route="SettingsPage" />
+
+    <ShellContent
+        Title="Emulation"
+        ContentTemplate="{DataTemplate local:EmulationPage}"
+        Route="EmulationPage" />
+
 
 </Shell>
