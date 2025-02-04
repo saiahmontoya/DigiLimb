@@ -9,7 +9,8 @@
         <VerticalStackLayout Padding="30,50" Spacing="25" HorizontalOptions="Center">
 
             <!-- Title Label -->
-            <Label Text="DigiLimb Dashboard"
+            <Label x:Name="lblDeviceName"
+                   Text="DigiLimb Dashboard"
                    FontSize="36"
                    FontAttributes="Bold"
                    HorizontalTextAlignment="Center"

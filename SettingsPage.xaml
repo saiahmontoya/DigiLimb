@@ -1,11 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.SettingsPage"
              Title="Settings">
-    <VerticalStackLayout>
-        <Label Text="Settings Page" 
-               FontSize="24"
-               HorizontalOptions="Center"
-               VerticalOptions="Center"/>
+
+    <VerticalStackLayout Padding="20,50,20,20" Spacing="25">
+
+        <!-- Device Name Entry -->
+        <Label Text="Device Name"
+               FontSize="16"
+               HorizontalOptions="Start"/>
+        <Entry x:Name="txtName" Placeholder="Enter device name" />
+
+        <!-- DPI Entry -->
+        <Label Text="DPI Level"
+               FontSize="16"
+               HorizontalOptions="Start"/>
+        <Entry x:Name="txtDPI" Placeholder="Enter DPI level" Keyboard="Numeric" />
+
+        <!-- Save Button -->
+        <Button Text="Save" 
+                x:Name="btnSave" 
+                Clicked="OnSaveClicked" 
+                BackgroundColor="Black" 
+                TextColor="White"
+                BorderColor="Cyan" 
+                BorderWidth="2" 
+                HeightRequest="60"/>
+
     </VerticalStackLayout>
 </ContentPage>
