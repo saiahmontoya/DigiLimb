@@ -1,38 +1,31 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="DigiLimbDesktop.ConnectionsPage">
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbDesktop.ConnectionsPage"
+             Title="Bluetooth Device Scanner">
 
-    <!-- StackLayout as the root container for all UI elements -->
-    <StackLayout Padding="10">
+    <VerticalStackLayout Padding="20">
+        <Button x:Name="btnScan" Text="Start Scan" Clicked="btnScan_Click"/>
 
-        <!-- Start Scan Button -->
-        <Button Text="Start Scan"
-                x:Name="btnStartScan"
-                Clicked="btnStartScan_Click" />
+        <Label Text="Discovered Devices:" FontSize="18" Margin="0,10,0,5"/>
 
-        <!-- ListView to display found devices -->
-        <ListView x:Name="lstDevices"
-                  IsVisible="True">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <StackLayout>
-                            <Label Text="{Binding DeviceName}" />
-                            <Label Text="{Binding ManufacturerData}" />
-                            <Label Text="{Binding Model}" />
-                        </StackLayout>
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <ScrollView HeightRequest="300">
+            <CollectionView x:Name="DevicesListView" SelectionMode="Single" SelectionChanged="OnDeviceSelected">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="10" Margin="5" BorderColor="Gray">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding DisplayName}" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="{Binding DeviceId}" FontSize="14" />
+                                <Label Text="{Binding ManufacturerData}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
 
-        <!-- TextBox for logging -->
-        <Editor x:Name="txtLogs"
-                HeightRequest="150"
-                IsReadOnly="True"
-                Placeholder="Logs will be displayed here..." />
+        <Button x:Name="btnConnect" Text="Connect to Selected Device" Clicked="btnConnect_Click" IsEnabled="False"/>
 
-    </StackLayout>
-
+        <Editor x:Name="txtLogs" HeightRequest="150" IsReadOnly="True" BackgroundColor="LightGray"/>
+    </VerticalStackLayout>
 </ContentPage>

@@ -10,76 +10,105 @@ namespace DigiLimbDesktop
 {
     public partial class ConnectionsPage : ContentPage
     {
-        private IAdapter _adapter;
-        private ObservableCollection<BluetoothDeviceInfo> _deviceList;
+        private readonly IAdapter _adapter;
+        private readonly ObservableCollection<BluetoothDeviceInfo> _deviceList;
+        private IDevice _selectedDevice;
+        private bool _isScanning = false;
 
         public ConnectionsPage()
         {
             InitializeComponent();
+            _adapter = CrossBluetoothLE.Current.Adapter;
             _deviceList = new ObservableCollection<BluetoothDeviceInfo>();
-            lstDevices.ItemsSource = _deviceList; // Bind the ListView to the ObservableCollection
+            DevicesListView.ItemsSource = _deviceList;
         }
 
-        // Start BLE scanning
-        private async Task StartBLEScan()
+        private async Task ToggleScan()
         {
-            _adapter = CrossBluetoothLE.Current.Adapter;
-
-            _adapter.DeviceDiscovered += (s, a) =>
-            {
-                var device = a.Device;
-                var deviceName = device.Name ?? "Unnamed Device";
-                var deviceId = device.Id.ToString();
-                var manufacturerData = string.Empty;
-
-                // Access manufacturer data if available (plugin doesn't support advertisement directly)
-                var manufacturerInfo = "Manufacturer data unavailable";
-
-                // Create BluetoothDeviceInfo object for displaying in ListView
-                var deviceInfo = new BluetoothDeviceInfo
-                {
-                    DeviceName = deviceName,
-                    DeviceId = deviceId,
-                    ManufacturerData = manufacturerInfo,
-                    Model = "Unknown Model"
-                };
-
-                // Add the discovered device to the ObservableCollection
-                _deviceList.Add(deviceInfo);
-
-                Log($"Discovered: {deviceInfo.DeviceName}");
-            };
-
             try
             {
-                Log("Scanning for Bluetooth devices...");
-                await _adapter.StartScanningForDevicesAsync();
+                if (_isScanning)
+                {
+                    // Stop scanning
+                    await _adapter.StopScanningForDevicesAsync();
+                    _isScanning = false;
+                    btnScan.Text = "Start Scan";
+                    Log("Scan stopped.");
+                }
+                else
+                {
+                    // Start scanning
+                    _deviceList.Clear();
+                    btnConnect.IsEnabled = false;
+                    _isScanning = true;
+                    btnScan.Text = "Stop Scan";
+
+                    _adapter.DeviceDiscovered += (s, a) =>
+                    {
+                        var device = a.Device;
+                        if (device == null || _deviceList.Any(d => d.DeviceId == device.Id.ToString())) return;
+
+                        var deviceInfo = new BluetoothDeviceInfo
+                        {
+                            DisplayName = device.Name ?? "Unknown Device",
+                            DeviceId = device.Id.ToString(),
+                            ManufacturerData = "Unknown Manufacturer" // Placeholder (modify if needed)
+                        };
+
+                        MainThread.BeginInvokeOnMainThread(() => _deviceList.Add(deviceInfo));
+                        Log($"Discovered: {deviceInfo.DisplayName}");
+                    };
+
+                    Log("Scanning for Bluetooth devices...");
+                    await _adapter.StartScanningForDevicesAsync();
+                }
             }
             catch (Exception ex)
             {
-                Log($"Error starting BLE scan: {ex.Message}");
+                Log($"Scan error: {ex.Message}");
             }
         }
 
-        // Log to the TextBox
+        private async void btnScan_Click(object sender, EventArgs e)
+        {
+            await ToggleScan();
+        }
+
+        private void OnDeviceSelected(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.CurrentSelection.FirstOrDefault() is BluetoothDeviceInfo selected)
+            {
+                _selectedDevice = _adapter.DiscoveredDevices.FirstOrDefault(d => d.Id.ToString() == selected.DeviceId);
+                btnConnect.IsEnabled = _selectedDevice != null;
+                Log($"Selected: {selected.DisplayName}");
+            }
+        }
+
+        private async void btnConnect_Click(object sender, EventArgs e)
+        {
+            if (_selectedDevice == null) return;
+
+            try
+            {
+                await _adapter.ConnectToDeviceAsync(_selectedDevice);
+                Log($"Connected to {_selectedDevice.Name}");
+            }
+            catch (Exception ex)
+            {
+                Log($"Connection failed: {ex.Message}");
+            }
+        }
+
         private void Log(string message)
         {
-            txtLogs.Text += $"{message}{Environment.NewLine}";
+            MainThread.BeginInvokeOnMainThread(() => txtLogs.Text += $"{message}{Environment.NewLine}");
         }
+    }
 
-        // Button click event to start scanning
-        private async void btnStartScan_Click(object sender, EventArgs e)
-        {
-            await StartBLEScan();
-        }
-
-        // Bluetooth device information
-        public class BluetoothDeviceInfo
-        {
-            public string DeviceName { get; set; }
-            public string DeviceId { get; set; }
-            public string ManufacturerData { get; set; }
-            public string Model { get; set; }
-        }
+    public class BluetoothDeviceInfo
+    {
+        public string DisplayName { get; set; }
+        public string DeviceId { get; set; }
+        public string ManufacturerData { get; set; }
     }
 }
