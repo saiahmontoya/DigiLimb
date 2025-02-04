@@ -68,4 +68,20 @@
 	  <Folder Include="Save Palisades\" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="SupportPage.xaml.cs">
+	    <DependentUpon>SupportPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="SupportPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>

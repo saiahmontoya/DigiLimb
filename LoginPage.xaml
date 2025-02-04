@@ -1,15 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.LoginPage"
-             Title="Login">
-    <VerticalStackLayout Padding="30" Spacing="20">
-        <Label Text="Login" FontSize="28" HorizontalOptions="Center"/>
+             BackgroundColor="Black">
 
-        <Entry x:Name="UsernameEntry" Placeholder="Enter Username"/>
-        <Entry x:Name="PasswordEntry" Placeholder="Enter Password" IsPassword="True"/>
+    <VerticalStackLayout Spacing="20" Padding="30">
+        <!-- App Title -->
+        <Label Text="DigiLimb" 
+               FontSize="36" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center" 
+               TextColor="White"/>
 
-        <Button Text="Login" Clicked="OnLoginClicked" 
-                BackgroundColor="#6200EE" TextColor="White"
-                HeightRequest="50" CornerRadius="10"/>
+        <!-- Email Entry -->
+        <Entry x:Name="txtEmail"
+               Placeholder="Email"
+               Keyboard="Email"
+               TextColor="White"
+               BackgroundColor="Gray"
+               HeightRequest="50"/>
+
+        <!-- Password Entry -->
+        <Entry x:Name="txtPassword"
+               Placeholder="Password"
+               IsPassword="True"
+               TextColor="White"
+               BackgroundColor="Gray"
+               HeightRequest="50"/>
+
+        <!-- Login Button -->
+        <Button Text="Login"
+                Clicked="OnLoginClicked"
+                BackgroundColor="Blue"
+                TextColor="White"
+                HeightRequest="50"/>
+
+        <!-- Register Button -->
+        <Button Text="Register"
+                Clicked="OnRegisterClicked"
+                BackgroundColor="Green"
+                TextColor="White"
+                HeightRequest="50"/>
     </VerticalStackLayout>
+
 </ContentPage>

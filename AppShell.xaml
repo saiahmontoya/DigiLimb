@@ -30,5 +30,10 @@
         Title="Emulation"
         ContentTemplate="{DataTemplate local:EmulationPage}"
         Route="EmulationPage" />
+    
+    <ShellContent
+        Title="Support"
+        ContentTemplate="{DataTemplate local:SupportPage}"
+        Route="SupportPage" />
 
 </Shell>
