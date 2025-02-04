@@ -5,6 +5,12 @@
     xmlns:local="clr-namespace:DigiLimbDesktop"
     Shell.FlyoutBehavior="Flyout">
 
+    <!-- Set LoginPage as the first page -->
+    <ShellContent
+        Title="Login"
+        ContentTemplate="{DataTemplate local:LoginPage}"
+        Route="LoginPage" />
+
     <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
@@ -24,6 +30,5 @@
         Title="Emulation"
         ContentTemplate="{DataTemplate local:EmulationPage}"
         Route="EmulationPage" />
-
 
 </Shell>
