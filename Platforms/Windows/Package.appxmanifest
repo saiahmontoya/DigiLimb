@@ -6,14 +6,18 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap rescap">
 
-  <Identity Name="maui-package-name-placeholder" Publisher="CN=User Name" Version="0.0.0.0" />
+	<Identity Name="DigiLimb"
+			  Publisher="CN=Lebron"
+			  Version="1.0.0.0"
+			  ProcessorArchitecture="x64" />
 
   <mp:PhoneIdentity PhoneProductId="A32D4106-0663-4BCD-B424-CC14FC188457" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>$placeholder$</DisplayName>
-    <PublisherDisplayName>User Name</PublisherDisplayName>
-    <Logo>$placeholder$.png</Logo>
+    <DisplayName>DigiLimb</DisplayName>
+    <PublisherDisplayName>Lebron</PublisherDisplayName>
+	  <Description>Goat</Description>
+    <Logo>lebron.jpg</Logo>
   </Properties>
 
   <Dependencies>
@@ -26,9 +30,9 @@
   </Resources>
 
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
+    <Application Id="DigiLimb" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="$placeholder$"
+        DisplayName="DigiLimb"
         Description="$placeholder$"
         Square150x150Logo="$placeholder$.png"
         Square44x44Logo="$placeholder$.png"
@@ -41,7 +45,27 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
-    <DeviceCapability Name="bluetooth"/>
+	  <Capability Name="internetClient" />
+	  <Capability Name="bluetooth" />
+	  <Capability Name="bluetoothAll" />
+	  <Capability Name="bluetooth.rfcomm" />
+	  <Capability Name="bluetooth.genericAttributeProfile" />
+	  <rescap:Capability Name="bluetooth" />
+	  
+	  <DeviceCapability Name="bluetooth" >
+		  <Device Id="any">
+			  <Function Type="service" Name="advertisement" />
+		  </Device>
+	  </DeviceCapability>
+
+	  <DeviceCapability Name="bluetooth.genericAttributeProfile">
+		  <Device Id="any">
+			  <Function Type="name:custom" />
+			  <Function Type="serviceId:00001800-0000-1000-8000-00805F9B34FB" />
+		  </Device>
+	  </DeviceCapability>
   </Capabilities>
+	
+	
 
 </Package>
