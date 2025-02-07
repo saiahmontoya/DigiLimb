@@ -4,11 +4,19 @@ using Plugin.BLE.Abstractions.EventArgs;
 using Microsoft.Maui.Controls;
 #if WINDOWS
 using DigiLimbDesktop.Platforms.Windows;
+using System.Net;
+#endif
+#if ANDROID || IOS
+//using DigiLimbDesktop.Services; // Assuming the client service is inside the Services folder
 #endif
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Sockets;
+using System.Net;
+using System.Text;
+
 
 namespace DigiLimbDesktop
 {
@@ -20,6 +28,10 @@ namespace DigiLimbDesktop
         private bool _isScanning = false;
 #if WINDOWS
         private BluetoothAdvertiser _bluetoothAdvertiser;
+        private ServerService _serverService;
+#endif
+#if ANDROID || IOS
+        private ClientService _clientService;
 #endif
 
 
@@ -34,9 +46,94 @@ namespace DigiLimbDesktop
 
 #if WINDOWS
             _bluetoothAdvertiser = new BluetoothAdvertiser();
+            _serverService = new ServerService(); // Initialize the server
             _bluetoothAdvertiser.DeviceConnected += OnDeviceConnected;
 #endif
+#if ANDROID || IOS
+            _clientService = new ClientService(); // Initialize the client
+#endif
         }
+
+        private async void btnStartServerClient_Click(object sender, EventArgs e)
+        {
+#if WINDOWS
+            if (_serverService != null)
+            {
+                string serverIP = GetLocalIPAddress();
+                Log($"Starting Server on {serverIP}...");
+                _serverService.StartServer(5000);
+                StartUdpBroadcast(serverIP);
+                Log("Server started and broadcasting IP.");
+            }
+#endif
+#if ANDROID || IOS
+            string serverIP = await DiscoverServerIP();
+            if (!string.IsNullOrEmpty(serverIP))
+            {
+                Log($"Connecting to detected server at {serverIP}...");
+                await _clientService.ConnectToServer(serverIP, 5000);
+                Log("Connected to server.");
+            }
+            else
+            {
+                Log("Server not found.");
+            }
+#endif
+        }
+
+#if WINDOWS
+        // ===================== Server: Get Local IP =====================
+        private string GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork) // IPv4 only
+                {
+                    return ip.ToString();
+                }
+            }
+            throw new Exception("No network adapters with an IPv4 address found.");
+        }
+
+        // ===================== Server: Broadcast IP to Clients =====================
+        private async void StartUdpBroadcast(string serverIP)
+        {
+            using UdpClient udpClient = new UdpClient();
+            udpClient.EnableBroadcast = true;
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, 8888);
+            byte[] data = Encoding.UTF8.GetBytes(serverIP);
+
+            while (true)
+            {
+                await udpClient.SendAsync(data, data.Length, endPoint);
+                await Task.Delay(5000); // Broadcast every 5 seconds
+            }
+        }
+#endif
+
+#if ANDROID || IOS
+        // ===================== Client: Discover Server IP =====================
+        private async Task<string> DiscoverServerIP()
+        {
+            using UdpClient udpClient = new UdpClient(8888);
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 8888);
+            Log("Listening for server broadcasts...");
+
+            try
+            {
+                UdpReceiveResult result = await udpClient.ReceiveAsync();
+                string serverIP = Encoding.UTF8.GetString(result.Buffer);
+                Log($"Discovered server IP: {serverIP}");
+                return serverIP;
+            }
+            catch (Exception ex)
+            {
+                Log($"Error discovering server: {ex.Message}");
+                return string.Empty;
+            }
+        }
+#endif
 
         private async Task ToggleScan()
         {
