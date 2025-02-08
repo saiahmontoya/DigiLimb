@@ -1,5 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using Plugin.BLE.Abstractions.Contracts;
+using Plugin.BLE.Abstractions.EventArgs;
+using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
@@ -13,10 +15,17 @@ namespace DigiLimbDesktop.Platforms.Windows
     {
         private GattServiceProvider _gattServiceProvider;
         private GattLocalCharacteristic _characteristic;
-        public event Action<string, string> DeviceConnected = delegate { };
+        private IAdapter _adapter;
+        private IDevice _connectedDevice; // Store the connected device
 
-        public BluetoothPeripheral()
+        public event EventHandler<IDevice> DeviceConnected;
+        public event EventHandler<IDevice> DeviceDisconnected;
+
+        public BluetoothPeripheral(IAdapter adapter)
         {
+            _adapter = adapter;
+            
+
             MainThread.InvokeOnMainThreadAsync(async () => await InitializeBluetoothAsync());
         }
 
@@ -45,6 +54,8 @@ namespace DigiLimbDesktop.Platforms.Windows
 
             _gattServiceProvider = serviceResult.ServiceProvider;
 
+
+
             var characteristicParameters = new GattLocalCharacteristicParameters
             {
                 CharacteristicProperties = GattCharacteristicProperties.Read | GattCharacteristicProperties.Notify,
@@ -56,7 +67,6 @@ namespace DigiLimbDesktop.Platforms.Windows
                 new Guid("0000FFF1-0000-1000-8000-00805F9B34FB"), // Characteristic UUID
                 characteristicParameters
             );
-            
 
             if (characteristicResult.Error == BluetoothError.Success)
             {
@@ -79,31 +89,32 @@ namespace DigiLimbDesktop.Platforms.Windows
             {
                 IsDiscoverable = true,
                 IsConnectable = true,
-                
             });
-            
-            
-
 
             Console.WriteLine("✅ GATT Server Advertising Started.");
         }
 
         private async void OnReadRequested(GattLocalCharacteristic sender, GattReadRequestedEventArgs args)
         {
-            var deferral = args.GetDeferral(); // Take deferral to process request
+            var deferral = args.GetDeferral(); // Take deferral to process the request
+
             try
             {
-                using (var writer = new DataWriter())
-                {
-                    writer.WriteString("Hello from DigiLimb!");
-                    var buffer = writer.DetachBuffer();
+                // Create the string message you want to send
+                string message = "Hello from DigiLimb!";
 
-                    var request = await args.GetRequestAsync();
-                    if (request != null)
-                    {
-                        request.RespondWithValue(buffer); // Send data to the connected device
-                        Console.WriteLine("📡 Device Read Requested: Sent Data.");
-                    }
+                // Convert the message to a byte array (UTF-8 encoding)
+                byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(message);
+
+                // Convert the byte[] to IBuffer
+                IBuffer buffer = messageBytes.AsBuffer();
+
+                var request = await args.GetRequestAsync();
+                if (request != null)
+                {
+                    // Respond with the IBuffer as the value
+                    request.RespondWithValue(buffer); // Send data to the connected device
+                    Console.WriteLine("📡 Device Read Requested: Sent Data.");
                 }
             }
             finally
@@ -111,6 +122,9 @@ namespace DigiLimbDesktop.Platforms.Windows
                 deferral.Complete(); // Complete request handling
             }
         }
+
+
+
 
         public void Start()
         {
@@ -123,10 +137,30 @@ namespace DigiLimbDesktop.Platforms.Windows
             Console.WriteLine("🔹 GATT Server Stopped Advertising.");
         }
 
-        public void OnDeviceConnected(string deviceName, string deviceId)
+        // Internal handler for DeviceConnected event
+        private void OnDeviceConnectedInternal(object sender, DeviceEventArgs args)
         {
-            // Fire the event
-            DeviceConnected?.Invoke(deviceName, deviceId);
+            _connectedDevice = args.Device;
+            Console.WriteLine($"✅ Device Connected: {_connectedDevice.Name}");
+
+            // Raise the DeviceConnected event
+            DeviceConnected?.Invoke(this, _connectedDevice);
+        }
+
+        // Internal handler for DeviceDisconnected event
+        private void OnDeviceDisconnectedInternal(object sender, DeviceEventArgs args)
+        {
+            _connectedDevice = null;
+            Console.WriteLine("❌ Device Disconnected");
+
+            // Raise the DeviceDisconnected event
+            DeviceDisconnected?.Invoke(this, args.Device);
+        }
+
+        public void MonitorDeviceConnections()
+        {
+            _adapter.DeviceConnected += OnDeviceConnectedInternal;
+            _adapter.DeviceDisconnected += OnDeviceDisconnectedInternal;
         }
     }
 }

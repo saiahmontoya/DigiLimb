@@ -43,8 +43,11 @@ namespace DigiLimbDesktop
         }
             */
 #if WINDOWS
-            _bluetoothPeripheral = new BluetoothPeripheral();
+            _bluetoothPeripheral = new BluetoothPeripheral(_adapter);
             _bluetoothPeripheral.DeviceConnected += OnDeviceConnected;
+            _bluetoothPeripheral.DeviceDisconnected += OnDeviceDisconnected;
+
+            _bluetoothPeripheral.MonitorDeviceConnections();
 #endif
         }
 
@@ -261,12 +264,11 @@ namespace DigiLimbDesktop
         }
 
 
-            private void OnDeviceConnected(string deviceName, string deviceId)
+        private void OnDeviceConnected(object sender, IDevice device)
         {
-
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                lblConnectedDevice.Text = $"Connected to: {deviceName}\nID: {deviceId}";
+                lblConnectedDevice.Text = $"Connected to: {device.Name}\nID: {device.Id}";
                 lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
                 lblConnectedDevice.IsVisible = true;
 
@@ -275,7 +277,23 @@ namespace DigiLimbDesktop
                 lblAwaitingConnection.IsVisible = false;
             });
 
-            Log($"Device Connected: {deviceName} (ID: {deviceId})");
+            Log($"Device Connected: {device.Name} (ID: {device.Id})");
+        }
+
+        private void OnDeviceDisconnected(object sender, IDevice device)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                lblConnectedDevice.Text = "Device Disconnected";
+                lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Red;
+                lblConnectedDevice.IsVisible = false;
+
+                // Show other elements again
+                btnAllowIncomingConnection.IsVisible = true;
+                lblAwaitingConnection.IsVisible = true;
+            });
+
+            Log("Device Disconnected.");
         }
 
     }
