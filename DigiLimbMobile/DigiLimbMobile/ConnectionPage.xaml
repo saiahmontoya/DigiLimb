@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbMobile.ConnectionPage"
+             Title="ConnectionPage">
+    <Grid RowDefinitions=".6*,.4*">
+        <Grid Grid.Row="0">
+            <RoundRectangle BackgroundColor="#d9ecfa"
+                            CornerRadius="10"
+                            HeightRequest="400"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            WidthRequest="300"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Button Margin="60,0,60,0"
+                BackgroundColor="#57b9FF"
+                HeightRequest="60"
+                VerticalOptions="Start"
+                Text="Connect"
+                TextColor="#d9ecfa"/>
+        </Grid>
+    </Grid>
+</ContentPage>
