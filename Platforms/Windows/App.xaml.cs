@@ -1,25 +1,36 @@
-﻿using Microsoft.UI.Xaml;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
+﻿using System.Threading;
+using Microsoft.Maui.Controls;
+using Microsoft.UI.Xaml;
+using DigiLimbDesktop;
 namespace DigiLimbDesktop.WinUI
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     public partial class App : MauiWinUIApplication
     {
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
+
         public App()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            LogThreadInfo("Constructor");
         }
 
-        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
-    }
+        
+        protected override MauiApp CreateMauiApp()
+        {
+            LogThreadInfo("CreateMauiApp");
+            Console.WriteLine($"Thread ID: {Thread.CurrentThread.ManagedThreadId}, Is UI Thread: {Thread.CurrentThread.IsBackground == false}");
 
+            return MauiProgram.CreateMauiApp();
+        }
+
+        
+
+        /// <summary>
+        /// Logs the current thread information.
+        /// </summary>
+        public static void LogThreadInfo(string context)
+        {
+            string threadInfo = $"Thread ID: {Thread.CurrentThread.ManagedThreadId}, Is UI Thread: {Thread.CurrentThread.IsBackground == false}";
+            Console.WriteLine($"[{context}] {threadInfo}");
+        }
+    }
 }

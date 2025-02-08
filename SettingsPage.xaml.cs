@@ -153,7 +153,12 @@ namespace DigiLimbDesktop
                 }
 
                 // Trigger the event to notify MainPage about the update
-                DeviceNameUpdated?.Invoke(deviceName);
+                // Ensure the event is invoked on the main thread
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    DeviceNameUpdated?.Invoke(deviceName);
+                });
+
             }
             catch (Exception ex)
             {

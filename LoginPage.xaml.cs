@@ -95,10 +95,12 @@ namespace DigiLimbDesktop
 
                 if (VerifyPassword(password, user.PasswordHash, user.Salt))
                 {
-                    await DisplayAlert("Success", "Login Successful!", "OK");
-
-                    
-                    await Navigation.PushAsync(new MainPage(email));
+                    // Ensure UI updates are on the main thread
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        DisplayAlert("Success", "Login Successful!", "OK");
+                        Navigation.PushAsync(new MainPage(email));
+                    });
                 }
                 else
                 {

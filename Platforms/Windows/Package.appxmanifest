@@ -3,69 +3,72 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap rescap">
+  xmlns:uap18="http://schemas.microsoft.com/appx/manifest/uap/windows10/18"
+  IgnorableNamespaces="uap mp desktop rescap uap18">
 
 	<Identity Name="DigiLimb"
-			  Publisher="CN=Lebron"
-			  Version="1.0.0.0"
-			  ProcessorArchitecture="x64" />
+              Publisher="CN=Lebron"
+              Version="1.0.0.0"
+              ProcessorArchitecture="x64" />
 
-  <mp:PhoneIdentity PhoneProductId="A32D4106-0663-4BCD-B424-CC14FC188457" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+	<mp:PhoneIdentity PhoneProductId="A32D4106-0663-4BCD-B424-CC14FC188457"
+                      PhonePublisherId="00000000-0000-0000-0000-000000000000" />
 
-  <Properties>
-    <DisplayName>DigiLimb</DisplayName>
-    <PublisherDisplayName>Lebron</PublisherDisplayName>
-	  <Description>Goat</Description>
-    <Logo>lebron.jpg</Logo>
-  </Properties>
+	<Properties>
+		<DisplayName>DigiLimb</DisplayName>
+		<PublisherDisplayName>Lebron</PublisherDisplayName>
+		<Description>Goat</Description>
+		<Logo>lebron.jpg</Logo>
+	</Properties>
 
-  <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
-  </Dependencies>
+	<Dependencies>
+		<TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+		<TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+	</Dependencies>
 
-  <Resources>
-    <Resource Language="x-generate" />
-  </Resources>
+	<Resources>
+		<Resource Language="x-generate" />
+	</Resources>
 
-  <Applications>
-    <Application Id="DigiLimb" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
-      <uap:VisualElements
-        DisplayName="DigiLimb"
-        Description="$placeholder$"
-        Square150x150Logo="$placeholder$.png"
-        Square44x44Logo="$placeholder$.png"
-        BackgroundColor="transparent">
-        <uap:DefaultTile Square71x71Logo="$placeholder$.png" Wide310x150Logo="$placeholder$.png" Square310x310Logo="$placeholder$.png" />
-        <uap:SplashScreen Image="$placeholder$.png" />
-      </uap:VisualElements>
-    </Application>
-  </Applications>
+	<Applications>
+		<Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Windows.FullTrustApplication" uap18:TrustLevel="mediumIL">
+			<uap:VisualElements
+                DisplayName="DigiLimb"
+                Description="DigiLimb Application"
+                Square150x150Logo="lebron.jpg"
+                Square44x44Logo="lebron.jpg"
+                BackgroundColor="transparent">
+				<uap:DefaultTile Square71x71Logo="lebron.jpg"
+                                 Wide310x150Logo="lebron.jpg"
+                                 Square310x310Logo="lebron.jpg" />
+				<uap:SplashScreen Image="lebron.jpg" />
+			</uap:VisualElements>
+		</Application>
+	</Applications>
 
-  <Capabilities>
-    <rescap:Capability Name="runFullTrust" />
-	  <Capability Name="internetClient" />
-	  <Capability Name="bluetooth" />
-	  <Capability Name="bluetoothAll" />
-	  <Capability Name="bluetooth.rfcomm" />
-	  <Capability Name="bluetooth.genericAttributeProfile" />
-	  <rescap:Capability Name="bluetooth" />
-	  
-	  <DeviceCapability Name="bluetooth" >
-		  <Device Id="any">
-			  <Function Type="service" Name="advertisement" />
-		  </Device>
-	  </DeviceCapability>
+	<Capabilities>
+		<Capability Name="internetClient" />
 
-	  <DeviceCapability Name="bluetooth.genericAttributeProfile">
-		  <Device Id="any">
-			  <Function Type="name:custom" />
-			  <Function Type="serviceId:00001800-0000-1000-8000-00805F9B34FB" />
-		  </Device>
-	  </DeviceCapability>
-  </Capabilities>
-	
-	
+		<!-- FullTrust Capability -->
+		<rescap:Capability Name="runFullTrust" />
+
+		<!-- Bluetooth Permissions -->
+		<DeviceCapability Name="bluetooth">
+			<Device Id="any">
+				<Function Type="name:advertisement"/>
+				<Function Type="name:peripheral"/>
+			</Device>
+		</DeviceCapability>
+
+		<DeviceCapability Name="bluetooth.genericAttributeProfile">
+			<Device Id="any">
+				<Function Type="name:peripheral"/>
+			</Device>
+		</DeviceCapability>
+
+	</Capabilities>
 
 </Package>

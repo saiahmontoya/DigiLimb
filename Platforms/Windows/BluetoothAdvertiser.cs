@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Devices.Radios;
 using Windows.Storage.Streams;
 
 namespace DigiLimbDesktop.Platforms.Windows
@@ -8,12 +10,38 @@ namespace DigiLimbDesktop.Platforms.Windows
     public class BluetoothAdvertiser
     {
         private readonly BluetoothLEAdvertisementPublisher _publisher;
-        public event Action<string, string> DeviceConnected; // Trigger when connected
+        public event Action<string, string> DeviceConnected = delegate { };
+        // Trigger when connected
 
         public BluetoothAdvertiser()
         {
             _publisher = new BluetoothLEAdvertisementPublisher();
-            ConfigureAdvertisement();
+            MainThread.InvokeOnMainThreadAsync(async () => await RequestBluetoothAccessAsync());
+            // Ensure permission before advertising
+        }
+
+        private async Task RequestBluetoothAccessAsync()
+        {
+            var radios = await Radio.GetRadiosAsync();
+            var bluetoothRadio = radios.FirstOrDefault(r => r.Kind == RadioKind.Bluetooth);
+            if (bluetoothRadio != null)
+            {
+                var accessStatus = await Radio.RequestAccessAsync();
+                if (accessStatus != RadioAccessStatus.Allowed)
+                {
+                    Console.WriteLine("❌ Bluetooth access denied. Cannot start advertising.");
+                    return;
+                }
+                Console.WriteLine("✅ Bluetooth access granted.");
+                ConfigureAdvertisement();
+
+            }
+            else
+            {
+                Console.WriteLine("❌ No Bluetooth radio found.");
+                return;
+            }
+
         }
 
         private void ConfigureAdvertisement()
@@ -62,7 +90,12 @@ namespace DigiLimbDesktop.Platforms.Windows
         // ✅ Simulated Connection Trigger
         public void SimulateDeviceConnected()
         {
-            DeviceConnected?.Invoke("Test Device", "00:11:22:33:44:55");
+            // Ensure the event is triggered on the main thread
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                DeviceConnected?.Invoke("Test Device", "00:11:22:33:44:55");
+            });
         }
+
     }
 }

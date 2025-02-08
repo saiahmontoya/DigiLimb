@@ -18,8 +18,12 @@ namespace DigiLimbDesktop
         private readonly ObservableCollection<BluetoothDeviceInfo> _deviceList;
         private IDevice _selectedDevice;
         private bool _isScanning = false;
+        /*
 #if WINDOWS
         private BluetoothAdvertiser _bluetoothAdvertiser;
+#endif */
+#if WINDOWS
+        private BluetoothPeripheral _bluetoothPeripheral;
 #endif
 
 
@@ -31,12 +35,20 @@ namespace DigiLimbDesktop
             DevicesListView.ItemsSource = _deviceList;
 
             RequestBluetoothPermissions();
-
+            /*
 #if WINDOWS
             _bluetoothAdvertiser = new BluetoothAdvertiser();
             _bluetoothAdvertiser.DeviceConnected += OnDeviceConnected;
 #endif
         }
+            */
+#if WINDOWS
+            _bluetoothPeripheral = new BluetoothPeripheral();
+            _bluetoothPeripheral.DeviceConnected += OnDeviceConnected;
+#endif
+        }
+
+
 
         private async Task ToggleScan()
         {
@@ -179,6 +191,7 @@ namespace DigiLimbDesktop
 
         private void btnAllowIncomingConnection_Click(object sender, EventArgs e)
         {
+            /*
 #if WINDOWS
 
             if (btnAllowIncomingConnection.Text == "Allow Incoming Connection")
@@ -200,6 +213,29 @@ namespace DigiLimbDesktop
                 btnScan.IsVisible = true;
             }
 #endif 
+            */
+#if WINDOWS
+            if (btnAllowIncomingConnection.Text == "Allow Incoming Connection")
+            {
+                _bluetoothPeripheral.Start();  //  Now correctly starts advertising
+                Log("Started BLE Peripheral Mode: Advertising DigiLimb Device.");
+
+                btnAllowIncomingConnection.Text = "Cancel";
+                lblAwaitingConnection.IsVisible = true;
+                btnScan.IsVisible = false;
+            }
+            else
+            {
+                _bluetoothPeripheral.StopAdvertising();  // Stop advertising
+                Log("Stopped BLE Peripheral Mode.");
+
+                btnAllowIncomingConnection.Text = "Allow Incoming Connection";
+                lblAwaitingConnection.IsVisible = false;
+                btnScan.IsVisible = true;
+            }
+#else
+    Log("BLE Peripheral Mode is not available on this platform.");
+#endif
         }
 
         private async void RequestBluetoothPermissions()
@@ -227,6 +263,7 @@ namespace DigiLimbDesktop
 
             private void OnDeviceConnected(string deviceName, string deviceId)
         {
+
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 lblConnectedDevice.Text = $"Connected to: {deviceName}\nID: {deviceId}";
