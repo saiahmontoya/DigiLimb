@@ -11,7 +11,10 @@
     <ShellContent
         Title="Login"
         ContentTemplate="{DataTemplate view:Login}"
-        Route="Login" />
+        Route="Login"
+        Shell.FlyoutBehavior="Disabled"
+        FlyoutItemIsVisible="False"/>
+
     <ShellContent
         Title="Connect"
         ContentTemplate="{DataTemplate local:ConnectionPage }"

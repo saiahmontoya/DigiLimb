@@ -93,7 +93,7 @@ public partial class Login : ContentPage
             {
                 await DisplayAlert("Success", "Login Successful!", "OK");
 
-                await Shell.Current.GoToAsync($"{nameof(ConnectionPage)}");
+                await Shell.Current.GoToAsync("//ConnectionPage");
 
             }
             else
