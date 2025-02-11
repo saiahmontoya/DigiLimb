@@ -17,6 +17,9 @@
     <MauiXaml Update="EmulatorPage.xaml">
       <SubType>Designer</SubType>
     </MauiXaml>
+    <MauiXaml Update="View\AddNewDevicePage.xaml">
+      <SubType>Designer</SubType>
+    </MauiXaml>
     <MauiXaml Update="View\Login.xaml">
       <SubType>Designer</SubType>
     </MauiXaml>

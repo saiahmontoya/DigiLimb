@@ -40,7 +40,8 @@
                     HeightRequest="60"
                     VerticalOptions="Start"
                     Text="Add new device"
-                    TextColor="#517891"/>
+                    TextColor="#517891"
+                    Clicked="OnAddDeviceClicked"/>
         </Grid>
     </Grid>
 </ContentPage>
