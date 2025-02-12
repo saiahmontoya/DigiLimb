@@ -51,11 +51,7 @@
 
         <!-- Log Area -->
         <Editor x:Name="txtLogs" HeightRequest="150" IsReadOnly="True" BackgroundColor="LightGray"/>
-
-		<!-- Server/Client Button -->
-		<Button x:Name="btnStartServerClient" Text="Start Server/Client" Clicked="btnStartServerClient_Click" IsVisible="True"/>
-
-
-
-	</VerticalStackLayout>
+        
+        
+    </VerticalStackLayout>
 </ContentPage>
