@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbMobile.ConnectionPage"
+             Title="Connect">
+    <Grid RowDefinitions=".6*,.4*">
+        <Grid Grid.Row="0">
+
+            <RoundRectangle BackgroundColor="#d9ecfa"
+                            CornerRadius="10"
+                            HeightRequest="400"
+                            TranslationY="30"
+                            VerticalOptions="Center"
+                            WidthRequest="350"
+                            />
+            <Label Text="Connect to Computer" 
+                   TranslationY="-130"
+                   TranslationX="50"
+                   VerticalOptions="Center"
+                   FontSize="25"
+                   />
+            <Label Text="Select the computer device that you'd like to connect. To Start a new connection with new device, select add new device."
+                   TranslationY="130"
+                   HorizontalOptions="Center"
+                   Padding=" 50,20,50,20"
+                   FontSize="16"
+                   />
+
+        </Grid>
+        <Grid Grid.Row="1">
+            <Button Margin="60,20,60,0"
+                    BackgroundColor="#57b9FF"
+                    HeightRequest="60"
+                    VerticalOptions="Start"
+                    Text="Connect"
+                    TextColor="#d9ecfa"/>
+
+            <Button Margin="60,120,60,0"
+                    BackgroundColor="#d9ecfa"
+                    HeightRequest="60"
+                    VerticalOptions="Start"
+                    Text="Add new device"
+                    TextColor="#517891"
+                    Clicked="OnAddDeviceClicked"/>
+        </Grid>
+    </Grid>
+</ContentPage>
