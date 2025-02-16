@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|g:\\github\\digilimb\\digilimbmobile\\digilimbmobile\\view\\addnewdevicepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|solutionrelative:digilimbmobile\\view\\addnewdevicepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|g:\\github\\digilimb\\digilimbmobile\\digilimbmobile\\connectionpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|solutionrelative:digilimbmobile\\connectionpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|g:\\github\\digilimb\\digilimbmobile\\digilimbmobile\\view\\addnewdevicepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|solutionrelative:digilimbmobile\\view\\addnewdevicepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|g:\\github\\digilimb\\digilimbmobile\\digilimbmobile\\view\\addnewdevicepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|solutionrelative:digilimbmobile\\view\\addnewdevicepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|g:\\github\\digilimb\\digilimbmobile\\digilimbmobile\\view\\login.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -17,10 +21,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|g:\\github\\digilimb\\digilimbmobile\\digilimbmobile\\view\\login.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|solutionrelative:digilimbmobile\\view\\login.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|g:\\github\\digilimb\\digilimbmobile\\digilimbmobile\\connectionpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|solutionrelative:digilimbmobile\\connectionpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6CE80549-B7D6-4229-B71E-2AD372A6D769}|DigiLimbMobile\\DigiLimbMobile.csproj|g:\\github\\digilimb\\digilimbmobile\\digilimbmobile\\connectionpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -54,8 +54,22 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 5,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Login.xaml",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\View\\Login.xaml",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml",
+              "RelativeToolTip": "DigiLimbMobile\\View\\Login.xaml",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAAEUAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-02-10T10:13:31.027Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 6,
@@ -71,7 +85,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Login.xaml.cs",
               "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml.cs",
               "RelativeDocumentMoniker": "DigiLimbMobile\\View\\Login.xaml.cs",
@@ -84,13 +98,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "AddNewDevicePage.xaml.cs",
               "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs",
               "RelativeDocumentMoniker": "DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs",
               "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs",
               "RelativeToolTip": "DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAYAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-11T07:42:28.614Z",
               "EditorCaption": ""
@@ -110,26 +124,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Login.xaml",
-              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml",
-              "RelativeDocumentMoniker": "DigiLimbMobile\\View\\Login.xaml",
-              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml",
-              "RelativeToolTip": "DigiLimbMobile\\View\\Login.xaml",
-              "ViewState": "AgIAABsAAAAAAAAAAAAAAEUAAAAzAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-02-10T10:13:31.027Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
               "Title": "ConnectionPage.xaml",
               "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\ConnectionPage.xaml",
               "RelativeDocumentMoniker": "DigiLimbMobile\\ConnectionPage.xaml",
               "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\ConnectionPage.xaml",
               "RelativeToolTip": "DigiLimbMobile\\ConnectionPage.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC0AAAALAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-02-06T22:48:13.543Z",
               "EditorCaption": ""

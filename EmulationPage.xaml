@@ -2,9 +2,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.EmulationPage"
              Title="Emulation">
-    <VerticalStackLayout>
+    <VerticalStackLayout Spacing="20" Padding="30">
         <Label Text="Emulation Page" 
                FontSize="24"
+               HorizontalOptions="Center"
+               VerticalOptions="Start"/>
+
+        <!-- Button to simulate keyboard input -->
+        <Button Text="Simulate Keyboard Input: 'A'" 
+                Clicked="OnSimulateKeyboardInputClicked"
+                HorizontalOptions="Center"/>
+
+        <!-- Label to display results -->
+        <Label x:Name="lblStatus" 
+               Text="Status will appear here after actions are triggered."
+               FontSize="16"
                HorizontalOptions="Center"
                VerticalOptions="Center"/>
     </VerticalStackLayout>

@@ -71,6 +71,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
+		<PackageReference Include="Uno.UI" Version="5.6.61" />
 	</ItemGroup>
 
 	<ItemGroup>

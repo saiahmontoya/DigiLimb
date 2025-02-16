@@ -2,12 +2,79 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbMobile.EmulatorPage"
-             Title="Emulators">
-    <VerticalStackLayout>
-        <Label 
-            Text="Emulators"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center"
-            Style="{StaticResource Headline}"/>
-    </VerticalStackLayout>
+             Title="Keyboard Emulator">
+    <ScrollView>
+        <VerticalStackLayout Spacing="10" Padding="30">
+            <Label 
+                Text="Custom Keyboard Emulator"
+                VerticalOptions="Start" 
+                HorizontalOptions="Center"
+                Style="{StaticResource Headline}"/>
+            <Grid HorizontalOptions="Center" VerticalOptions="Start" ColumnSpacing="5" RowSpacing="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <!-- Number Row -->
+                <Button Text="1" Grid.Row="0" Grid.Column="0" Clicked="OnKeyClicked"/>
+                <Button Text="2" Grid.Row="0" Grid.Column="1" Clicked="OnKeyClicked"/>
+                <Button Text="3" Grid.Row="0" Grid.Column="2" Clicked="OnKeyClicked"/>
+                <Button Text="4" Grid.Row="0" Grid.Column="3" Clicked="OnKeyClicked"/>
+                <Button Text="5" Grid.Row="0" Grid.Column="4" Clicked="OnKeyClicked"/>
+                <Button Text="6" Grid.Row="0" Grid.Column="5" Clicked="OnKeyClicked"/>
+                <Button Text="7" Grid.Row="0" Grid.Column="6" Clicked="OnKeyClicked"/>
+                <Button Text="8" Grid.Row="0" Grid.Column="7" Clicked="OnKeyClicked"/>
+                <Button Text="9" Grid.Row="0" Grid.Column="8" Clicked="OnKeyClicked"/>
+                <Button Text="0" Grid.Row="0" Grid.Column="9" Clicked="OnKeyClicked"/>
+                <!-- Top Row -->
+                <Button Text="Q" Grid.Row="1" Grid.Column="0" Clicked="OnKeyClicked"/>
+                <Button Text="W" Grid.Row="1" Grid.Column="1" Clicked="OnKeyClicked"/>
+                <Button Text="E" Grid.Row="1" Grid.Column="2" Clicked="OnKeyClicked"/>
+                <Button Text="R" Grid.Row="1" Grid.Column="3" Clicked="OnKeyClicked"/>
+                <Button Text="T" Grid.Row="1" Grid.Column="4" Clicked="OnKeyClicked"/>
+                <Button Text="Y" Grid.Row="1" Grid.Column="5" Clicked="OnKeyClicked"/>
+                <Button Text="U" Grid.Row="1" Grid.Column="6" Clicked="OnKeyClicked"/>
+                <Button Text="I" Grid.Row="1" Grid.Column="7" Clicked="OnKeyClicked"/>
+                <Button Text="O" Grid.Row="1" Grid.Column="8" Clicked="OnKeyClicked"/>
+                <Button Text="P" Grid.Row="1" Grid.Column="9" Clicked="OnKeyClicked"/>
+                <!-- Home Row -->
+                <Button Text="A" Grid.Row="2" Grid.Column="0" Clicked="OnKeyClicked"/>
+                <Button Text="S" Grid.Row="2" Grid.Column="1" Clicked="OnKeyClicked"/>
+                <Button Text="D" Grid.Row="2" Grid.Column="2" Clicked="OnKeyClicked"/>
+                <Button Text="F" Grid.Row="2" Grid.Column="3" Clicked="OnKeyClicked"/>
+                <Button Text="G" Grid.Row="2" Grid.Column="4" Clicked="OnKeyClicked"/>
+                <Button Text="H" Grid.Row="2" Grid.Column="5" Clicked="OnKeyClicked"/>
+                <Button Text="J" Grid.Row="2" Grid.Column="6" Clicked="OnKeyClicked"/>
+                <Button Text="K" Grid.Row="2" Grid.Column="7" Clicked="OnKeyClicked"/>
+                <Button Text="L" Grid.Row="2" Grid.Column="8" Clicked="OnKeyClicked"/>
+                <Button Text="Enter" Grid.Row="2" Grid.Column="9" Clicked="OnKeyClicked"/>
+                <!-- Bottom Row -->
+                <Button Text="Z" Grid.Row="3" Grid.Column="0" Clicked="OnKeyClicked"/>
+                <Button Text="X" Grid.Row="3" Grid.Column="1" Clicked="OnKeyClicked"/>
+                <Button Text="C" Grid.Row="3" Grid.Column="2" Clicked="OnKeyClicked"/>
+                <Button Text="V" Grid.Row="3" Grid.Column="3" Clicked="OnKeyClicked"/>
+                <Button Text="B" Grid.Row="3" Grid.Column="4" Clicked="OnKeyClicked"/>
+                <Button Text="N" Grid.Row="3" Grid.Column="5" Clicked="OnKeyClicked"/>
+                <Button Text="M" Grid.Row="3" Grid.Column="6" Clicked="OnKeyClicked"/>
+                <Button Text="," Grid.Row="3" Grid.Column="7" Clicked="OnKeyClicked"/>
+                <Button Text="." Grid.Row="3" Grid.Column="8" Clicked="OnKeyClicked"/>
+                <Button Text="Space" Grid.Row="3" Grid.Column="9" Grid.ColumnSpan="2" Clicked="OnKeyClicked"/>
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

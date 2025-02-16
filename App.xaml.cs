@@ -5,11 +5,18 @@
         public App()
         {
             InitializeComponent();
+            InitializeBluetoothService();
+        }
+
+        private void InitializeBluetoothService()
+        {
+            BluetoothService bluetoothService = new BluetoothService();
+            bluetoothService.InitializeGattService();
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell()); // This ensures AppShell is the entry point
+            return new Window(new AppShell());
         }
     }
 }
