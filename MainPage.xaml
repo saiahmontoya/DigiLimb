@@ -1,15 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DigiLimbDesktop.MainPage"
-             Title="Main Menu"
-             BackgroundColor="Black">
+             x:Class="DigiLimb.MainPage">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="30,50" Spacing="25" HorizontalOptions="Center">
+	<ScrollView>
+		<VerticalStackLayout x:Name="DesktopView" Padding="30,50" Spacing="25" HorizontalOptions="Center" IsVisible="False">
 
-            <!-- Title Label -->
-            <Label x:Name="lblDeviceName"
+			<!-- Desktop Title -->
+			<Label x:Name="lblDeviceName"
                    Text="DigiLimb Dashboard"
                    FontSize="36"
                    FontAttributes="Bold"
@@ -17,21 +15,8 @@
                    TextColor="Cyan"
                    Margin="0,0,0,20"/>
 
-            <!-- Clicker Button -->
-            <Button x:Name="CounterBtn"
-                    Text="Click me" 
-                    SemanticProperties.Hint="Counts the number of times you click"
-                    Clicked="OnCounterClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="Lime"
-                    BorderWidth="2"
-                    HeightRequest="60"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
-
-            <!-- Functional Buttons -->
-            <Button Text="Connections"
+			<!-- Desktop Functional Buttons -->
+			<Button Text="Connections"
                     Clicked="OnConnectionsClicked"
                     BackgroundColor="Black"
                     TextColor="White"
@@ -41,7 +26,7 @@
                     WidthRequest="250"
                     HorizontalOptions="Center"/>
 
-            <Button Text="Emulation"
+			<Button Text="Emulation"
                     Clicked="OnEmulationClicked"
                     BackgroundColor="Black"
                     TextColor="White"
@@ -51,7 +36,7 @@
                     WidthRequest="250"
                     HorizontalOptions="Center"/>
 
-            <Button Text="Settings"
+			<Button Text="Settings"
                     Clicked="OnSettingsClicked"
                     BackgroundColor="Black"
                     TextColor="White"
@@ -61,7 +46,7 @@
                     WidthRequest="250"
                     HorizontalOptions="Center"/>
 
-            <Button Text="Support"
+			<Button Text="Support"
                     Clicked="OnSupportClicked"
                     BackgroundColor="Black"
                     TextColor="White"
@@ -71,10 +56,8 @@
                     WidthRequest="250"
                     HorizontalOptions="Center"/>
 
-            
-
-            <!-- Quit Button -->
-            <Button Text="Quit"
+			<!-- Quit Button -->
+			<Button Text="Quit"
                     Clicked="OnQuitClicked"
                     BackgroundColor="Black"
                     TextColor="White"
@@ -85,7 +68,24 @@
                     HorizontalOptions="Center"
                     Margin="0,20,0,0"/>
 
-        </VerticalStackLayout>
-    </ScrollView>
+		</VerticalStackLayout>
+
+		<VerticalStackLayout x:Name="MobileView" Padding="30,0" Spacing="25" IsVisible="False">
+
+			<!-- Mobile Image -->
+			<Image Source="dotnet_bot.png"
+                   HeightRequest="185"
+                   Aspect="AspectFit"
+                   SemanticProperties.Description="dot net bot in a hovercraft number nine"/>
+
+			<!-- Counter Button -->
+			<Button x:Name="CounterBtn"
+                    Text="Click me"
+                    SemanticProperties.Hint="Counts the number of times you click"
+                    Clicked="OnCounterClicked"
+                    HorizontalOptions="Fill"/>
+
+		</VerticalStackLayout>
+	</ScrollView>
 
 </ContentPage>

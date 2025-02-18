@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimb.ConnectionPage">
+
+    <Grid>
+        <!-- Mobile UI -->
+        <Grid x:Name="MobileView" RowDefinitions=".6*,.4*" IsVisible="False">
+            <Grid Grid.Row="0">
+                <RoundRectangle BackgroundColor="#d9ecfa"
+                                CornerRadius="10"
+                                HeightRequest="400"
+                                TranslationY="30"
+                                VerticalOptions="Center"
+                                WidthRequest="350"/>
+                <Label Text="Connect to Computer" 
+                       TranslationY="-130"
+                       TranslationX="50"
+                       VerticalOptions="Center"
+                       FontSize="25"/>
+                <Label Text="Select the computer device that you'd like to connect. To start a new connection with a new device, select add new device."
+                       TranslationY="130"
+                       HorizontalOptions="Center"
+                       Padding="50,20,50,20"
+                       FontSize="16"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Button Margin="60,20,60,0"
+                        BackgroundColor="#57b9FF"
+                        HeightRequest="60"
+                        VerticalOptions="Start"
+                        Text="Connect"
+                        TextColor="#d9ecfa"/>
+                <Button Margin="60,120,60,0"
+                        BackgroundColor="#d9ecfa"
+                        HeightRequest="60"
+                        VerticalOptions="Start"
+                        Text="Add new device"
+                        TextColor="#517891"
+                        Clicked="OnAddDeviceClicked"/>
+            </Grid>
+        </Grid>
+
+        <!-- Desktop UI -->
+        <VerticalStackLayout x:Name="DesktopView" Padding="20" Spacing="20" IsVisible="False">
+            <Button x:Name="btnScan" Text="Start Scan" Clicked="btnScan_Click" IsVisible="True" />
+            <Button x:Name="btnAllowIncomingConnection" Text="Allow Incoming Connection" Clicked="btnAllowIncomingConnection_Click" IsVisible="True" />
+            <Label x:Name="lblAwaitingConnection" Text="Awaiting connection..." IsVisible="False" FontSize="18" Margin="0,10,0,5" TextColor="OrangeRed" />
+            <Label x:Name="lblConnectedDevice" Text="No device connected" TextColor="Red" FontSize="16" IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Label Text="Discovered Devices:" FontSize="18" Margin="0,10,0,5" IsVisible="False" x:Name="lblDevicesList" />
+
+            <ScrollView HeightRequest="300" IsVisible="False" x:Name="devicesScrollView">
+                <CollectionView x:Name="DevicesListView" SelectionMode="Single" SelectionChanged="OnDeviceSelected">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Padding="10" Margin="5" BorderColor="Gray" BackgroundColor="LightGray">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding DisplayName}" FontSize="16" FontAttributes="Bold"/>
+                                    <Label Text="{Binding DeviceId}" FontSize="14" />
+                                    <Label Text="{Binding ManufacturerData}" FontSize="12" />
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </ScrollView>
+
+            <Button x:Name="btnConnect" Text="Connect to Selected Device" Clicked="btnConnect_Click" IsEnabled="False" />
+            <Button x:Name="btnBack" Text="Back" Clicked="btnBack_Click" IsVisible="True" />
+            <Label x:Name="lblPairedDevice" FontSize="18" Text="No device paired" Margin="0,10,0,5" TextColor="Green" IsVisible="False" />
+            <Editor x:Name="txtLogs" HeightRequest="150" IsReadOnly="True" BackgroundColor="LightGray"/>
+        </VerticalStackLayout>
+    </Grid>
+
+</ContentPage>

@@ -60,13 +60,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-		<PackageReference Include="Plugin.BLE" Version="3.0.0" />
+	  <AndroidResource Remove="Save Palisades\**" />
+	  <Compile Remove="Save Palisades\**" />
+	  <EmbeddedResource Remove="Save Palisades\**" />
+	  <MauiCss Remove="Save Palisades\**" />
+	  <MauiXaml Remove="Save Palisades\**" />
+	  <None Remove="Save Palisades\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Save Palisades\" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+		<PackageReference Include="Plugin.BLE" Version="3.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

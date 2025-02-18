@@ -1,26 +1,52 @@
-
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Security.Cryptography;
 using System.Text;
-
 using System.Text.Json;
 
-namespace DigiLimbDesktop
+namespace DigiLimb
 {
     public partial class LoginPage : ContentPage
-
     {
         private MongoClient client;
         private IMongoDatabase database;
         private IMongoCollection<User> userCollection;
 
-       
         public LoginPage()
         {
             InitializeComponent();
+            ConfigurePlatformUI();
             InitializeMongoDbConnection();
+        }
+
+        private void ConfigurePlatformUI()
+        {
+#if WINDOWS
+            Title = "Login";
+            TitleLabel.Text = "DigiLimb";
+            TitleLabel.TextColor = Colors.White;
+            BackgroundColor = Colors.Black;
+
+            // Desktop Style Adjustments
+            txtEmail.TextColor = Colors.White;
+            txtEmail.BackgroundColor = Colors.Gray;
+            txtPassword.TextColor = Colors.White;
+            txtPassword.BackgroundColor = Colors.Gray;
+            LoginButton.BackgroundColor = Colors.Blue;
+            LoginButton.TextColor = Colors.White;
+            RegisterButton.BackgroundColor = Colors.Green;
+            RegisterButton.TextColor = Colors.White;
+#else
+            Title = "Login";
+            TitleLabel.Text = "Welcome to DigiLimb";
+            TitleLabel.TextColor = Colors.Black;
+            MobileLoginGrid.IsVisible = true; // Show Mobile UI
+            LoginButton.BackgroundColor = Color.FromArgb("#57b9FF");
+            LoginButton.TextColor = Color.FromArgb("#d9ecfa");
+            RegisterButton.BackgroundColor = Color.FromArgb("#d9ecfa");
+            RegisterButton.TextColor = Color.FromArgb("#517891");
+#endif
         }
 
         public class User
@@ -74,7 +100,7 @@ namespace DigiLimbDesktop
 
         private async void OnLoginClicked(object sender, EventArgs e)
         {
-            string email = txtEmail.Text.Trim();
+            string email = txtEmail.Text?.Trim();
             string password = txtPassword.Text;
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
@@ -97,8 +123,11 @@ namespace DigiLimbDesktop
                 {
                     await DisplayAlert("Success", "Login Successful!", "OK");
 
-                    
+#if WINDOWS
                     await Navigation.PushAsync(new MainPage(email));
+#else
+                    await Shell.Current.GoToAsync("//ConnectionPage");
+#endif
                 }
                 else
                 {
@@ -113,7 +142,7 @@ namespace DigiLimbDesktop
 
         private async void OnRegisterClicked(object sender, EventArgs e)
         {
-            string email = txtEmail.Text.Trim();
+            string email = txtEmail.Text?.Trim();
             string password = txtPassword.Text;
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))

@@ -1,46 +1,51 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DigiLimbDesktop.LoginPage"
-             BackgroundColor="Black">
+             x:Class="DigiLimb.LoginPage">
 
-    <VerticalStackLayout Spacing="20" Padding="30">
-        <!-- App Title -->
-        <Label Text="DigiLimb" 
-               FontSize="36" 
-               FontAttributes="Bold" 
-               HorizontalOptions="Center" 
-               TextColor="White"/>
+	<VerticalStackLayout Spacing="20" Padding="30">
 
-        <!-- Email Entry -->
-        <Entry x:Name="txtEmail"
+		<!-- Title (Mobile & Desktop) -->
+		<Label x:Name="TitleLabel"
+               FontSize="36"
+               FontAttributes="Bold"
+               HorizontalOptions="Center"/>
+
+		<!-- Mobile Login Image -->
+		<Grid x:Name="MobileLoginGrid" RowDefinitions=".3*, .7*" IsVisible="False">
+			<Image Aspect="AspectFill" Source="digilogin.webp"/>
+			<Grid BackgroundColor="#90D5FF" Opacity=".9"/>
+			<Grid ColumnDefinitions="*,*">
+				<Image Aspect="AspectFit"
+                       HeightRequest="120"
+                       Source="applogo.jpg!sw800" />
+			</Grid>
+		</Grid>
+
+		<!-- Email Entry -->
+		<Entry x:Name="txtEmail"
                Placeholder="Email"
                Keyboard="Email"
-               TextColor="White"
-               BackgroundColor="Gray"
                HeightRequest="50"/>
 
-        <!-- Password Entry -->
-        <Entry x:Name="txtPassword"
+		<!-- Password Entry -->
+		<Entry x:Name="txtPassword"
                Placeholder="Password"
                IsPassword="True"
-               TextColor="White"
-               BackgroundColor="Gray"
                HeightRequest="50"/>
 
-        <!-- Login Button -->
-        <Button Text="Login"
+		<!-- Login Button -->
+		<Button x:Name="LoginButton"
+                Text="Login"
                 Clicked="OnLoginClicked"
-                BackgroundColor="Blue"
-                TextColor="White"
-                HeightRequest="50"/>
+                HeightRequest="60"/>
 
-        <!-- Register Button -->
-        <Button Text="Register"
+		<!-- Register Button -->
+		<Button x:Name="RegisterButton"
+                Text="Register"
                 Clicked="OnRegisterClicked"
-                BackgroundColor="Green"
-                TextColor="White"
-                HeightRequest="50"/>
-    </VerticalStackLayout>
+                HeightRequest="60"/>
+
+	</VerticalStackLayout>
 
 </ContentPage>

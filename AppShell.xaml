@@ -1,39 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <Shell
-    x:Class="DigiLimbDesktop.AppShell"
+    x:Class="DigiLimb.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:DigiLimbDesktop"
+    xmlns:local="clr-namespace:DigiLimb"
+    xmlns:view="clr-namespace:DigiLimb.View"
     Shell.FlyoutBehavior="Flyout">
 
-    <!-- Set LoginPage as the first page -->
-    <ShellContent
+	<!-- Login Page -->
+	<ShellContent
+        x:Name="LoginShellContent"
         Title="Login"
-        ContentTemplate="{DataTemplate local:LoginPage}"
-        Route="LoginPage" />
+        Route="Login"
+        Shell.FlyoutBehavior="Disabled"
+        FlyoutItemIsVisible="False" />
 
-    <ShellContent
+	<!-- Home Page -->
+	<ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
 
-    <ShellContent
+	<!-- Connection Page -->
+	<ShellContent
+        x:Name="ConnectionShellContent"
         Title="Connections"
-        ContentTemplate="{DataTemplate local:ConnectionsPage}"
-        Route="ConnectionsPage" />
+        Route="ConnectionPage" />
 
-    <ShellContent
+	<!-- Emulation/Emulators Page -->
+	<ShellContent
+        x:Name="EmulationShellContent"
+        Title="Emulation"
+        Route="EmulatorPage" />
+
+	<!-- Desktop-Specific Pages -->
+	<ShellContent x:Name="SettingsShellContent"
         Title="Settings"
-        ContentTemplate="{DataTemplate local:SettingsPage}"
         Route="SettingsPage" />
 
-    <ShellContent
-        Title="Emulation"
-        ContentTemplate="{DataTemplate local:EmulationPage}"
-        Route="EmulationPage" />
-    
-    <ShellContent
+	<ShellContent x:Name="SupportShellContent"
         Title="Support"
-        ContentTemplate="{DataTemplate local:SupportPage}"
         Route="SupportPage" />
 
 </Shell>
