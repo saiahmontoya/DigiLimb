@@ -2,22 +2,25 @@ using Microsoft.Maui.Controls;
 using System;
 using System.Threading.Tasks;
 
-class InputCapture
+namespace DigiLimb // Ensure the class is inside the correct namespace
 {
-	private ClientService _client;
+    class InputCapture
+    {
+        private ClientService clientService;  // Renamed from _client to clientService
 
-	public InputCapture(ClientService client)
-	{
-		_client = client;
-	}
+        public InputCapture(ClientService client)
+        {
+            clientService = client;
+        }
 
-	public async Task OnKeyPress(string key)
-	{
-		await _client.SendInput($"KEY:{key}");
-	}
+        public async Task OnKeyPress(string key)
+        {
+            await clientService.SendInput($"KEY:{key}");
+        }
 
-	public async Task OnMouseMove(int dx, int dy)
-	{
-		await _client.SendInput($"MOUSE:{dx},{dy}");
-	}
+        public async Task OnMouseMove(int dx, int dy)
+        {
+            await clientService.SendInput($"MOUSE:{dx},{dy}");
+        }
+    }
 }
