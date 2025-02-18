@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 
-namespace DigiLimb
+namespace DigiLimbDesktop
 {
     public partial class App : Application
     {

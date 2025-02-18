@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace DigiLimb
+namespace DigiLimbDesktop
 {
     public partial class LoginPage : ContentPage
     {

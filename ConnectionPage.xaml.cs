@@ -17,7 +17,7 @@ using DigiLimbDesktop.Platforms.Windows;
 using Microsoft.Maui.ApplicationModel;
 #endif
 
-namespace DigiLimb
+namespace DigiLimbDesktop
 {
     public partial class ConnectionPage : ContentPage
     {

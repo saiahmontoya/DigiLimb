@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 
 #if WINDOWS
-namespace DigiLimb
+namespace DigiLimbDesktop
 {
     class KeyboardSimulator
     {

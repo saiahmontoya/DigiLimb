@@ -1,4 +1,5 @@
-﻿namespace DigiLimb
+﻿
+namespace DigiLimbDesktop
 {
     public partial class AppShell : Shell
     {
@@ -12,15 +13,15 @@
         {
 #if WINDOWS
             LoginShellContent.ContentTemplate = new DataTemplate(typeof(LoginPage));
-            ConnectionShellContent.ContentTemplate = new DataTemplate(typeof(ConnectionsPage));
+            ConnectionShellContent.ContentTemplate = new DataTemplate(typeof(ConnectionPage));
             EmulationShellContent.ContentTemplate = new DataTemplate(typeof(EmulationPage));
 
             SettingsShellContent.IsVisible = true;
             SupportShellContent.IsVisible = true;
 #else
-            LoginShellContent.ContentTemplate = new DataTemplate(typeof(view.Login));
+            LoginShellContent.ContentTemplate = new DataTemplate(typeof(LoginPage));
             ConnectionShellContent.ContentTemplate = new DataTemplate(typeof(ConnectionPage));
-            EmulationShellContent.ContentTemplate = new DataTemplate(typeof(EmulatorPage));
+            EmulationShellContent.ContentTemplate = new DataTemplate(typeof(EmulationPage));
 
             SettingsShellContent.IsVisible = false;
             SupportShellContent.IsVisible = false;

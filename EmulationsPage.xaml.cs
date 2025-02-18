@@ -1,4 +1,4 @@
-namespace DigiLimb
+namespace DigiLimbDesktop
 {
     public partial class EmulationPage : ContentPage
     {

@@ -2,7 +2,7 @@ using Microsoft.Maui.Controls;
 using System;
 using System.Threading.Tasks;
 
-namespace DigiLimb // Ensure the class is inside the correct namespace
+namespace DigiLimbDesktop // Ensure the class is inside the correct namespace
 {
     class InputCapture
     {
