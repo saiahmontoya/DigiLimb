@@ -1,4 +1,4 @@
-using Plugin.BLE;
+﻿using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Microsoft.Maui.Controls;
@@ -9,6 +9,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace DigiLimbDesktop
 {
@@ -44,10 +45,17 @@ namespace DigiLimbDesktop
             */
 #if WINDOWS
             _bluetoothPeripheral = new BluetoothPeripheral(_adapter);
+            _bluetoothPeripheral.DeviceInfoReceived += OnDeviceInfoReceived;
+
+            // Ensure event subscription is active
+            _bluetoothPeripheral.DeviceConnected -= OnDeviceConnected;
             _bluetoothPeripheral.DeviceConnected += OnDeviceConnected;
+
+            _bluetoothPeripheral.DeviceDisconnected -= OnDeviceDisconnected;
             _bluetoothPeripheral.DeviceDisconnected += OnDeviceDisconnected;
 
             _bluetoothPeripheral.MonitorDeviceConnections();
+            Console.WriteLine("?? Subscribed to BluetoothPeripheral Events.");
 #endif
         }
 
@@ -67,14 +75,14 @@ namespace DigiLimbDesktop
                     lblDevicesList.IsVisible = false; // Hide "Discovered Devices" label
                     devicesScrollView.IsVisible = false; // Hide the device list
                     _deviceList.Clear(); // Clear the list when scan stops
-                    Log("Scan stopped.");
+                    Debug.WriteLine("Scan stopped.");
                     return;
                 }
 
                 // Ensure Bluetooth is enabled
                 if (CrossBluetoothLE.Current.State != BluetoothState.On)
                 {
-                    Log("Bluetooth is off. Please enable it.");
+                    Debug.WriteLine("Bluetooth is off. Please enable it.");
                     return;
                 }
 
@@ -91,12 +99,12 @@ namespace DigiLimbDesktop
 
                 lblDevicesList.IsVisible = true; // Show "Discovered Devices" label
                 devicesScrollView.IsVisible = true; // Show devices list
-                Log("Scanning for Bluetooth devices...");
+                Debug.WriteLine("Scanning for Bluetooth devices...");
                 await _adapter.StartScanningForDevicesAsync();
             }
             catch (Exception ex)
             {
-                Log($"Scan error: {ex.Message}");
+                Debug.WriteLine($"Scan error: {ex.Message}");
             }
         }
 
@@ -136,7 +144,7 @@ namespace DigiLimbDesktop
                 };
 
                 MainThread.BeginInvokeOnMainThread(() => _deviceList.Add(deviceInfo));
-                Log($"Discovered: {deviceType}");
+                Debug.WriteLine($"Discovered: {deviceType}");
             }
         }
 
@@ -151,7 +159,7 @@ namespace DigiLimbDesktop
             {
                 _selectedDevice = _adapter.DiscoveredDevices.FirstOrDefault(d => d.Id.ToString() == selected.DeviceId);
                 btnConnect.IsEnabled = _selectedDevice != null;
-                Log($"Selected: {selected.DisplayName}");
+                Debug.WriteLine($"Selected: {selected.DisplayName}");
             }
         }
 
@@ -162,7 +170,7 @@ namespace DigiLimbDesktop
             try
             {
                 await _adapter.ConnectToDeviceAsync(_selectedDevice);
-                Log($"Connected to {_selectedDevice.Name}");
+                Debug.WriteLine($"Connected to {_selectedDevice.Name}");
 
                 // Show connected device info and hide device list
                 lblPairedDevice.Text = $"Connected to: {_selectedDevice.Name}";
@@ -177,14 +185,11 @@ namespace DigiLimbDesktop
             }
             catch (Exception ex)
             {
-                Log($"Connection failed: {ex.Message}");
+                Debug.WriteLine($"Connection failed: {ex.Message}");
             }
         }
 
-        private void Log(string message)
-        {
-            MainThread.BeginInvokeOnMainThread(() => txtLogs.Text += $"{message}{Environment.NewLine}");
-        }
+        
 
         private async void btnBack_Click(object sender, EventArgs e)
         {
@@ -200,7 +205,7 @@ namespace DigiLimbDesktop
             if (btnAllowIncomingConnection.Text == "Allow Incoming Connection")
             {
                 _bluetoothAdvertiser.StartAdvertising();
-                Log("Started advertising DigiLimbDevice.");
+                Debug.WriteLine("Started advertising DigiLimbDevice.");
 
                 btnAllowIncomingConnection.Text = "Cancel";
                 lblAwaitingConnection.IsVisible = true;
@@ -209,7 +214,7 @@ namespace DigiLimbDesktop
             else
             {
                 _bluetoothAdvertiser.StopAdvertising();
-                Log("Stopped advertising DigiLimbDevice.");
+                Debug.WriteLine("Stopped advertising DigiLimbDevice.");
 
                 btnAllowIncomingConnection.Text = "Allow Incoming Connection";
                 lblAwaitingConnection.IsVisible = false;
@@ -217,11 +222,14 @@ namespace DigiLimbDesktop
             }
 #endif 
             */
+
 #if WINDOWS
+// Broadcast gatt service with defined characteristics
             if (btnAllowIncomingConnection.Text == "Allow Incoming Connection")
             {
                 _bluetoothPeripheral.Start();  //  Now correctly starts advertising
-                Log("Started BLE Peripheral Mode: Advertising DigiLimb Device.");
+                Debug.WriteLine("Started BLE Peripheral Mode: Advertising DigiLimb Device.");
+                Debug.WriteLine("GATT started");
 
                 btnAllowIncomingConnection.Text = "Cancel";
                 lblAwaitingConnection.IsVisible = true;
@@ -230,14 +238,14 @@ namespace DigiLimbDesktop
             else
             {
                 _bluetoothPeripheral.StopAdvertising();  // Stop advertising
-                Log("Stopped BLE Peripheral Mode.");
+                Debug.WriteLine("Stopped BLE Peripheral Mode.");
 
                 btnAllowIncomingConnection.Text = "Allow Incoming Connection";
                 lblAwaitingConnection.IsVisible = false;
                 btnScan.IsVisible = true;
             }
 #else
-    Log("BLE Peripheral Mode is not available on this platform.");
+            Debug.WriteLine("BLE Peripheral Mode is not available on this platform.");
 #endif
         }
 
@@ -252,33 +260,72 @@ namespace DigiLimbDesktop
 
             if (status != PermissionStatus.Granted)
             {
-                Log("Location permission is required for Bluetooth scanning.");
+                Debug.WriteLine("Location permission is required for Bluetooth scanning.");
                 return;
             }
 
             // Check if Bluetooth is enabled
             if (CrossBluetoothLE.Current.State != BluetoothState.On)
             {
-                Log("Bluetooth is off. Please enable it.");
+                Debug.WriteLine("Bluetooth is off. Please enable it.");
             }
         }
 
 
-        private void OnDeviceConnected(object sender, IDevice device)
+#if WINDOWS
+        private void OnDeviceInfoReceived(object sender, ReceivedDeviceInfo deviceInfo)
         {
+
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                lblConnectedDevice.Text = $"Connected to: {device.Name}\nID: {device.Id}";
+                if (lblConnectedDevice != null)
+                {
+                    lblConnectedDevice.Text = $"Connected to: {deviceInfo.DeviceName}\nID: {deviceInfo.DeviceId}";
+                    lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
+                    lblConnectedDevice.IsVisible = true;
+                }
+            });
+
+            Console.WriteLine($"📡 UI Updated: Connected to {deviceInfo.DeviceName} (ID: {deviceInfo.DeviceId})");
+        }
+#endif
+
+
+        // Update display if a device is connected
+        private void OnDeviceConnected(object? sender, IDevice device)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                if (lblConnectedDevice == null)
+                {
+                    Debug.WriteLine("❌ lblConnectedDevice is null! UI is not ready.");
+                    return;
+                }
+
+                if (device == null)
+                {
+                    Debug.WriteLine("❌ Device is null! No valid connection.");
+                    return;
+                }
+                // Update UI with connected device info
+                lblConnectedDevice.Text = $"Connected to: {device.Name ?? "Unknown Device"}\nID: {device.Id}";
                 lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
                 lblConnectedDevice.IsVisible = true;
 
-                // Hide other elements
+                // Hide unnecessary UI elements
                 btnAllowIncomingConnection.IsVisible = false;
                 lblAwaitingConnection.IsVisible = false;
-            });
 
-            Log($"Device Connected: {device.Name} (ID: {device.Id})");
+                Debug.WriteLine($"✅ Device Connected: {device.Name} (ID: {device.Id})");
+
+                // Show a confirmation alert
+                await DisplayAlert("Paired Successfully", $"Paired to {device.Name}.", "OK");
+
+                // Navigate to Main Menu after confirmation
+                await Shell.Current.GoToAsync("//MainMenu");
+            });
         }
+
 
         private void OnDeviceDisconnected(object sender, IDevice device)
         {
@@ -293,7 +340,7 @@ namespace DigiLimbDesktop
                 lblAwaitingConnection.IsVisible = true;
             });
 
-            Log("Device Disconnected.");
+            Debug.WriteLine("Device Disconnected.");
         }
 
     }

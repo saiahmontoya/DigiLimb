@@ -20,6 +20,8 @@ namespace DigiLimbDesktop.Platforms.Windows
             // Ensure permission before advertising
         }
 
+
+        // Check bluetooth permissions
         private async Task RequestBluetoothAccessAsync()
         {
             var radios = await Radio.GetRadiosAsync();
@@ -73,6 +75,7 @@ namespace DigiLimbDesktop.Platforms.Windows
             Console.WriteLine("🔹 BLE Advertising Stopped.");
         }
 
+        // Buffers to trasnmit bluetooth metadata
         private IBuffer CreateUuidBuffer(ushort uuid)
         {
             var writer = new DataWriter();

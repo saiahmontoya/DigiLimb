@@ -3,89 +3,97 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.MainPage"
              Title="Main Menu"
-             BackgroundColor="Black">
+             BackgroundColor="#EAEAEA">
+    <!-- 🔹 Light Gray Background -->
 
-    <ScrollView>
-        <VerticalStackLayout Padding="30,50" Spacing="25" HorizontalOptions="Center">
+    <Grid RowDefinitions="Auto, *, Auto" Padding="0">
 
-            <!-- Title Label -->
+        <!-- 🔹 Title Box (Fixed Shape & Visibility) -->
+        <Frame BackgroundColor="White"
+               CornerRadius="15"
+               HeightRequest="80"  
+            Margin="30,50,30,20"
+               Padding="15"
+               HasShadow="True"
+               HorizontalOptions="Fill"
+               VerticalOptions="Start">
+            <!-- 🔹 Positions title correctly -->
+
             <Label x:Name="lblDeviceName"
                    Text="DigiLimb Dashboard"
-                   FontSize="36"
+                   FontSize="30"
                    FontAttributes="Bold"
                    HorizontalTextAlignment="Center"
-                   TextColor="Cyan"
-                   Margin="0,0,0,20"/>
+                   TextColor="#2D2D2D" 
+                VerticalOptions="Center"/>
+        </Frame>
 
-            <!-- Clicker Button -->
-            <Button x:Name="CounterBtn"
-                    Text="Click me" 
-                    SemanticProperties.Hint="Counts the number of times you click"
-                    Clicked="OnCounterClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="Lime"
-                    BorderWidth="2"
-                    HeightRequest="60"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
+        <!-- 🔹 Menu Container -->
+        <Grid Grid.Row="1">
+            <Frame Margin="30"
+                   Padding="40,30,40,40"
+                   CornerRadius="20"
+                   BackgroundColor="White"
+                   HasShadow="True">
 
-            <!-- Functional Buttons -->
-            <Button Text="Connections"
-                    Clicked="OnConnectionsClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="Cyan"
-                    BorderWidth="2"
-                    HeightRequest="60"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
+                <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
 
-            <Button Text="Emulation"
-                    Clicked="OnEmulationClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="Cyan"
-                    BorderWidth="2"
-                    HeightRequest="60"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
+                    <!-- Connections Button -->
+                    <Button Text="Connections"
+                            Clicked="OnConnectionsClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            HeightRequest="55"
+                            FontSize="18"
+                            CornerRadius="10"
+                            WidthRequest="250"/>
 
-            <Button Text="Settings"
-                    Clicked="OnSettingsClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="Cyan"
-                    BorderWidth="2"
-                    HeightRequest="60"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
+                    <!-- Emulation Button -->
+                    <Button Text="Emulation"
+                            Clicked="OnEmulationClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            HeightRequest="55"
+                            FontSize="18"
+                            CornerRadius="10"
+                            WidthRequest="250"/>
 
-            <Button Text="Support"
-                    Clicked="OnSupportClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="Cyan"
-                    BorderWidth="2"
-                    HeightRequest="60"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
+                    <!-- Settings Button -->
+                    <Button Text="Settings"
+                            Clicked="OnSettingsClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            HeightRequest="55"
+                            FontSize="18"
+                            CornerRadius="10"
+                            WidthRequest="250"/>
 
-            
+                    <!-- Support Button -->
+                    <Button Text="Support"
+                            Clicked="OnSupportClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            HeightRequest="55"
+                            FontSize="18"
+                            CornerRadius="10"
+                            WidthRequest="250"/>
 
-            <!-- Quit Button -->
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+
+        <!-- 🔹 Quit Button (Now Visible & Fixed) -->
+        <Grid Grid.Row="2" Margin="0,20,0,20">
             <Button Text="Quit"
                     Clicked="OnQuitClicked"
-                    BackgroundColor="Black"
+                    BackgroundColor="#d9534f"
                     TextColor="White"
-                    BorderColor="Red"
-                    BorderWidth="2"
                     HeightRequest="50"
+                    FontSize="18"
+                    CornerRadius="10"
                     WidthRequest="250"
-                    HorizontalOptions="Center"
-                    Margin="0,20,0,0"/>
+                    HorizontalOptions="Center"/>
+        </Grid>
 
-        </VerticalStackLayout>
-    </ScrollView>
-
+    </Grid>
 </ContentPage>

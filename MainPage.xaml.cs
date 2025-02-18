@@ -26,14 +26,7 @@ namespace DigiLimbDesktop
             LoadUserDeviceNameAsync(email);
         }
 
-        // Click Counter Logic
-        private int _clickCount = 0;
-        private void OnCounterClicked(object sender, EventArgs e)
-        {
-            _clickCount++;
-            CounterBtn.Text = $"Clicked {_clickCount} times!";
-        }
-
+        
         // Navigate to Connections Page
         private async void OnConnectionsClicked(object sender, EventArgs e)
         {
