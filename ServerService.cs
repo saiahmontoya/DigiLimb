@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 public static class NetworkHelper
@@ -23,87 +24,199 @@ public static class NetworkHelper
     }
 }
 
-public static class UdpBroadcaster
-{
-    /// <summary>
-    /// Continuously broadcasts the server's IP address over UDP.
-    /// </summary>
-    public static async Task BroadcastServerIP(int port = 8888)
-    {
-        string localIP = NetworkHelper.GetLocalIPAddress();
-        using UdpClient udpClient = new UdpClient();
-        udpClient.EnableBroadcast = true;
-
-        IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, port);
-        byte[] data = Encoding.UTF8.GetBytes(localIP);
-
-        while (true)
-        {
-            await udpClient.SendAsync(data, data.Length, endPoint);
-            Console.WriteLine($"📡 Broadcasted IP: {localIP} on port {port}");
-            await Task.Delay(5000); // Broadcast every 5 seconds
-        }
-    }
-}
-
 public class ServerService
 {
     private TcpListener _server;
     private bool _isRunning = false;
+    private int _serverPort;
+    private CancellationTokenSource _cancellationTokenSource;
 
     /// <summary>
-    /// Starts the server and listens for incoming connections.
+    /// Starts the server on an available port.
     /// </summary>
-    public async Task StartServer(int port = 5000)
+    public async Task StartServer(int startPort = 5000, int endPort = 6000)
     {
-        string localIP = NetworkHelper.GetLocalIPAddress();
-        Console.WriteLine($"🚀 Server starting on {localIP}:{port}");
-
-        _server = new TcpListener(IPAddress.Any, port);
-        _server.Start();
-        _isRunning = true;
-
-        Console.WriteLine("✅ Server started. Waiting for connections...");
-
-        while (_isRunning)
+        if (_isRunning)
         {
-            TcpClient client = await _server.AcceptTcpClientAsync();
-            Console.WriteLine("🔗 Client connected!");
-            _ = Task.Run(() => HandleClient(client));
+            Console.WriteLine("⚠️ Server is already running.");
+            return;
+        }
+
+        _cancellationTokenSource = new CancellationTokenSource();
+        CancellationToken token = _cancellationTokenSource.Token;
+
+        string localIP = NetworkHelper.GetLocalIPAddress();
+        _serverPort = FindAvailablePort(startPort, endPort);
+
+        Console.WriteLine($"🚀 Attempting to start server on {localIP}:{_serverPort}");
+
+        try
+        {
+            _server = new TcpListener(IPAddress.Any, _serverPort);
+            _server.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            _server.Start();
+            _isRunning = true;
+
+            Console.WriteLine($"✅ Server started on port {_serverPort}. Waiting for connections...");
+
+            // Run the listener loop in a background task
+            _ = Task.Run(async () => await AcceptConnectionsAsync(token), token);
+        }
+        catch (SocketException ex)
+        {
+            Console.WriteLine($"❌ Server start failed: {ex.Message}");
+            _isRunning = false;
+        }
+    }
+
+    /// <summary>
+    /// Accepts client connections asynchronously.
+    /// </summary>
+    private async Task AcceptConnectionsAsync(CancellationToken token)
+    {
+        try
+        {
+            while (_isRunning)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    Console.WriteLine("⚠️ Server is stopping, canceling new connections.");
+                    return;
+                }
+
+                try
+                {
+                    Console.WriteLine("🔍 Waiting for client connections...");
+
+                    // Accept client with a timeout of 10 seconds to avoid hanging
+                    TcpClient client = await Task.Run(() => _server.AcceptTcpClientAsync(), token);
+
+                    if (!_isRunning || token.IsCancellationRequested)
+                    {
+                        client.Close();
+                        return;
+                    }
+
+                    Console.WriteLine("🔗 Client connected!");
+                    _ = Task.Run(() => HandleClient(client, token));
+                }
+                catch (TaskCanceledException)
+                {
+                    Console.WriteLine("⚠️ Server stopped while waiting for a connection.");
+                    return;
+                }
+                catch (ObjectDisposedException)
+                {
+                    Console.WriteLine("⚠️ Server listener disposed.");
+                    return;
+                }
+                catch (SocketException ex)
+                {
+                    Console.WriteLine($"❌ SocketException while accepting client: {ex.Message}");
+                    return;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ AcceptConnectionsAsync Error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Finds an available port within the given range.
+    /// </summary>
+    private int FindAvailablePort(int startPort, int endPort)
+    {
+        for (int port = startPort; port <= endPort; port++)
+        {
+            if (IsPortAvailable(port))
+                return port;
+        }
+        throw new Exception("❌ No available ports found.");
+    }
+
+    /// <summary>
+    /// Checks if a port is available.
+    /// </summary>
+    private bool IsPortAvailable(int port)
+    {
+        try
+        {
+            using (Socket testSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
+                testSocket.Bind(new IPEndPoint(IPAddress.Loopback, port));
+                return true;
+            }
+        }
+        catch (SocketException)
+        {
+            return false; // Port is in use
         }
     }
 
     /// <summary>
     /// Handles a connected client by reading incoming messages.
     /// </summary>
-    private async Task HandleClient(TcpClient client)
+    private async Task HandleClient(TcpClient client, CancellationToken token)
     {
         NetworkStream stream = client.GetStream();
         byte[] buffer = new byte[1024];
 
-        while (client.Connected)
+        try
         {
-            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-            if (bytesRead == 0) break;
+            while (client.Connected && !token.IsCancellationRequested)
+            {
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, token);
+                if (bytesRead == 0) break;
 
-            string data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-            Console.WriteLine($"📩 Received: {data}");
+                string data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                Console.WriteLine($"📩 Received: {data}");
+            }
         }
-
-        Console.WriteLine("🔌 Client disconnected.");
-        client.Close();
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("⚠️ Client operation canceled.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Client error: {ex.Message}");
+        }
+        finally
+        {
+            Console.WriteLine("🔌 Client disconnected.");
+            client.Close();
+        }
     }
 
     /// <summary>
-    /// Stops the server and closes all active connections.
+    /// Stops the server and releases the port immediately.
     /// </summary>
     public void StopServer()
     {
         if (_isRunning)
         {
             _isRunning = false;
-            _server?.Stop();
-            Console.WriteLine("🛑 Server stopped.");
+
+            try
+            {
+                _cancellationTokenSource?.Cancel();
+
+                // Small delay to ensure all async tasks exit
+                Task.Delay(500).Wait();
+
+                _server?.Stop();
+                _server = null;
+                Console.WriteLine("🛑 Server stopped. Port released.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"⚠️ Error stopping server: {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("⚠️ No server is running.");
         }
     }
 }

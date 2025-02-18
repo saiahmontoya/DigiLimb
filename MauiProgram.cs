@@ -15,11 +15,13 @@ namespace DigiLimbDesktop
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-#if DEBUG
-    		builder.Logging.AddDebug();
-#endif
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                System.Diagnostics.Debug.WriteLine($"Unhandled Exception: {e.ExceptionObject}");
+            };
 
             return builder.Build();
         }
     }
+
 }

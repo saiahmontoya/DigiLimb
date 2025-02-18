@@ -45,6 +45,34 @@ namespace DigiLimbDesktop
             MobileView.IsVisible = true;
 #endif
         }
+#if !WINDOWS
+        private void OnConnectionsClicked(object sender, EventArgs e)
+        {
+            // Do nothing or show an alert for unsupported feature
+            DisplayAlert("Not Supported", "Connections feature is only available on Desktop.", "OK");
+        }
+        private void OnEmulationClicked(object sender, EventArgs e)
+        {
+            // Placeholder for non-Windows platforms
+            DisplayAlert("Not Supported", "Emulation feature is only available on Desktop.", "OK");
+        }
+        
+        private void OnSettingsClicked(object sender, EventArgs e)
+        {
+            // Placeholder for non-Windows platforms
+            DisplayAlert("Not Supported", "Emulation feature is only available on Desktop.", "OK");
+        }
+        private void OnSupportClicked(object sender, EventArgs e)
+        {
+            // Placeholder for non-Windows platforms
+            DisplayAlert("Not Supported", "Emulation feature is only available on Desktop.", "OK");
+        }
+        private void OnQuitClicked(object sender, EventArgs e)
+        {
+            // Placeholder for non-Windows platforms
+            DisplayAlert("Not Supported", "Emulation feature is only available on Desktop.", "OK");
+        }
+#endif
 
         // Click Counter Logic
         private void OnCounterClicked(object sender, EventArgs e)

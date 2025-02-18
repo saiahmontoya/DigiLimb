@@ -3,7 +3,7 @@ using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.Exceptions;
 using System.Collections.ObjectModel;
 
-namespace DigiLimbMobile.View;
+namespace DigiLimbDesktop;
 
 public partial class AddNewDevicePage : ContentPage
 {

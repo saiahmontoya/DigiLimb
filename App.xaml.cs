@@ -7,20 +7,31 @@ namespace DigiLimbDesktop
     {
         public App()
         {
-            InitializeComponent();
-
-#if WINDOWS
-            MainPage = new AppShell(); // Desktop entry point
-#else
-            MainPage = new AppShell(); // Mobile entry point
-#endif
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Startup Error: {ex.Message}");
+            }
         }
 
-#if WINDOWS
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell()); // Only required for desktop
-        }
+            try
+            {
+#if WINDOWS
+                return new Window(new AppShell()); // Windows Entry Point
+#else
+                return new Window(new AppShell()); // Mobile Entry Point
 #endif
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Window Creation Error: {ex.Message}");
+                return base.CreateWindow(activationState); // Fallback to default window if error occurs
+            }
+        }
     }
 }

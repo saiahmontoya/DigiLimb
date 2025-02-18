@@ -67,6 +67,27 @@
 
             <Button x:Name="btnConnect" Text="Connect to Selected Device" Clicked="btnConnect_Click" IsEnabled="False" />
             <Button x:Name="btnBack" Text="Back" Clicked="btnBack_Click" IsVisible="True" />
+
+            <!-- Windows-Only Buttons for Starting/Stopping the Server -->
+            <Button x:Name="btnStartServer"
+                    Text="Start Server"
+                    Clicked="btnStartServer_Click"
+                    BackgroundColor="Green"
+                    TextColor="White"
+                    Margin="10"
+                    IsVisible="True"/>
+            <!-- Visible on Windows -->
+
+            <Button x:Name="btnStopServer"
+                    Text="Stop Server"
+                    Clicked="btnStopServer_Click"
+                    BackgroundColor="Red"
+                    TextColor="White"
+                    IsEnabled="False"
+                    Margin="10"
+                    IsVisible="True"/>
+            <!-- Visible on Windows -->
+
             <Label x:Name="lblPairedDevice" FontSize="18" Text="No device paired" Margin="0,10,0,5" TextColor="Green" IsVisible="False" />
             <Editor x:Name="txtLogs" HeightRequest="150" IsReadOnly="True" BackgroundColor="LightGray"/>
         </VerticalStackLayout>

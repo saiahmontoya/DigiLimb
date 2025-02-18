@@ -7,7 +7,6 @@ using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Microsoft.Maui.Dispatching;
-using DigiLimbMobile.View;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -28,6 +27,7 @@ namespace DigiLimbDesktop
         private bool _isScanning = false;
         private BluetoothAdvertiser _bluetoothAdvertiser;
         private ServerService _serverService;
+        private bool _isServerRunning = false;
 #endif
 
         public ConnectionPage()
@@ -44,9 +44,6 @@ namespace DigiLimbDesktop
             _bluetoothAdvertiser.DeviceConnected += OnDeviceConnected;
 
             _serverService = new ServerService();
-            StartServerAndBroadcast();
-
-            RequestBluetoothPermissions();
 #endif
         }
 
@@ -66,94 +63,29 @@ namespace DigiLimbDesktop
 #endif
         }
 
+        // ---------------------- WINDOWS-ONLY BUTTONS ---------------------- //
+
 #if WINDOWS
         /// <summary>
-        /// Requests Bluetooth permissions at runtime.
+        /// Handles when a Bluetooth device successfully connects.
         /// </summary>
-        private async void RequestBluetoothPermissions()
+        private void OnDeviceConnected(string deviceName, string deviceId)
         {
-            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-
-            if (status != PermissionStatus.Granted)
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-            }
+                lblConnectedDevice.Text = $"✅ Connected to: {deviceName}\nID: {deviceId}";
+                lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
+                lblConnectedDevice.IsVisible = true;
 
-            if (status != PermissionStatus.Granted)
-            {
-                Log("⚠️ Location permission is required for Bluetooth scanning.");
-                return;
-            }
-
-            if (CrossBluetoothLE.Current.State != BluetoothState.On)
-            {
-                Log("⚠️ Bluetooth is off. Please enable it.");
-            }
-        }
-
-        /// <summary>
-        /// Starts the server and begins broadcasting.
-        /// </summary>
-        private async void StartServerAndBroadcast()
-        {
-            try
-            {
-                Log("🚀 Starting server...");
-                await _serverService.StartServer(5000);
-                Log("✅ Server started.");
-
-                Log("📡 Starting broadcast...");
-                _ = Task.Run(() => UdpBroadcaster.BroadcastServerIP());
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ Server error: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Stops broadcasting when the page is destroyed.
-        /// </summary>
-        protected override void OnDisappearing()
-        {
-            base.OnDisappearing();
-            Log("🛑 Stopping server and broadcasting...");
-            _serverService?.StopServer();
-        }
-
-        /// <summary>
-        /// Logs messages to the UI.
-        /// </summary>
-        private void Log(string message)
-        {
-            MainThread.BeginInvokeOnMainThread(() => txtLogs.Text += $"{message}{Environment.NewLine}");
-        }
-
-        /// <summary>
-        /// Allows incoming Bluetooth connections by starting advertising.
-        /// </summary>
-        private void btnAllowIncomingConnection_Click(object sender, EventArgs e)
-        {
-            if (btnAllowIncomingConnection.Text == "Allow Incoming Connection")
-            {
-                _bluetoothAdvertiser.StartAdvertising();
-                Log("📡 Started advertising DigiLimbDevice.");
-                btnAllowIncomingConnection.Text = "Cancel";
-                lblAwaitingConnection.IsVisible = true;
-                btnScan.IsVisible = false;
-            }
-            else
-            {
-                _bluetoothAdvertiser.StopAdvertising();
-                Log("📴 Stopped advertising DigiLimbDevice.");
-                btnAllowIncomingConnection.Text = "Allow Incoming Connection";
+                btnAllowIncomingConnection.IsVisible = false;
                 lblAwaitingConnection.IsVisible = false;
-                btnScan.IsVisible = true;
-            }
+            });
+
+            Log($"🔗 Device Connected: {deviceName} (ID: {deviceId})");
         }
 
         /// <summary>
-        /// Handles the event when a Bluetooth device is discovered.
+        /// Handles when a Bluetooth device is discovered during scanning.
         /// </summary>
         private void OnDeviceDiscovered(object sender, DeviceEventArgs args)
         {
@@ -189,23 +121,130 @@ namespace DigiLimbDesktop
         }
 
         /// <summary>
-        /// Handles the event when a Bluetooth device is successfully connected.
+        /// Starts the server when button is clicked (Windows only).
         /// </summary>
-        private void OnDeviceConnected(string deviceName, string deviceId)
+        private async void btnStartServer_Click(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(() =>
+            if (_isServerRunning)
             {
-                lblConnectedDevice.Text = $"✅ Connected to: {deviceName}\nID: {deviceId}";
-                lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
-                lblConnectedDevice.IsVisible = true;
+                Log("⚠️ Server is already running.");
+                return;
+            }
 
-                btnAllowIncomingConnection.IsVisible = false;
-                lblAwaitingConnection.IsVisible = false;
-            });
+            try
+            {
+                int openPort = FindOpenPort(5000, 5100);
+                await _serverService.StartServer(openPort);
+                _isServerRunning = true;
+                btnStartServer.IsEnabled = false;
+                btnStopServer.IsEnabled = true;
+                Log($"🚀 Server started on port {openPort}.");
+            }
+            catch (Exception ex)
+            {
+                Log($"❌ Server error: {ex.Message}");
+            }
+        }
 
-            Log($"🔗 Device Connected: {deviceName} (ID: {deviceId})");
+        /// <summary>
+        /// Stops the server when button is clicked (Windows only).
+        /// </summary>
+        private void btnStopServer_Click(object sender, EventArgs e)
+        {
+            if (!_isServerRunning)
+            {
+                Log("⚠️ No server is running.");
+                return;
+            }
+
+            _serverService.StopServer();
+            _isServerRunning = false;
+            btnStartServer.IsEnabled = true;
+            btnStopServer.IsEnabled = false;
+            Log("🛑 Server stopped.");
+        }
+
+        /// <summary>
+        /// Finds an available port in the given range.
+        /// </summary>
+        private int FindOpenPort(int startPort, int endPort)
+        {
+            for (int port = startPort; port <= endPort; port++)
+            {
+                try
+                {
+                    using (TcpListener listener = new TcpListener(IPAddress.Loopback, port))
+                    {
+                        listener.Start();
+                        listener.Stop();
+                        return port;
+                    }
+                }
+                catch (SocketException)
+                {
+                    continue; // Try next port
+                }
+            }
+            throw new Exception("No available ports found.");
         }
 #endif
+
+        // ---------------------- MOBILE BUTTON HANDLERS ---------------------- //
+#if !WINDOWS
+        private void btnStartServer_Click(object sender, EventArgs e)
+        {
+            Log("⚠️ Starting a server is not supported on mobile.");
+        }
+
+        private void btnStopServer_Click(object sender, EventArgs e)
+        {
+            Log("⚠️ Stopping a server is not supported on mobile.");
+        }
+        private async void OnAddDeviceClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new AddNewDevicePage());
+        }
+#else
+         private void OnAddDeviceClicked(object sender, EventArgs e)
+        {
+            Log("⚠️ Add New Device is not supported on Windows.");
+        }
+#endif
+
+        // ---------------------- COMMON BUTTON HANDLERS ---------------------- //
+        private void btnScan_Click(object sender, EventArgs e)
+        {
+            Log("🔍 Scanning for devices...");
+        }
+
+        private void btnAllowIncomingConnection_Click(object sender, EventArgs e)
+        {
+            Log("⚠️ Allowing incoming connections is not supported on Windows.");
+        }
+
+        private void OnDeviceSelected(object sender, SelectionChangedEventArgs e)
+        {
+            Log("⚠️ Device selection is not supported on Windows.");
+        }
+
+        private void btnConnect_Click(object sender, EventArgs e)
+        {
+            Log("⚠️ Connecting to a selected device is not supported on Windows.");
+        }
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            Log("⚠️ Navigating back is not supported on Windows.");
+        }
+       
+
+        /// <summary>
+        /// Logs messages to the UI.
+        /// </summary>
+        private void Log(string message)
+        {
+            MainThread.BeginInvokeOnMainThread(() => txtLogs.Text += $"{message}{Environment.NewLine}");
+        }
     }
 
     /// <summary>
