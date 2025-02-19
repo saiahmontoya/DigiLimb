@@ -51,7 +51,5 @@
 
         <!-- Log Area -->
         <Editor x:Name="txtLogs" HeightRequest="150" IsReadOnly="True" BackgroundColor="LightGray"/>
-        
-        
     </VerticalStackLayout>
 </ContentPage>

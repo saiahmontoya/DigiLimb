@@ -3,6 +3,10 @@ using MongoDB.Driver;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Security.Cryptography;
 using System.Text;
+using System;
+using System.Diagnostics;
+
+
 using System.Text.Json;
 using Microsoft.Maui.Devices;
 
@@ -138,6 +142,7 @@ namespace DigiLimbDesktop
                     {
                         DisplayAlert("Success", "Login Successful!", "OK");
                         Navigation.PushAsync(new MainPage(email));
+                        Debug.WriteLine("Succesfully logged in.");
                     });
                 }
                 else
