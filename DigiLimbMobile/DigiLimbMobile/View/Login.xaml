@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbMobile.View.Login"
+             Title="Login">
+    
+    <Grid RowDefinitions=".3*, .7*">
+        <Image Aspect="AspectFill" Source="digilogin.webp"/>
+        <Grid BackgroundColor="#90D5FF" Opacity=".9"/>
+        <Grid ColumnDefinitions="*,*">
+            <Image Aspect="AspectFit"
+                   HeightRequest="120"
+                   Source="applogo.jpg!sw800" />
+        </Grid>
+        <Grid Grid.Row="1">
+            <RoundRectangle Margin="-5, -30, -5, -2"
+                            CornerRadius="30, 30, 0, 0"
+                            Fill="White" />
+            <VerticalStackLayout Margin="30,0,30,0">
+                <Label FontAttributes="Bold"
+                       FontFamily="bold"
+                       FontSize="Medium"
+                       Text="Welcome to DigiLimb"
+                       TextColor="#2D2D2D"/>
+                <Label
+                    FontFamily="medium"
+                    Text="Log in to continue"
+                    TextColor="#A3A3A4"/>
+                <Grid Margin="0,30,0,0" ColumnDefinitions=".2*,.8*">
+                    <RoundRectangle BackgroundColor="#77B1D4"
+                                    CornerRadius="10"
+                                    HeightRequest="60"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    WidthRequest="60"/>
+                    <Image HorizontalOptions="Center"
+                           Aspect="AspectFill"
+                           HeightRequest="50"
+                           Source="accountimage.png" />
+                    <Entry x:Name="Username"
+                           Grid.Column="1"
+                           Placeholder="USERNAME"
+                           VerticalOptions="Center"/>
+                </Grid>
+                <Grid Margin="0,30,0,0" ColumnDefinitions=".2*,.8*">
+                    <RoundRectangle BackgroundColor="#77B1D4"
+                        CornerRadius="10"
+                        HeightRequest="60"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        WidthRequest="60"/>
+                    <Image HorizontalOptions="Center"
+                       Aspect="AspectFill"
+                       HeightRequest="30"
+                       Source="keyimage.png" />
+                    <Entry x:Name="Password"
+                       Grid.Column="1"
+                       Placeholder="PASSWORD"
+                       VerticalOptions="Center"/>       
+                </Grid>
+                <Button Margin="0,20,0,0"
+                        BackgroundColor="#57b9FF"
+                        HeightRequest="60"
+                        Clicked="OnLoginClicked"
+                        Text="Login"
+                        TextColor="#d9ecfa"/>
+                <Button Margin="0,20,0,0"
+                        BackgroundColor="#d9ecfa"
+                        HeightRequest="60"
+                        Clicked="OnRegisterClicked"
+                        Text="Register"
+                        TextColor="#517891"/>
+            </VerticalStackLayout>
+        </Grid>
+
+    </Grid>
+</ContentPage>
