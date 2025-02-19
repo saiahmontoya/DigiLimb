@@ -1,28 +1,27 @@
-
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Security.Cryptography;
 using System.Text;
-
 using System.Text.Json;
+using Microsoft.Maui.Devices;
 
 namespace DigiLimbDesktop
 {
     public partial class LoginPage : ContentPage
-
     {
         private MongoClient client;
         private IMongoDatabase database;
         private IMongoCollection<User> userCollection;
+        private IMongoCollection<Device> deviceCollection;
 
-       
         public LoginPage()
         {
             InitializeComponent();
             InitializeMongoDbConnection();
         }
 
+        // 📌 User Schema
         public class User
         {
             [BsonId]
@@ -38,6 +37,42 @@ namespace DigiLimbDesktop
             [BsonElement("salt")]
             public string Salt { get; set; }
 
+            [BsonElement("deviceIds")]
+            public List<string> DeviceIds { get; set; } = new List<string>();
+
+            [BsonElement("createdAt")]
+            public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        }
+
+        // 📌 Device Schema
+        public class Device
+        {
+            [BsonId]
+            [BsonRepresentation(BsonType.ObjectId)]
+            public string Id { get; set; }
+
+            [BsonElement("userId")]
+            [BsonRepresentation(BsonType.ObjectId)]
+            public string UserId { get; set; }
+
+            [BsonElement("deviceModel")]
+            public string DeviceModel { get; set; }
+
+            [BsonElement("manufacturer")]
+            public string Manufacturer { get; set; }
+
+            [BsonElement("platform")]
+            public string Platform { get; set; }
+
+            [BsonElement("osVersion")]
+            public string OsVersion { get; set; }
+
+            [BsonElement("idiom")]
+            public string Idiom { get; set; }
+
+            [BsonElement("deviceType")]
+            public string DeviceType { get; set; }
+
             [BsonElement("createdAt")]
             public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         }
@@ -50,6 +85,7 @@ namespace DigiLimbDesktop
                 client = new MongoClient(connectionUri);
                 database = client.GetDatabase("DigilimbDatabase");
                 userCollection = database.GetCollection<User>("Users");
+                deviceCollection = database.GetCollection<Device>("Devices");
 
                 await TestConnectionAsync();
             }
@@ -95,7 +131,9 @@ namespace DigiLimbDesktop
 
                 if (VerifyPassword(password, user.PasswordHash, user.Salt))
                 {
-                    // Ensure UI updates are on the main thread
+                    // 📌 Check if the device is already registered
+                    await CheckAndSaveDevice(user.Id);
+
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
                         DisplayAlert("Success", "Login Successful!", "OK");
@@ -110,6 +148,45 @@ namespace DigiLimbDesktop
             catch (Exception ex)
             {
                 await DisplayAlert("Login Error", ex.Message, "OK");
+            }
+        }
+
+        private async Task CheckAndSaveDevice(string userId)
+        {
+            var deviceInfo = new Device
+            {
+                UserId = userId,
+                DeviceModel = DeviceInfo.Current.Model,
+                Manufacturer = DeviceInfo.Current.Manufacturer,
+                Platform = DeviceInfo.Current.Platform.ToString(),
+                OsVersion = DeviceInfo.Current.VersionString,
+                Idiom = DeviceInfo.Current.Idiom.ToString(),
+                DeviceType = DeviceInfo.Current.DeviceType.ToString(),
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // 📌 Check if the device already exists
+            var existingDevice = await deviceCollection.Find(d =>
+                d.UserId == userId &&
+                d.DeviceModel == deviceInfo.DeviceModel &&
+                d.Platform == deviceInfo.Platform &&
+                d.OsVersion == deviceInfo.OsVersion).FirstOrDefaultAsync();
+
+            if (existingDevice == null)
+            {
+                // 📌 Save new device to database
+                await deviceCollection.InsertOneAsync(deviceInfo);
+
+                // 📌 Update the user with the new device ID
+                var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+                var update = Builders<User>.Update.Push(u => u.DeviceIds, deviceInfo.Id);
+                await userCollection.UpdateOneAsync(filter, update);
+
+                Console.WriteLine("New device registered!");
+            }
+            else
+            {
+                Console.WriteLine("Device already registered!");
             }
         }
 

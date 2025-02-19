@@ -5,6 +5,7 @@
              Title="Main Menu"
              BackgroundColor="Black">
 
+    <!-- Wrap everything in a ScrollView -->
     <ScrollView>
         <VerticalStackLayout Padding="30,50" Spacing="25" HorizontalOptions="Center">
 
@@ -51,6 +52,16 @@
                     WidthRequest="250"
                     HorizontalOptions="Center"/>
 
+            <Button Text="Devices"
+                    Clicked="OnDevicesClicked"
+                    BackgroundColor="Black"
+                    TextColor="White"
+                    BorderColor="Cyan"
+                    BorderWidth="2"
+                    HeightRequest="60"
+                    WidthRequest="250"
+                    HorizontalOptions="Center"/>
+
             <Button Text="Settings"
                     Clicked="OnSettingsClicked"
                     BackgroundColor="Black"
@@ -70,8 +81,6 @@
                     HeightRequest="60"
                     WidthRequest="250"
                     HorizontalOptions="Center"/>
-
-            
 
             <!-- Quit Button -->
             <Button Text="Quit"

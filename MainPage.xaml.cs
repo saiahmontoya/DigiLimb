@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
+using Plugin.BLE.Abstractions;
 
 namespace DigiLimbDesktop
 {
@@ -39,6 +40,13 @@ namespace DigiLimbDesktop
         {
             await Navigation.PushAsync(new ConnectionsPage());
         }
+
+        // Navigate to Devices Page
+        private async void OnDevicesClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new DevicesPage(_email));
+        }
+
 
         // Navigate to Modifications (Settings) Page
         private async void OnSettingsClicked(object sender, EventArgs e)

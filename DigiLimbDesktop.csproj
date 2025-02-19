@@ -86,6 +86,9 @@
 	  <Compile Update="ConnectionsPage.xaml.cs">
 	    <DependentUpon>ConnectionsPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="DevicesPage.xaml.cs">
+	    <DependentUpon>DevicesPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="SupportPage.xaml.cs">
 	    <DependentUpon>SupportPage.xaml</DependentUpon>
 	  </Compile>
@@ -93,6 +96,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="ConnectionsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="DevicesPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="SupportPage.xaml">
