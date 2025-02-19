@@ -1,44 +1,61 @@
-using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
-using Plugin.BLE.Abstractions.Exceptions;
-using System.Collections.ObjectModel;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Maui.Controls;
 
-namespace DigiLimbMobile.View;
-
-public partial class AddNewDevicePage : ContentPage
+namespace DigiLimbMobile.View
 {
-    private BluetoothManager bluetoothManager;
-    public AddNewDevicePage()
-	{
-		InitializeComponent();
-        bluetoothManager = new BluetoothManager();
-        DeviceListView.ItemsSource = bluetoothManager.Devices;
-    }
-
-    private async void OnScanClicked(object sender, EventArgs e)
+    public partial class AddNewDevicePage : ContentPage
     {
-        await bluetoothManager.ScanForDevices();
-        DeviceListView.ItemsSource = bluetoothManager.Devices;// Populate list of found devices
-    }
+        private readonly BluetoothManager bluetoothManager;
 
-
-    private async void OnConnectClicked(object sender, EventArgs e)
-    {
-        if (DeviceListView.SelectedItem is IDevice selectedDevice) //If selected item is an IDevice, assign it to selectedDevice
+        public AddNewDevicePage()
         {
-            bool success = await bluetoothManager.ConnectToDevice(selectedDevice);
-            if (success)
-            {
-                await DisplayAlert("Connection", $"Connected to {selectedDevice.Name}", "OK");
-            }
-            else
-            {
-                await DisplayAlert("Error", "Failed to connect to device", "OK");
-            }
+            InitializeComponent();
+            bluetoothManager = new BluetoothManager();
+            BindingContext = bluetoothManager;
+
+            DeviceListView.ItemTapped += OnDeviceTapped; // Handle tapping on a device
         }
-        else
+
+        private async void OnScanClicked(object sender, EventArgs e)
         {
-            await DisplayAlert("Error", "Please select a device first", "OK");
+            await bluetoothManager.ScanForDevices();
+        }
+
+        private async void OnDeviceTapped(object sender, ItemTappedEventArgs e)
+        {
+            if (e.Item is DeviceInfo selectedDevice)
+            {
+                bool userConfirmed = await DisplayAlert(
+                    "Connect to Device",
+                    $"Connect to {selectedDevice.Name}?",
+                    "Yes",
+                    "No"
+                );
+
+                if (!userConfirmed)
+                    return; // Exit if the user cancels
+
+                var deviceToConnect = bluetoothManager.GetDeviceById(selectedDevice.Id);
+                if (deviceToConnect == null)
+                {
+                    await DisplayAlert("Error", "Device not found in scan results.", "OK");
+                    return;
+                }
+
+                bool isConnected = await bluetoothManager.ConnectToDevice(deviceToConnect);
+                if (isConnected)
+                {
+                    await DisplayAlert("Success", $"Paired to {selectedDevice.Name}.", "OK");
+                    await Shell.Current.GoToAsync("//ConnectionPage"); // Navigate back to ConnectionPage
+                }
+                else
+                {
+                    await DisplayAlert("Error", $"Failed to connect to {selectedDevice.Name}.", "OK");
+                }
+            }
         }
     }
 }

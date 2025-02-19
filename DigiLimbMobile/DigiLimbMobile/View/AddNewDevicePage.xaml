@@ -25,13 +25,33 @@
                Padding=" 50,20,50,20"
                FontSize="16"
                />
-            <ListView x:Name="DeviceListView" ItemsSource="{Binding Devices}" SelectionMode="Single">
+            <ListView x:Name="DeviceListView" 
+                      ItemsSource="{Binding Devices}" 
+                      SelectionMode="Single"
+                      HasUnevenRows="True">
+                <!-- Allows flexible row heights -->
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextCell Text="{Binding Name}" Detail="{Binding Id}"/>
-                    </DataTemplate> 
+                        <ViewCell>
+                            <Frame Padding="15" Margin="10,5,10,5" CornerRadius="10" BackgroundColor="White" HasShadow="True">
+                                <StackLayout Spacing="5">
+                                    <!-- Device Name (Large & Bold) -->
+                                    <Label Text="{Binding Name}" 
+                               FontSize="20" 
+                               FontAttributes="Bold"
+                               TextColor="Black" />
+
+                                    <!-- Device ID (Smaller, Gray) -->
+                                    <Label Text="{Binding Id}" 
+                               FontSize="14" 
+                               TextColor="Gray" />
+                                </StackLayout>
+                            </Frame>
+                        </ViewCell>
+                    </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+
 
         </Grid>
         <Grid Grid.Row="1">

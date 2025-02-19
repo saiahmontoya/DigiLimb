@@ -40,6 +40,7 @@
                     <Entry x:Name="Username"
                            Grid.Column="1"
                            Placeholder="USERNAME"
+                           TextColor="Black"
                            VerticalOptions="Center"/>
                 </Grid>
                 <Grid Margin="0,30,0,0" ColumnDefinitions=".2*,.8*">
@@ -56,6 +57,7 @@
                     <Entry x:Name="Password"
                        Grid.Column="1"
                        Placeholder="PASSWORD"
+                       TextColor="Black"
                        VerticalOptions="Center"/>       
                 </Grid>
                 <Button Margin="0,20,0,0"

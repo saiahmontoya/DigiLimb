@@ -3,45 +3,71 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbMobile.ConnectionPage"
              Title="Connect">
-    <Grid RowDefinitions=".6*,.4*">
-        <Grid Grid.Row="0">
+    <VerticalStackLayout Padding="20" Spacing="20">
 
-            <RoundRectangle BackgroundColor="#d9ecfa"
-                            CornerRadius="10"
-                            HeightRequest="400"
-                            TranslationY="30"
-                            VerticalOptions="Center"
-                            WidthRequest="350"
-                            />
-            <Label Text="Connect to Computer" 
-                   TranslationY="-130"
-                   TranslationX="50"
-                   VerticalOptions="Center"
-                   FontSize="25"
-                   />
-            <Label Text="Select the computer device that you'd like to connect. To Start a new connection with new device, select add new device."
-                   TranslationY="130"
-                   HorizontalOptions="Center"
-                   Padding=" 50,20,50,20"
-                   FontSize="16"
-                   />
+        <!-- Background Card -->
+        <Frame BackgroundColor="#d9ecfa"
+               CornerRadius="15"
+               Padding="20"
+               HasShadow="True">
 
-        </Grid>
-        <Grid Grid.Row="1">
-            <Button Margin="60,20,60,0"
-                    BackgroundColor="#57b9FF"
-                    HeightRequest="60"
-                    VerticalOptions="Start"
-                    Text="Connect"
-                    TextColor="#d9ecfa"/>
+            <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                <!-- Title -->
+                <Label Text="Connect to Computer"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="#333"
+                       HorizontalOptions="Center"/>
 
-            <Button Margin="60,120,60,0"
-                    BackgroundColor="#d9ecfa"
-                    HeightRequest="60"
-                    VerticalOptions="Start"
-                    Text="Add new device"
-                    TextColor="#517891"
-                    Clicked="OnAddDeviceClicked"/>
-        </Grid>
-    </Grid>
+                <!-- Instruction Text -->
+                <Label Text="Select the computer device that you'd like to connect. 
+                             To start a new connection with a new device, select 'Add New Device'."
+                       FontSize="16"
+                       TextColor="#555"
+                       HorizontalTextAlignment="Center"
+                       Padding="10,0,10,0"/>
+            </VerticalStackLayout>
+
+        </Frame>
+
+        <!-- Device List -->
+        <Frame BackgroundColor="White"
+               CornerRadius="10"
+               Padding="10"
+               HasShadow="True"
+               HeightRequest="200">
+
+            <ListView x:Name="DeviceListView"
+                      SelectionMode="Single"
+                      HeightRequest="180">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Padding="10">
+                                <Label Text="No devices added." FontSize="18" FontAttributes="Bold"/>
+                                
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Frame>
+
+        <!-- Buttons -->
+        <Button Margin="20,10,20,0"
+                BackgroundColor="#57b9FF"
+                HeightRequest="60"
+                VerticalOptions="Start"
+                Text="Connect"
+                TextColor="White"/>
+
+        <Button Margin="20,10,20,0"
+                BackgroundColor="#d9ecfa"
+                HeightRequest="60"
+                VerticalOptions="Start"
+                Text="Add New Device"
+                TextColor="#517891"
+                Clicked="OnAddDeviceClicked"/>
+
+    </VerticalStackLayout>
 </ContentPage>
