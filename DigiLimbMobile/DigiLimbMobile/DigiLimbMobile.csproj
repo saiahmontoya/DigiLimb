@@ -50,7 +50,7 @@
 	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios'">
 	  <ProvisioningType>manual</ProvisioningType>
 	  <CodesignKey>iPhone Developer</CodesignKey>
-	  <CodesignProvision>iOS Team Provisioning Profile: Dig.DigiLimb</CodesignProvision>
+	  <CodesignProvision></CodesignProvision>
 	</PropertyGroup>
 
 	<ItemGroup>

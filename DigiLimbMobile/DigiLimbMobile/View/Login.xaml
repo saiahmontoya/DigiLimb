@@ -36,6 +36,7 @@
                     <Image HorizontalOptions="Center"
                            Aspect="AspectFill"
                            HeightRequest="50"
+                           WidthRequest="50"
                            Source="accountimage.png" />
                     <Entry x:Name="Username"
                            Grid.Column="1"
@@ -45,20 +46,22 @@
                 </Grid>
                 <Grid Margin="0,30,0,0" ColumnDefinitions=".2*,.8*">
                     <RoundRectangle BackgroundColor="#77B1D4"
-                        CornerRadius="10"
-                        HeightRequest="60"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center"
-                        WidthRequest="60"/>
+                                    CornerRadius="10"
+                                    HeightRequest="60"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    WidthRequest="60"/>
                     <Image HorizontalOptions="Center"
-                       Aspect="AspectFill"
-                       HeightRequest="30"
-                       Source="keyimage.png" />
+                           Aspect="AspectFill"
+                           HeightRequest="40"
+                           WidthRequest="40"
+                           Source="keyimage.png" />
                     <Entry x:Name="Password"
-                       Grid.Column="1"
-                       Placeholder="PASSWORD"
-                       TextColor="Black"
-                       VerticalOptions="Center"/>       
+                           Grid.Column="1"
+                           IsPassword="true"
+                           Placeholder="PASSWORD"
+                           TextColor="Black"
+                           VerticalOptions="Center"/>       
                 </Grid>
                 <Button Margin="0,20,0,0"
                         BackgroundColor="#57b9FF"

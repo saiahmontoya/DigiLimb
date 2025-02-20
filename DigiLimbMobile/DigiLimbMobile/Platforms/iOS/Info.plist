@@ -38,6 +38,6 @@
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>YOUR CUSTOM MESSAGE</string>
 	<key>CFBundleIdentifier</key>
-	<string>Dig.DigiLimb</string>
+	<string>Mobile.Digilimb</string>
 </dict>
 </plist>

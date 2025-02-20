@@ -132,6 +132,7 @@ namespace DigiLimbMobile
                     }
                 }
 
+
                 return true;
             }
             catch (DeviceConnectionException e)
