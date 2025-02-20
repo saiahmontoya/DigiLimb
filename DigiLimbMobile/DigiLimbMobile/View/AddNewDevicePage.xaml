@@ -56,7 +56,7 @@
             </Frame>
             
         </Grid>
-        <Grid Grid.Row="1">s
+        <Grid Grid.Row="1">
             <Button Margin="60,20,60,0"
                 BackgroundColor="#57b9FF"
                 HeightRequest="60"

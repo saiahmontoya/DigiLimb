@@ -3,7 +3,7 @@
   <PropertyGroup>
     <IsFirstTimeProjectOpen>False</IsFirstTimeProjectOpen>
     <ActiveDebugFramework>net9.0-ios</ActiveDebugFramework>
-    <ActiveDebugProfile>iPhone 16 iOS 18.2</ActiveDebugProfile>
+    <ActiveDebugProfile>Simulator</ActiveDebugProfile>
     <SelectedPlatformGroup>Simulator</SelectedPlatformGroup>
     <DefaultDevice>iPhone 16 iOS 18.2</DefaultDevice>
     <TargetiOSDevice>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
