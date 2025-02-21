@@ -135,16 +135,18 @@ namespace DigiLimbDesktop
 
                 if (VerifyPassword(password, user.PasswordHash, user.Salt))
                 {
-                    // 📌 Check if the device is already registered
-                    await CheckAndSaveDevice(user.Id);
+                    // 📌 Store user email globally
+                    AppShell.UserEmail = email;
 
+                    // 📌 Navigate to MainPage
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
                         DisplayAlert("Success", "Login Successful!", "OK");
-                        Navigation.PushAsync(new MainPage(email));
-                        Debug.WriteLine("Succesfully logged in.");
+                        Navigation.PushAsync(new MainPage());
+                        Debug.WriteLine("Successfully logged in.");
                     });
                 }
+
                 else
                 {
                     await DisplayAlert("Login Error", "Invalid password.", "OK");

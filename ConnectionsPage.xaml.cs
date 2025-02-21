@@ -19,6 +19,7 @@ namespace DigiLimbDesktop
         private readonly ObservableCollection<BluetoothDeviceInfo> _deviceList;
         private IDevice _selectedDevice;
         private bool _isScanning = false;
+
         /*
 #if WINDOWS
         private BluetoothAdvertiser _bluetoothAdvertiser;
@@ -284,6 +285,10 @@ namespace DigiLimbDesktop
                     lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
                     lblConnectedDevice.IsVisible = true;
                 }
+                else
+                {
+                Debug.WriteLine("❌ lblConnectedDevice is null! UI is not ready.");
+                }
             });
 
             Console.WriteLine($"📡 UI Updated: Connected to {deviceInfo.DeviceName} (ID: {deviceInfo.DeviceId})");
@@ -322,7 +327,16 @@ namespace DigiLimbDesktop
                 await DisplayAlert("Paired Successfully", $"Paired to {device.Name}.", "OK");
 
                 // Navigate to Main Menu after confirmation
-                await Shell.Current.GoToAsync("//MainMenu");
+                try
+                {
+                    await Shell.Current.GoToAsync("//MainPage");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Navigation Error: {ex.Message}");
+                    await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
+                }
+
             });
         }
 

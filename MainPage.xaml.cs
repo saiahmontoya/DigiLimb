@@ -13,21 +13,22 @@ namespace DigiLimbDesktop
         private readonly IMongoCollection<BsonDocument> _usersCollection;
         private ObjectId? _userID;
 
-        public MainPage(string email) // Constructor receives email
+        public MainPage() // ✅ No longer requires email in constructor
         {
             InitializeComponent();
-            _email = email; // Store it for later use
+
+            // ✅ Retrieve email from AppShell global state
+            _email = AppShell.UserEmail;
 
             // Initialize MongoDB connection
             var client = new MongoClient("mongodb+srv://saiahmontoya01:AQfSCJE5bfDnhYSh@digilimbdatabase.mneoe.mongodb.net/?authSource=admin&w=majority&appName=DigilimbDatabase");
             var database = client.GetDatabase("DigilimbDatabase");
             _usersCollection = database.GetCollection<BsonDocument>("Users");
 
-            // Load user data by email
-            LoadUserDeviceNameAsync(email);
+            // Load user data
+            LoadUserDeviceNameAsync(_email);
         }
 
-        
         // Navigate to Connections Page
         private async void OnConnectionsClicked(object sender, EventArgs e)
         {
@@ -40,7 +41,6 @@ namespace DigiLimbDesktop
             await Navigation.PushAsync(new DevicesPage(_email));
         }
 
-
         // Navigate to Modifications (Settings) Page
         private async void OnSettingsClicked(object sender, EventArgs e)
         {
@@ -52,13 +52,11 @@ namespace DigiLimbDesktop
             await Navigation.PushAsync(settingsPage);
         }
 
-        
         // Navigate to Support Page
         private async void OnSupportClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new SupportPage());
         }
-        
 
         // Navigate to Emulation Page
         private async void OnEmulationClicked(object sender, EventArgs e)

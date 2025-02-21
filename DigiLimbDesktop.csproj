@@ -69,6 +69,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <AndroidResource Remove="DigiLimbMobile\**" />
+	  <Compile Remove="DigiLimbMobile\**" />
+	  <EmbeddedResource Remove="DigiLimbMobile\**" />
+	  <MauiCss Remove="DigiLimbMobile\**" />
+	  <MauiXaml Remove="DigiLimbMobile\**" />
+	  <None Remove="DigiLimbMobile\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 		<PackageReference Include="Plugin.BLE" Version="3.0.0" />
