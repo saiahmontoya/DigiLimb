@@ -43,6 +43,10 @@
         <!-- Connect Button -->
         <Button x:Name="btnConnect" Text="Connect to Selected Device" Clicked="btnConnect_Click" IsEnabled="False" />
 
+        <!-- Server Control Buttons -->
+        <Button x:Name="btnStartServer" Text="Start Server" Clicked="btnStartServer_Click" BackgroundColor="Green" TextColor="White" />
+        <Button x:Name="btnStopServer" Text="Stop Server" Clicked="btnStopServer_Click" BackgroundColor="Red" TextColor="White" IsEnabled="False" />
+
         <!-- Back Button -->
         <Button x:Name="btnBack" Text="Back" Clicked="btnBack_Click" IsVisible="True" />
 

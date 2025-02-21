@@ -19,6 +19,8 @@ namespace DigiLimbDesktop
         private readonly ObservableCollection<BluetoothDeviceInfo> _deviceList;
         private IDevice _selectedDevice;
         private bool _isScanning = false;
+        private ServerService _serverService;  // ✅ Declare the ServerService
+        private bool _isServerRunning = false; // ✅ Tracks server status
         /*
 #if WINDOWS
         private BluetoothAdvertiser _bluetoothAdvertiser;
@@ -34,7 +36,7 @@ namespace DigiLimbDesktop
             _adapter = CrossBluetoothLE.Current.Adapter;
             _deviceList = new ObservableCollection<BluetoothDeviceInfo>();
             DevicesListView.ItemsSource = _deviceList;
-
+            _serverService = new ServerService(UpdateServerStatus);
             RequestBluetoothPermissions();
             /*
 #if WINDOWS
@@ -189,7 +191,7 @@ namespace DigiLimbDesktop
             }
         }
 
-        
+
 
         private async void btnBack_Click(object sender, EventArgs e)
         {
@@ -342,16 +344,49 @@ namespace DigiLimbDesktop
 
             Debug.WriteLine("Device Disconnected.");
         }
+        private void btnStartServer_Click(object sender, EventArgs e)
+        {
+            if (!_isServerRunning)
+            {
+                _serverService.StartServer();
+                _isServerRunning = true;
+                btnStartServer.IsEnabled = false;
+                btnStopServer.IsEnabled = true;
+            }
+        }
+
+        private void btnStopServer_Click(object sender, EventArgs e)
+        {
+            if (_isServerRunning)
+            {
+                _serverService.StopServer();
+                _isServerRunning = false;
+                btnStartServer.IsEnabled = true;
+                btnStopServer.IsEnabled = false;
+            }
+        }
+
+        // ✅ Update UI when the server starts, stops, or a client joins
+        private void UpdateServerStatus(string message, bool isRunning)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                txtLogs.Text += $"\n{message}";
+                lblPairedDevice.Text = isRunning ? message : "Server Stopped";
+                lblPairedDevice.TextColor = isRunning ? Microsoft.Maui.Graphics.Colors.Green : Microsoft.Maui.Graphics.Colors.Red;
+                lblPairedDevice.IsVisible = true;
+            });
+
+            Debug.WriteLine($"📡 Server Status: {message}");
+        }
 
     }
 
 }
 
-    public class BluetoothDeviceInfo
-    {
-        public string DisplayName { get; set; }
-        public string DeviceId { get; set; }
-        public string ManufacturerData { get; set; }
-    }
-
-
+public class BluetoothDeviceInfo
+{
+    public string DisplayName { get; set; }
+    public string DeviceId { get; set; }
+    public string ManufacturerData { get; set; }
+}
