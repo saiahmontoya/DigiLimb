@@ -72,6 +72,15 @@
                         Clicked="OnRegisterClicked"
                         Text="Register"
                         TextColor="#517891"/>
+                <Button x:Name="btnDeveloperBypass"
+                        Text="Developer Bypass"
+                        BackgroundColor="Gray"
+                        TextColor="White"
+                        HeightRequest="50"
+                        WidthRequest="250"
+                        IsVisible="False"
+                        Clicked="OnDeveloperBypassClicked"/>
+
             </VerticalStackLayout>
         </Grid>
 

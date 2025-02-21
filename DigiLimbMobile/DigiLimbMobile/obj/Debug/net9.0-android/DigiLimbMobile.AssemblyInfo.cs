@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DigiLimbMobile")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+9f7617496a62714211526f9b214eaa924b6006d1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+5b6891c10ccb388ed7206688a784c5a7518977cf")]
 [assembly: System.Reflection.AssemblyProductAttribute("DigiLimbMobile")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DigiLimbMobile")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

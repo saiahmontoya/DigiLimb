@@ -1,4 +1,4 @@
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Security.Cryptography;
@@ -145,6 +145,26 @@ public partial class Login : ContentPage
         {
             await DisplayAlert("Registration Error", ex.Message, "OK");
         }
+    }
+
+    // ✅ Developer Bypass Function
+    private async void OnDeveloperBypassClicked(object sender, EventArgs e)
+    {
+        if (IsDeveloperModeEnabled())
+        {
+            await DisplayAlert("Developer Mode", "Bypassing login...", "OK");
+            await Shell.Current.GoToAsync("//ConnectionPage");
+        }
+        else
+        {
+            await DisplayAlert("Access Denied", "Developer mode is not enabled!", "OK");
+        }
+    }
+
+    // ✅ Checks if Developer Mode is Enabled
+    private bool IsDeveloperModeEnabled()
+    {
+        return Environment.GetEnvironmentVariable("DEV_MODE") == "true";
     }
 
     private static string GenerateSalt()

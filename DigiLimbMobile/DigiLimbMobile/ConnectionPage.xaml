@@ -3,71 +3,120 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbMobile.ConnectionPage"
              Title="Connect">
-    <VerticalStackLayout Padding="20" Spacing="20">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
 
-        <!-- Background Card -->
-        <Frame BackgroundColor="#d9ecfa"
+            <!-- Background Card -->
+            <Frame BackgroundColor="#d9ecfa"
                CornerRadius="15"
                Padding="20"
                HasShadow="True">
 
-            <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-                <!-- Title -->
-                <Label Text="Connect to Computer"
+                <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <!-- Title -->
+                    <Label Text="Connect to Computer"
                        FontSize="24"
                        FontAttributes="Bold"
                        TextColor="#333"
                        HorizontalOptions="Center"/>
 
-                <!-- Instruction Text -->
-                <Label Text="Select the computer device that you'd like to connect. 
+                    <!-- Instruction Text -->
+                    <Label Text="Select the computer device that you'd like to connect. 
                              To start a new connection with a new device, select 'Add New Device'."
                        FontSize="16"
                        TextColor="#555"
                        HorizontalTextAlignment="Center"
                        Padding="10,0,10,0"/>
-            </VerticalStackLayout>
+                </VerticalStackLayout>
 
-        </Frame>
+            </Frame>
 
-        <!-- Device List -->
-        <Frame BackgroundColor="White"
+            <!-- Device List -->
+            <Frame BackgroundColor="White"
                CornerRadius="10"
                Padding="10"
                HasShadow="True"
                HeightRequest="200">
 
-            <ListView x:Name="DeviceListView"
+                <ListView x:Name="DeviceListView"
                       SelectionMode="Single"
                       HeightRequest="180">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <StackLayout Padding="10">
-                                <Label Text="No devices added." FontSize="18" FontAttributes="Bold"/>
-                                
-                            </StackLayout>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Frame>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <StackLayout Padding="10">
+                                    <Label Text="No devices added." FontSize="18" FontAttributes="Bold"/>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Frame>
 
-        <!-- Buttons -->
-        <Button Margin="20,10,20,0"
+            <!-- Existing Buttons -->
+            <Button Margin="20,10,20,0"
                 BackgroundColor="#57b9FF"
-                HeightRequest="60"
+                HeightRequest="50"
                 VerticalOptions="Start"
                 Text="Connect"
                 TextColor="White"/>
 
-        <Button Margin="20,10,20,0"
+            <Button Margin="20,10,20,0"
                 BackgroundColor="#d9ecfa"
-                HeightRequest="60"
+                HeightRequest="50"
                 VerticalOptions="Start"
                 Text="Add New Device"
                 TextColor="#517891"
                 Clicked="OnAddDeviceClicked"/>
 
-    </VerticalStackLayout>
+            <!-- Newly Added Buttons -->
+            <Frame BackgroundColor="White"
+               CornerRadius="10"
+               Padding="10"
+               HasShadow="True"
+               Margin="10,20,10,10">
+
+                <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+
+                    <Label x:Name="lblConnectionStatus"
+                       Text="Not Connected"
+                       TextColor="Red"
+                       FontSize="16"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+
+                    <Button x:Name="btnConnectServer"
+                        Margin="10,5,10,5"
+                        BackgroundColor="Green"
+                        HeightRequest="40"
+                        WidthRequest="250"
+                        Text="Connect to Server"
+                        TextColor="White"
+                        Clicked="btnConnectServer_Click"/>
+
+                    <Button x:Name="btnDisconnectServer"
+                        Margin="10,5,10,5"
+                        BackgroundColor="Red"
+                        HeightRequest="40"
+                        WidthRequest="250"
+                        Text="Disconnect"
+                        TextColor="White"
+                        Clicked="btnDisconnectServer_Click"
+                        IsEnabled="False"/>
+
+                    <Button x:Name="btnSendMessage"
+                        Margin="10,5,10,5"
+                        BackgroundColor="Blue"
+                        HeightRequest="40"
+                        WidthRequest="250"
+                        Text="Send Message"
+                        TextColor="White"
+                        Clicked="btnSendMessage_Click"
+                        IsEnabled="False"/>
+                </VerticalStackLayout>
+
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
