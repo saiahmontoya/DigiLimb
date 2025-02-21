@@ -6,38 +6,35 @@
              BackgroundColor="#EAEAEA">
     <!-- 🔹 Light Gray Background -->
 
-    <Grid RowDefinitions="Auto, *, Auto" Padding="0">
-    <!-- Wrap everything in a ScrollView -->
+    <!-- Wrap everything in a ScrollView to ensure full scrolling -->
     <ScrollView>
         <VerticalStackLayout Padding="30,50" Spacing="25" HorizontalOptions="Center">
 
-        <!-- 🔹 Title Box (Fixed Shape & Visibility) -->
-        <Frame BackgroundColor="White"
-               CornerRadius="15"
-               HeightRequest="80"  
-            Margin="30,50,30,20"
-               Padding="15"
-               HasShadow="True"
-               HorizontalOptions="Fill"
-               VerticalOptions="Start">
-            <!-- 🔹 Positions title correctly -->
+            <!-- 🔹 Title Box (Fixed Shape & Visibility) -->
+            <Frame BackgroundColor="White"
+                   CornerRadius="15"
+                   HeightRequest="80"  
+                   Margin="30,50,30,20"
+                   Padding="15"
+                   HasShadow="True"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Start">
+                <Label x:Name="lblDeviceName"
+                       Text="DigiLimb Dashboard"
+                       FontSize="30"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TextColor="#2D2D2D"
+                       VerticalOptions="Center"/>
+            </Frame>
 
-            <Label x:Name="lblDeviceName"
-                   Text="DigiLimb Dashboard"
-                   FontSize="30"
-                   FontAttributes="Bold"
-                   HorizontalTextAlignment="Center"
-                   TextColor="#2D2D2D" 
-                VerticalOptions="Center"/>
-        </Frame>
-
-        <!-- 🔹 Menu Container -->
-        <Grid Grid.Row="1">
+            <!-- 🔹 Menu Container -->
             <Frame Margin="30"
                    Padding="40,30,40,40"
                    CornerRadius="20"
                    BackgroundColor="White"
-                   HasShadow="True">
+                   HasShadow="True"
+                   HorizontalOptions="Fill">
 
                 <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
 
@@ -70,25 +67,17 @@
                             FontSize="18"
                             CornerRadius="10"
                             WidthRequest="250"/>
-            <Button Text="Devices"
-                    Clicked="OnDevicesClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="Cyan"
-                    BorderWidth="2"
-                    HeightRequest="60"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
 
-            <Button Text="Settings"
-                    Clicked="OnSettingsClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="Cyan"
-                    BorderWidth="2"
-                    HeightRequest="60"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
+                    <!-- Devices Button -->
+                    <Button Text="Devices"
+                            Clicked="OnDevicesClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            BorderWidth="2"
+                            FontSize="18"
+                            HeightRequest="60"
+                            WidthRequest="250"
+                            HorizontalOptions="Center"/>
 
                     <!-- Support Button -->
                     <Button Text="Support"
@@ -99,24 +88,10 @@
                             FontSize="18"
                             CornerRadius="10"
                             WidthRequest="250"/>
-
                 </VerticalStackLayout>
             </Frame>
-        </Grid>
 
-        <!-- 🔹 Quit Button (Now Visible & Fixed) -->
-        <Grid Grid.Row="2" Margin="0,20,0,20">
-            <Button Text="Support"
-                    Clicked="OnSupportClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="Cyan"
-                    BorderWidth="2"
-                    HeightRequest="60"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
-
-            <!-- Quit Button -->
+            <!-- 🔹 Quit Button -->
             <Button Text="Quit"
                     Clicked="OnQuitClicked"
                     BackgroundColor="#d9534f"
@@ -126,7 +101,7 @@
                     CornerRadius="10"
                     WidthRequest="250"
                     HorizontalOptions="Center"/>
-        </Grid>
 
-    </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
