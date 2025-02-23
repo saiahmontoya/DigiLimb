@@ -1,0 +1,240 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\View\\Login.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\dotnet\\packs\\Microsoft.iOS.Sdk.net9.0_18.2\\18.2.9173\\tools\\msbuild\\Xamarin.Shared.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\Platforms\\iOS\\Info.plist||{4B819833-C3E7-40A8-B4AF-4F7F5E6B913F}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\Platforms\\iOS\\Info.plist||{4B819833-C3E7-40A8-B4AF-4F7F5E6B913F}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\App.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\App.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\BluetoothManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\BluetoothManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\AddNewDevicePage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\View\\AddNewDevicePage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\Platforms\\iOS\\AppDelegate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\Platforms\\iOS\\AppDelegate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\ConnectionPage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\ConnectionPage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\App.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\App.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\View\\Login.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\MainPage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DigiLimbMobile\\MainPage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 16,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Login.xaml",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\View\\Login.xaml",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml",
+              "RelativeToolTip": "DigiLimbMobile\\View\\Login.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAD0AAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-02-10T10:13:31.027Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Xamarin.Shared.targets",
+              "DocumentMoniker": "C:\\Program Files\\dotnet\\packs\\Microsoft.iOS.Sdk.net9.0_18.2\\18.2.9173\\tools\\msbuild\\Xamarin.Shared.targets",
+              "ToolTip": "C:\\Program Files\\dotnet\\packs\\Microsoft.iOS.Sdk.net9.0_18.2\\18.2.9173\\tools\\msbuild\\Xamarin.Shared.targets",
+              "ViewState": "AgIAAIgHAAAAAAAAAAAEwJUHAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2025-02-20T10:08:40.311Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Info.plist",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\Platforms\\iOS\\Info.plist",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\Platforms\\iOS\\Info.plist",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\Platforms\\iOS\\Info.plist",
+              "RelativeToolTip": "DigiLimbMobile\\Platforms\\iOS\\Info.plist",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-02-20T10:02:38.242Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "App.xaml",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\App.xaml",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\App.xaml",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\App.xaml",
+              "RelativeToolTip": "DigiLimbMobile\\App.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-02-18T20:39:08.243Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "BluetoothManager.cs",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\BluetoothManager.cs",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\BluetoothManager.cs",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\BluetoothManager.cs",
+              "RelativeToolTip": "DigiLimbMobile\\BluetoothManager.cs",
+              "ViewState": "AgIAAGkAAAAAAAAAAAAcwIYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-11T08:26:38.819Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AddNewDevicePage.xaml",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\AddNewDevicePage.xaml",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\View\\AddNewDevicePage.xaml",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\AddNewDevicePage.xaml",
+              "RelativeToolTip": "DigiLimbMobile\\View\\AddNewDevicePage.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-02-11T07:06:34.796Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AppDelegate.cs",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\Platforms\\iOS\\AppDelegate.cs",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\Platforms\\iOS\\AppDelegate.cs",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\Platforms\\iOS\\AppDelegate.cs",
+              "RelativeToolTip": "DigiLimbMobile\\Platforms\\iOS\\AppDelegate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-20T10:14:22.681Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ConnectionPage.xaml",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\ConnectionPage.xaml",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\ConnectionPage.xaml",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\ConnectionPage.xaml",
+              "RelativeToolTip": "DigiLimbMobile\\ConnectionPage.xaml",
+              "ViewState": "AgIAACEAAAAAAAAAAAAcwDsAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-02-20T10:41:53.156Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AddNewDevicePage.xaml.cs",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs",
+              "RelativeToolTip": "DigiLimbMobile\\View\\AddNewDevicePage.xaml.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAADMAAABpAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-20T11:11:09.92Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "App.xaml.cs",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\App.xaml.cs",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\App.xaml.cs",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\App.xaml.cs",
+              "RelativeToolTip": "DigiLimbMobile\\App.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-06T01:45:56.472Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Login.xaml.cs",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml.cs",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\View\\Login.xaml.cs",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\View\\Login.xaml.cs",
+              "RelativeToolTip": "DigiLimbMobile\\View\\Login.xaml.cs",
+              "ViewState": "AgIAAHUAAAAAAAAAAAAQwKwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-06T22:30:02.965Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "MainPage.xaml",
+              "DocumentMoniker": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\MainPage.xaml",
+              "RelativeDocumentMoniker": "DigiLimbMobile\\MainPage.xaml",
+              "ToolTip": "G:\\GitHub\\DigiLimb\\DigiLimbMobile\\DigiLimbMobile\\MainPage.xaml",
+              "RelativeToolTip": "DigiLimbMobile\\MainPage.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-02-06T01:42:09.969Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 384,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{a80febb4-e7e0-4147-b476-21aaf2453969}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
