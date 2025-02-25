@@ -6,4 +6,9 @@ public partial class EmulatorPage : ContentPage
 	{
 		InitializeComponent();
 	}
+
+	private async void OnMouseClicked(object sender, EventArgs e)
+	{
+		await Navigation.PushAsync(new MousePage());
+	} 
 }

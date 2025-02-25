@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="DigiLimbMobile.MousePage"
+             Title="MousePage">
+    
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+        <BoxView Grid.Row="0" BackgroundColor="#90D5FF" AbsoluteLayout.LayoutBounds="0.5,0.5,300,300" AbsoluteLayout.LayoutFlags="PositionProportional">
+                <BoxView.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="OnPanUpdated"/>
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+
+        <Button Grid.Row="1" 
+                Margin="0,0,0,0"
+                HeightRequest="60"
+                WidthRequest="190"
+                VerticalOptions="Start"
+                HorizontalOptions="Start"
+                Clicked="LeftClick">
+                <Button.Behaviors>
+                    <toolkit:TouchBehavior
+                            PressedBackgroundColor="#77B1D4"
+                            PressedOpacity="0.8"
+                            DefaultBackgroundColor="#d9ecfa"
+                            DefaultOpacity="1" />
+                </Button.Behaviors>
+        </Button>
+
+        <Button Grid.Row="1" 
+                    Margin="0,0,0,0"
+                    HeightRequest="60"
+                    WidthRequest="190"  
+                    VerticalOptions="Start"
+                    HorizontalOptions="End"
+                    Clicked="RightClick">
+            <Button.Behaviors>
+                <toolkit:TouchBehavior
+                    PressedBackgroundColor="#77B1D4"
+                    PressedOpacity="0.8"
+                    DefaultBackgroundColor="#d9ecfa"
+                    DefaultOpacity="1" />
+            </Button.Behaviors>
+        </Button>
+        <Image Grid.Row="1" 
+               HorizontalOptions="Center"
+               VerticalOptions="End"
+               Aspect="AspectFill"
+               HeightRequest="150"
+               WidthRequest="150"
+               Source="legoat.png" />
+        <!-- A label to show feedback of touch movement -->
+        <Label x:Name="MovementFeedbackLabel" Text="Move your finger on the touchpad" 
+              VerticalOptions="Center" HorizontalOptions="Center" />
+        <Label Grid.Row="1" x:Name="ClickLabel" VerticalOptions="Center" HorizontalOptions="Center" TextColor="White"/>
+    </Grid>
+
+</ContentPage>

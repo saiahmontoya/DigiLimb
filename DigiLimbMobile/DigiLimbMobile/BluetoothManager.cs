@@ -28,7 +28,7 @@ namespace DigiLimbMobile
 
         public ObservableCollection<DeviceInfo> Devices { get; private set; } = new(); // Now uses DeviceInfo
 
-
+        public ICharacteristic? Characteristic { get; private set; }  // Store the characteristic
 
         public BluetoothManager()
         {

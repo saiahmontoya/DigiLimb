@@ -9,5 +9,12 @@
             VerticalOptions="Center" 
             HorizontalOptions="Center"
             Style="{StaticResource Headline}"/>
+        <Button Margin="20,10,20,0"
+                BackgroundColor="#d9ecfa"
+                HeightRequest="60"
+                VerticalOptions="Start"
+                Text="Mouse"
+                TextColor="#517891"
+                Clicked="OnMouseClicked"/>
     </VerticalStackLayout>
 </ContentPage>
