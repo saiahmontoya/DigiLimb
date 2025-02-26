@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbDesktop.DevicesPage"
+             Title="My Devices"
+             BackgroundColor="Black">
+
+    <VerticalStackLayout Padding="20">
+
+        <Label Text="Registered Devices"
+               FontSize="24"
+               TextColor="Cyan"
+               FontAttributes="Bold"
+               HorizontalTextAlignment="Center"/>
+
+        <!-- Device List -->
+        <ListView x:Name="devicesListView"
+                  BackgroundColor="Black"
+                  HasUnevenRows="True">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Border Padding="10"
+                                BackgroundColor="Gray"
+                                StrokeShape="RoundRectangle 10">
+
+                            <StackLayout>
+                                <Label Text="{Binding DeviceModel}" FontSize="18" TextColor="White"/>
+                                <Label Text="{Binding Manufacturer}" FontSize="14" TextColor="LightGray"/>
+                                <Label Text="{Binding Platform}" FontSize="14" TextColor="LightGray"/>
+                                <Label Text="{Binding OsVersion}" FontSize="14" TextColor="LightGray"/>
+
+                                <!-- Connect Button -->
+                                <Button Text="Connect"
+                                        BackgroundColor="Black"
+                                        TextColor="White"
+                                        BorderColor="Lime"
+                                        BorderWidth="2"
+                                        HorizontalOptions="Center"
+                                        Clicked="OnConnectClicked"
+                                        CommandParameter="{Binding Id}"/>
+                            </StackLayout>
+
+                        </Border>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- Back Button -->
+        <Button Text="Back"
+                Clicked="OnBackClicked"
+                BackgroundColor="Black"
+                TextColor="White"
+                BorderColor="Red"
+                BorderWidth="2"
+                HorizontalOptions="Center"
+                Margin="0,20,0,0"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbDesktop.MainPage"
+             Title="Main Menu"
+             BackgroundColor="#EAEAEA">
+    <!-- 🔹 Light Gray Background -->
+
+    <!-- Wrap everything in a ScrollView to ensure full scrolling -->
+    <ScrollView>
+        <VerticalStackLayout Padding="30,50" Spacing="25" HorizontalOptions="Center">
+
+            <!-- 🔹 Title Box (Fixed Shape & Visibility) -->
+            <Frame BackgroundColor="White"
+                   CornerRadius="15"
+                   HeightRequest="80"  
+                   Margin="30,50,30,20"
+                   Padding="15"
+                   HasShadow="True"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Start">
+                <Label x:Name="lblDeviceName"
+                       Text="DigiLimb Dashboard"
+                       FontSize="30"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TextColor="#2D2D2D"
+                       VerticalOptions="Center"/>
+            </Frame>
+
+            <!-- 🔹 Menu Container -->
+            <Frame Margin="30"
+                   Padding="40,30,40,40"
+                   CornerRadius="20"
+                   BackgroundColor="White"
+                   HasShadow="True"
+                   HorizontalOptions="Fill">
+
+                <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
+
+                    <!-- Connections Button -->
+                    <Button Text="Connections"
+                            Clicked="OnConnectionsClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            HeightRequest="55"
+                            FontSize="18"
+                            CornerRadius="10"
+                            WidthRequest="250"/>
+
+                    <!-- Emulation Button -->
+                    <Button Text="Emulation"
+                            Clicked="OnEmulationClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            HeightRequest="55"
+                            FontSize="18"
+                            CornerRadius="10"
+                            WidthRequest="250"/>
+
+                    <!-- Settings Button -->
+                    <Button Text="Settings"
+                            Clicked="OnSettingsClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            HeightRequest="55"
+                            FontSize="18"
+                            CornerRadius="10"
+                            WidthRequest="250"/>
+
+                    <!-- Devices Button -->
+                    <Button Text="Devices"
+                            Clicked="OnDevicesClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            BorderWidth="2"
+                            FontSize="18"
+                            HeightRequest="60"
+                            WidthRequest="250"
+                            HorizontalOptions="Center"/>
+
+                    <!-- Support Button -->
+                    <Button Text="Support"
+                            Clicked="OnSupportClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            HeightRequest="55"
+                            FontSize="18"
+                            CornerRadius="10"
+                            WidthRequest="250"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 🔹 Quit Button -->
+            <Button Text="Quit"
+                    Clicked="OnQuitClicked"
+                    BackgroundColor="#d9534f"
+                    TextColor="White"
+                    HeightRequest="50"
+                    FontSize="18"
+                    CornerRadius="10"
+                    WidthRequest="250"
+                    HorizontalOptions="Center"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

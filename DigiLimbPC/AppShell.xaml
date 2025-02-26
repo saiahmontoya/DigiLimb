@@ -1,0 +1,39 @@
+<Shell
+    x:Class="DigiLimbDesktop.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:DigiLimbDesktop"
+    Shell.FlyoutBehavior="Flyout">
+
+    <!-- Set LoginPage as the first page -->
+    <ShellContent
+        Title="Login"
+        ContentTemplate="{DataTemplate local:LoginPage}"
+        Route="LoginPage" />
+
+    <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+
+    <ShellContent
+        Title="Connections"
+        ContentTemplate="{DataTemplate local:ConnectionsPage}"
+        Route="ConnectionsPage" />
+
+    <ShellContent
+        Title="Settings"
+        ContentTemplate="{DataTemplate local:SettingsPage}"
+        Route="SettingsPage" />
+
+    <ShellContent
+        Title="Emulation"
+        ContentTemplate="{DataTemplate local:EmulationPage}"
+        Route="EmulationPage" />
+    
+    <ShellContent
+        Title="Support"
+        ContentTemplate="{DataTemplate local:SupportPage}"
+        Route="SupportPage" />
+
+</Shell>
