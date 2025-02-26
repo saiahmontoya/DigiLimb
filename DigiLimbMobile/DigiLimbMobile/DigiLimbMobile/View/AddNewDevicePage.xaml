@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbMobile.View.AddNewDevicePage"
+             Title="Add New Device">
+    <Grid RowDefinitions=".8*,.2*">
+        <Grid Grid.Row="0">
+
+            <Frame BackgroundColor="#d9ecfa"
+                        CornerRadius="10"
+                        HeightRequest="525"
+                        TranslationY="20"
+                        VerticalOptions="Center"
+                        WidthRequest="350"
+                        >
+
+                <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <Label Text="Pair Device" 
+                       HorizontalOptions="Center"
+                       FontSize="25"/>
+                    <Label Text="Make sure Bluetooth is enabled on both devices. &#10;Make sure DigiLimb PC is installed and visible to local devices."
+                       HorizontalOptions="Center"
+                       FontSize="16"
+                       TextColor="#555"
+                       HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame HeightRequest="360" WidthRequest="340" TranslationY="90" BackgroundColor="#d9ecfa" BorderColor="#d9ecfa">
+                <ListView x:Name="DeviceListView" 
+                          ItemsSource="{Binding Devices}" 
+                          SelectionMode="Single"
+                          HasUnevenRows="True"
+                          BackgroundColor="#d9ecfa">
+                <!-- Allows flexible row heights -->
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <Frame Padding="15" Margin="10,5,10,5" CornerRadius="10" BackgroundColor="White" HasShadow="True" >
+                                    <StackLayout Spacing="5">
+                                        <!-- Device Name (Large & Bold) -->
+                                        <Label Text="{Binding Name}" 
+                                                   FontSize="20" 
+                                                   FontAttributes="Bold"
+                                                   TextColor="Black" />
+
+                                        <!-- Device ID (Smaller, Gray) -->
+                                        <Label Text="{Binding Id}" 
+                                                   FontSize="14" 
+                                                   TextColor="Gray" />
+                                    </StackLayout>
+                                </Frame>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Frame>
+            
+        </Grid>
+        <Grid Grid.Row="1">
+            <Button Margin="60,20,60,0"
+                BackgroundColor="#57b9FF"
+                HeightRequest="60"
+                VerticalOptions="Start"
+                Text="Scan"
+                TextColor="#d9ecfa"
+                Clicked="OnScanClicked"/>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbMobile.EmulatorPage"
+             Title="Emulators">
+    <VerticalStackLayout>
+        <Label 
+            Text="Emulators"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center"
+            Style="{StaticResource Headline}"/>
+        <Button Margin="20,10,20,0"
+                BackgroundColor="#d9ecfa"
+                HeightRequest="60"
+                VerticalOptions="Start"
+                Text="Mouse"
+                TextColor="#517891"
+                Clicked="OnMouseClicked"/>
+    </VerticalStackLayout>
+</ContentPage>
