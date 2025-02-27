@@ -4,12 +4,13 @@ using System;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
-using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Radios;
 using Windows.Storage.Streams;
 using System.Diagnostics;
 using System.Text;
+using DigiLimbDesktop.Platforms.Windows; // Import MouseEmulator
+
 
 namespace DigiLimbDesktop.Platforms.Windows
 {
@@ -20,26 +21,25 @@ namespace DigiLimbDesktop.Platforms.Windows
         public string DeviceId { get; set; }
         public string Manufacturer { get; set; }
     }
-
     public class BluetoothPeripheral
     {
         private GattServiceProvider _gattServiceProvider;
-        private GattLocalCharacteristic _characteristic;
+        private GattLocalCharacteristic _characteristicDeviceInfo;
+        private GattLocalCharacteristic _characteristicMouseData;
         private IAdapter _adapter;
-        private IDevice _connectedDevice; // Store the connected device
+        private IDevice _connectedDevice;
 
         public event EventHandler<IDevice> DeviceConnected;
         public event EventHandler<IDevice> DeviceDisconnected;
+        public event EventHandler<(int x, int y, bool leftClick, bool rightClick)> MouseDataReceived;
+        public event EventHandler<ReceivedDeviceInfo> DeviceInfoReceived;
 
         public BluetoothPeripheral(IAdapter adapter)
         {
             _adapter = adapter;
-            
-
             MainThread.InvokeOnMainThreadAsync(async () => await InitializeBluetoothAsync());
         }
-        
-        // Establish bluetooth permissions
+
         private async Task InitializeBluetoothAsync()
         {
             var accessStatus = await Radio.RequestAccessAsync();
@@ -52,11 +52,9 @@ namespace DigiLimbDesktop.Platforms.Windows
             await StartGattServer();
         }
 
-        // Create new gatt server
         private async Task StartGattServer()
         {
-            var serviceUuid = new Guid("0000FFF0-0000-1000-8000-00805F9B34FB"); // Custom service UUID
-
+            var serviceUuid = new Guid("0000FFF0-0000-1000-8000-00805F9B34FB");
             var serviceResult = await GattServiceProvider.CreateAsync(serviceUuid);
             if (serviceResult.Error != BluetoothError.Success)
             {
@@ -67,93 +65,97 @@ namespace DigiLimbDesktop.Platforms.Windows
             _gattServiceProvider = serviceResult.ServiceProvider;
             Debug.WriteLine("✅ GATT Server Initialized Successfully.");
 
-            _gattServiceProvider.AdvertisementStatusChanged += (sender, args) =>
+            await CreateDeviceInfoCharacteristic();
+            await CreateMouseDataCharacteristic();
+
+            _gattServiceProvider.StartAdvertising(new GattServiceProviderAdvertisingParameters
             {
-                Debug.WriteLine($"🔹 GATT Server Status: {args.Status}");
-            };
+                IsDiscoverable = true,
+                IsConnectable = true,
+            });
 
+            Debug.WriteLine("✅ GATT Server Advertising Started.");
+        }
 
-            // Define characteristic properties 
+        private async Task CreateDeviceInfoCharacteristic()
+        {
             var characteristicParameters = new GattLocalCharacteristicParameters
             {
                 CharacteristicProperties = GattCharacteristicProperties.Read |
-                                   GattCharacteristicProperties.Write |
-                                   GattCharacteristicProperties.Notify, // ✅ Enables all three
+                                           GattCharacteristicProperties.Write |
+                                           GattCharacteristicProperties.Notify,
                 ReadProtectionLevel = GattProtectionLevel.Plain,
                 WriteProtectionLevel = GattProtectionLevel.Plain,
                 UserDescription = "Connection Signal with Read, Write & Notify"
             };
 
             var characteristicResult = await _gattServiceProvider.Service.CreateCharacteristicAsync(
-                new Guid("0000FFF2-0000-1000-8000-00805F9B34FB"), // Characteristic UUID
-                characteristicParameters
-            );
+                new Guid("0000FFF2-0000-1000-8000-00805F9B34FB"), characteristicParameters);
 
             if (characteristicResult.Error == BluetoothError.Success)
             {
-                _characteristic = characteristicResult.Characteristic;
-                _characteristic.ReadRequested += OnReadRequested;
-                _characteristic.WriteRequested += OnWriteRequested;
-                Debug.WriteLine("✅ GATT Characteristic Created.");
+                _characteristicDeviceInfo = characteristicResult.Characteristic;
+                _characteristicDeviceInfo.ReadRequested += OnReadRequested;
+                _characteristicDeviceInfo.WriteRequested += OnDeviceInfoWriteRequested;
+                Debug.WriteLine("✅ Device Info Characteristic Created.");
             }
             else
             {
-                Debug.WriteLine("❌ Failed to create characteristic.");
-                return;
+                Debug.WriteLine("❌ Failed to create Device Info Characteristic.");
             }
-
-            _gattServiceProvider.AdvertisementStatusChanged += (sender, args) =>
-            {
-                Debug.WriteLine($"🔹 GATT Server Status: {args.Status}");
-            };
-
-            // Ensure server can be connected to 
-            _gattServiceProvider.StartAdvertising(new GattServiceProviderAdvertisingParameters
-            {
-                IsDiscoverable = true,
-                IsConnectable = true,
-                
-            });
-
-            Debug.WriteLine("✅ GATT Server Advertising Started.");
         }
 
-        // Send data for mobile device to read
+        private async Task CreateMouseDataCharacteristic()
+        {
+            var characteristicParameters = new GattLocalCharacteristicParameters
+            {
+                CharacteristicProperties = GattCharacteristicProperties.Read |
+                                           GattCharacteristicProperties.Write |
+                                           GattCharacteristicProperties.Notify,
+                ReadProtectionLevel = GattProtectionLevel.Plain,
+                WriteProtectionLevel = GattProtectionLevel.Plain,
+                UserDescription = "Mouse Emulation Data"
+            };
+
+            var characteristicResult = await _gattServiceProvider.Service.CreateCharacteristicAsync(
+                new Guid("0000FFF3-0000-1000-8000-00805F9B34FB"), characteristicParameters);
+
+            if (characteristicResult.Error == BluetoothError.Success)
+            {
+                _characteristicMouseData = characteristicResult.Characteristic;
+                _characteristicMouseData.WriteRequested += OnMouseDataWriteRequested;
+                Debug.WriteLine("✅ Mouse Data Characteristic Created.");
+            }
+            else
+            {
+                Debug.WriteLine("❌ Failed to create Mouse Data Characteristic.");
+            }
+        }
+
         private async void OnReadRequested(GattLocalCharacteristic sender, GattReadRequestedEventArgs args)
         {
-            var deferral = args.GetDeferral(); // Take deferral to process the request
-
+            var deferral = args.GetDeferral();
             try
             {
-                // Create the string message you want to send
                 string message = "Hello from DigiLimb!";
-
-                // Convert the message to a byte array (UTF-8 encoding)
-                byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(message);
-
-                // Convert the byte[] to IBuffer
+                byte[] messageBytes = Encoding.UTF8.GetBytes(message);
                 IBuffer buffer = messageBytes.AsBuffer();
-
                 var request = await args.GetRequestAsync();
                 if (request != null)
                 {
-                    // Respond with the IBuffer as the value
-                    request.RespondWithValue(buffer); // Send data to the connected device
+                    request.RespondWithValue(buffer);
                     Debug.WriteLine("📡 Device Read Requested: Sent Data.");
                 }
             }
             finally
             {
-                deferral.Complete(); // Complete request handling
+                deferral.Complete();
             }
         }
 
-        public event EventHandler<ReceivedDeviceInfo> DeviceInfoReceived;
-
-        private async void OnWriteRequested(GattLocalCharacteristic sender, GattWriteRequestedEventArgs args)
+        private async void OnDeviceInfoWriteRequested(GattLocalCharacteristic sender, GattWriteRequestedEventArgs args)
         {
             var deferral = args.GetDeferral();
-
             try
             {
                 var request = await args.GetRequestAsync();
@@ -169,23 +171,12 @@ namespace DigiLimbDesktop.Platforms.Windows
 
                 Debug.WriteLine($"📡 Received Mobile Device Info: {mobileDeviceName}, {mobileDeviceId}, {manufacturerData}");
 
-
-                // ✅ Parse JSON message
-                try
+                DeviceInfoReceived?.Invoke(this, new ReceivedDeviceInfo
                 {
-                    ReceivedDeviceInfo deviceInfo = new ReceivedDeviceInfo
-                    {
-                        DeviceName = mobileDeviceName,
-                        DeviceId = mobileDeviceId,
-                        Manufacturer = manufacturerData
-                    };
-
-                    DeviceInfoReceived?.Invoke(this, deviceInfo);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"❌ Error parsing device info: {ex.Message}");
-                }
+                    DeviceName = mobileDeviceName,
+                    DeviceId = mobileDeviceId,
+                    Manufacturer = manufacturerData
+                });
             }
             finally
             {
@@ -193,8 +184,62 @@ namespace DigiLimbDesktop.Platforms.Windows
             }
         }
 
+        private async void OnMouseDataWriteRequested(GattLocalCharacteristic sender, GattWriteRequestedEventArgs args)
+        {
+            var deferral = args.GetDeferral();
+            try
+            {
+                var request = await args.GetRequestAsync();
+                if (request == null) return;
 
+                var reader = DataReader.FromBuffer(request.Value);
+                int x = 0, y = 0;
+                bool leftClick = false, rightClick = false;
 
+                while (reader.UnconsumedBufferLength > 0)
+                {
+                    byte header = reader.ReadByte(); // Read the header
+
+                    switch (header)
+                    {
+                        case 0x01:
+                            x = reader.ReadInt32();
+                            break;
+                        case 0x02:
+                            y = reader.ReadInt32();
+                            break;
+                        case 0x03:
+                            leftClick = reader.ReadByte() != 0;
+                            break;
+                        case 0x04:
+                            rightClick = reader.ReadByte() != 0;
+                            break;
+                        default:
+                            Debug.WriteLine($"⚠️ Unknown Header: {header}");
+                            break;
+                    }
+                }
+
+                Debug.WriteLine($"🖱️ Mouse Data Received: X={x}, Y={y}, LeftClick={leftClick}, RightClick={rightClick}");
+
+                if (leftClick)
+                {
+                    Debug.WriteLine("🖱️ Simulating Left Click...");
+                    MouseEmulator.SimulateLeftClick();
+                }
+                if (rightClick)
+                {
+                    Debug.WriteLine("🖱️ Simulating Right Click...");
+                    MouseEmulator.SimulateRightClick();
+                }
+
+                MouseDataReceived?.Invoke(this, (x, y, leftClick, rightClick));  
+            }
+            finally
+            {
+                deferral.Complete();
+            }
+        }
 
 
         public void Start()
@@ -230,7 +275,7 @@ namespace DigiLimbDesktop.Platforms.Windows
         private void OnDeviceDisconnectedInternal(object sender, DeviceEventArgs args)
         {
             _connectedDevice = null;
-                Debug.WriteLine("❌ Device Disconnected");
+            Debug.WriteLine("❌ Device Disconnected");
 
             // Debugging check
             if (DeviceDisconnected == null)
