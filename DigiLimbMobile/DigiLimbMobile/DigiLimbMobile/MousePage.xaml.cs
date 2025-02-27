@@ -58,7 +58,7 @@ public partial class MousePage : ContentPage
     // send movements to PC
     private async void SendMouseMovement(double x, double y)
     {
-        if (_bluetoothManager.Characteristic != null)
+        if (_bluetoothManager.mouseCharacteristic != null)
         {
             List<byte> message = new List<byte>();
 
@@ -70,7 +70,7 @@ public partial class MousePage : ContentPage
             message.Add(0x02);
             message.AddRange(BitConverter.GetBytes(y));
 
-            await _bluetoothManager.Characteristic.WriteAsync(message.ToArray());
+            await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
             Console.WriteLine($"Sent Mouse Movement: X={x}, Y={y}");
         }
         else
@@ -83,7 +83,7 @@ public partial class MousePage : ContentPage
     // send clicks to PC
     private async void SendClick(bool leftClick, bool rightClick)
     {
-        if (_bluetoothManager.Characteristic != null)
+        if (_bluetoothManager.mouseCharacteristic != null)
         {
             List<byte> message = new List<byte>();
 
@@ -101,7 +101,7 @@ public partial class MousePage : ContentPage
 
             if (message.Count > 0)
             {
-                await _bluetoothManager.Characteristic.WriteAsync(message.ToArray());
+                await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
                 Console.WriteLine($"Sent Click: Left={leftClick}, Right={rightClick}");
             }
         }

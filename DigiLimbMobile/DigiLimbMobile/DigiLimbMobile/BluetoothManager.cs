@@ -28,7 +28,7 @@ namespace DigiLimbMobile
 
         public ObservableCollection<DeviceInfo> Devices { get; private set; } = new(); // Now uses DeviceInfo
 
-        public ICharacteristic? Characteristic { get; private set; }  // Store the characteristic
+        public ICharacteristic? mouseCharacteristic { get; private set; }  // Store the characteristic
 
         public BluetoothManager()
         {
@@ -113,6 +113,7 @@ namespace DigiLimbMobile
                 if (service != null)
                 {
                     var characteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF2-0000-1000-8000-00805F9B34FB"));
+                    var mouseCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF3-0000-1000-8000-00805F9B34FB"));
                     if (characteristic != null)
                     {
                         string mobileDeviceName = "iPhone"; // 📱 iPhone, Samsung Galaxy, etc.
