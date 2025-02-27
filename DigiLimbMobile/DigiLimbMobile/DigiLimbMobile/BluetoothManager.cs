@@ -38,7 +38,7 @@ namespace DigiLimbMobile
             adapter.DeviceDiscovered += (s, e) =>
             {
                 bool isDigiLimb = false; // Flag for identifying DigiLimb Desktop
-                
+
 
                 Console.WriteLine($"📡 Scanned Device: {e.Device.Name} ({e.Device.Id})");
 
@@ -52,12 +52,11 @@ namespace DigiLimbMobile
                     if (record.Type == AdvertisementRecordType.UuidsComplete16Bit && BitConverter.ToString(record.Data) == "FF-F0")
                     {
                         isDigiLimb = true;
-                    }
+                    } 
                 }
-                    
+
 
                 string deviceName = isDigiLimb ? "DigiLimb Desktop" : e.Device.Name ?? "Unknown Device";
-
                 var deviceInfo = new DeviceInfo
                 {
                     Name = deviceName,

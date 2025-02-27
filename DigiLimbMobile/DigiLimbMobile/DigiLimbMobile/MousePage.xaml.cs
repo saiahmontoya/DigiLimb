@@ -21,10 +21,11 @@ namespace DigiLimbMobile;
 public partial class MousePage : ContentPage
 {
     private BluetoothManager _bluetoothManager;
-	public MousePage()
+
+    public MousePage()
 	{
 		InitializeComponent();
-        _bluetoothManager = new BluetoothManager();
+        _bluetoothManager = App.BluetoothManager;
        
     }
 
@@ -32,14 +33,14 @@ public partial class MousePage : ContentPage
     private void LeftClick(object sender, EventArgs e)
     {
         ClickLabel.Text = $"Left Click";
-        SendClick("left");
+        SendClick(false, true);
     }
 
     //right click functionality
     private void RightClick(object sender, EventArgs e)
     {
         ClickLabel.Text = $"Right Click";
-        SendClick("right");
+        SendClick(false, true);
     }
     //Handle pan gesture updates
     private void OnPanUpdated(object sender, PanUpdatedEventArgs e)
@@ -59,38 +60,55 @@ public partial class MousePage : ContentPage
     {
         if (_bluetoothManager.Characteristic != null)
         {
-            string xString = x.ToString();
-            string yString = y.ToString();
+            List<byte> message = new List<byte>();
 
-            byte[] xData = Encoding.UTF8.GetBytes(xString.PadRight(20));
-            byte[] yData = Encoding.UTF8.GetBytes(yString.PadRight(20));
+            // X Movement (Header 0x01 + 4 Bytes Integer)
+            message.Add(0x01);
+            message.AddRange(BitConverter.GetBytes(x));
 
-            byte[] message = xData.Concat(yData).ToArray();
+            // Y Movement (Header 0x02 + 4 Bytes Integer)
+            message.Add(0x02);
+            message.AddRange(BitConverter.GetBytes(y));
 
-            await _bluetoothManager.Characteristic.WriteAsync(message);
-            Console.WriteLine("Send success");
+            await _bluetoothManager.Characteristic.WriteAsync(message.ToArray());
+            Console.WriteLine($"Sent Mouse Movement: X={x}, Y={y}");
         }
         else
         {
-            Console.WriteLine("Send failed(mouse): no connection");
+            Console.WriteLine("Send failed (mouse): no connection");
         }
     }
 
+
     // send clicks to PC
-    private async void SendClick(string click)
+    private async void SendClick(bool leftClick, bool rightClick)
     {
         if (_bluetoothManager.Characteristic != null)
         {
-            byte[] clickData = Encoding.UTF8.GetBytes(click.PadRight(20));
+            List<byte> message = new List<byte>();
 
-            byte[] message = clickData.ToArray();
+            if (leftClick)
+            {
+                message.Add(0x03);
+                message.Add(1); // 1 = Click, 0 = No Click
+            }
 
-            await _bluetoothManager.Characteristic.WriteAsync(message);
-            Console.WriteLine("Send success");
+            if (rightClick)
+            {
+                message.Add(0x04);
+                message.Add(1); // 1 = Click, 0 = No Click
+            }
+
+            if (message.Count > 0)
+            {
+                await _bluetoothManager.Characteristic.WriteAsync(message.ToArray());
+                Console.WriteLine($"Sent Click: Left={leftClick}, Right={rightClick}");
+            }
         }
         else
         {
-            Console.WriteLine("Send failed(click): no connection");
+            Console.WriteLine("Send failed (click): no connection");
         }
     }
+
 }

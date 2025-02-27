@@ -8,12 +8,12 @@ namespace DigiLimbMobile.View
 {
     public partial class AddNewDevicePage : ContentPage
     {
-        private readonly BluetoothManager bluetoothManager;
 
+        private BluetoothManager bluetoothManager;
         public AddNewDevicePage()
         {
             InitializeComponent();
-            bluetoothManager = new BluetoothManager();
+            bluetoothManager = App.BluetoothManager;
             BindingContext = bluetoothManager;
 
             DeviceListView.ItemTapped += OnDeviceTapped; // Handle tapping on a device
