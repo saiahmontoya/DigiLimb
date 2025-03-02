@@ -21,33 +21,24 @@
                 Margin="0,0,0,0"
                 HeightRequest="60"
                 WidthRequest="190"
+                BackgroundColor="#d9ecfa"
                 VerticalOptions="Start"
                 HorizontalOptions="Start"
-                Clicked="LeftClick">
-                <Button.Behaviors>
-                    <toolkit:TouchBehavior
-                            PressedBackgroundColor="#77B1D4"
-                            PressedOpacity="0.8"
-                            DefaultBackgroundColor="#d9ecfa"
-                            DefaultOpacity="1" />
-                </Button.Behaviors>
+                Pressed="LeftPressed"
+                Released="LeftReleased">
+            
         </Button>
 
         <Button Grid.Row="1" 
-                    Margin="0,0,0,0"
-                    HeightRequest="60"
-                    WidthRequest="190"  
-                    VerticalOptions="Start"
-                    HorizontalOptions="End"
-                    Clicked="RightClick">
-            <Button.Behaviors>
-                <toolkit:TouchBehavior
-                    PressedBackgroundColor="#77B1D4"
-                    PressedOpacity="0.8"
-                    DefaultBackgroundColor="#d9ecfa"
-                    DefaultOpacity="1" />
-            </Button.Behaviors>
-        </Button>
+                Margin="0,0,0,0"
+                HeightRequest="60"
+                WidthRequest="190"  
+                VerticalOptions="Start"
+                BackgroundColor="#d9ecfa"
+                HorizontalOptions="End"
+                Pressed="RightPressed"
+                Released="RightReleased">
+        </Button> 
         <Image Grid.Row="1" 
                HorizontalOptions="Center"
                VerticalOptions="End"

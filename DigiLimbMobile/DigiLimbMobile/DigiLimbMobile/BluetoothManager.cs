@@ -65,8 +65,10 @@ namespace DigiLimbMobile
 
                 if (!Devices.Any(d => d.Id == deviceInfo.Id))
                 {
-                    Devices.Add(deviceInfo);
-
+                    if(deviceName == "DigiLimb Desktop")
+                    {
+                        Devices.Add(deviceInfo);
+                    }
                     Console.WriteLine($"📡 Found Device: {deviceInfo.Name} ({deviceInfo.Id})");
                 }
             };
@@ -113,7 +115,7 @@ namespace DigiLimbMobile
                 if (service != null)
                 {
                     var characteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF2-0000-1000-8000-00805F9B34FB"));
-                    var mouseCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF3-0000-1000-8000-00805F9B34FB"));
+                    mouseCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF3-0000-1000-8000-00805F9B34FB"));
                     if (characteristic != null)
                     {
                         string mobileDeviceName = "iPhone"; // 📱 iPhone, Samsung Galaxy, etc.

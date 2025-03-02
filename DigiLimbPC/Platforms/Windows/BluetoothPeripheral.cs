@@ -31,7 +31,7 @@ namespace DigiLimbDesktop.Platforms.Windows
 
         public event EventHandler<IDevice> DeviceConnected;
         public event EventHandler<IDevice> DeviceDisconnected;
-        public event EventHandler<(int x, int y, bool leftClick, bool rightClick)> MouseDataReceived;
+        public event EventHandler<(double x, double y, bool leftClick, bool rightClick)> MouseDataReceived;
         public event EventHandler<ReceivedDeviceInfo> DeviceInfoReceived;
 
         public BluetoothPeripheral(IAdapter adapter)
@@ -184,6 +184,9 @@ namespace DigiLimbDesktop.Platforms.Windows
             }
         }
 
+        private bool isLeftPressed = false;
+        private bool isRightPressed = false;
+        private bool isMoving = false;
         private async void OnMouseDataWriteRequested(GattLocalCharacteristic sender, GattWriteRequestedEventArgs args)
         {
             var deferral = args.GetDeferral();
@@ -192,8 +195,16 @@ namespace DigiLimbDesktop.Platforms.Windows
                 var request = await args.GetRequestAsync();
                 if (request == null) return;
 
+                //print received bytes
+                var rawBytes = new byte[request.Value.Length];
+                DataReader.FromBuffer(request.Value).ReadBytes(rawBytes);
+
+                //Debug.WriteLine($"Raw bytes received: {BitConverter.ToString(rawBytes)}");
+
                 var reader = DataReader.FromBuffer(request.Value);
-                int x = 0, y = 0;
+                //reader.ByteOrder = ByteORder.LittleEndian;
+
+                double x = 0, y = 0;
                 bool leftClick = false, rightClick = false;
 
                 while (reader.UnconsumedBufferLength > 0)
@@ -220,20 +231,52 @@ namespace DigiLimbDesktop.Platforms.Windows
                     }
                 }
 
-                Debug.WriteLine($"🖱️ Mouse Data Received: X={x}, Y={y}, LeftClick={leftClick}, RightClick={rightClick}");
-
-                if (leftClick)
+                //Debug.WriteLine($"🖱️ Mouse Data Received: X={x}, Y={y}, LeftClick={leftClick}, RightClick={rightClick}");
+                if (x != 0 || y != 0)
                 {
-                    Debug.WriteLine("🖱️ Simulating Left Click...");
-                    MouseEmulator.SimulateLeftClick();
+                    if (!isMoving)
+                    {
+                        isMoving = true;
+                        MouseEmulator.StartMouseMovement();
+                    }
+                    float scaleFactor = 2;
+                    double moveX = x / scaleFactor;
+                    double moveY = y / scaleFactor;
+                    MouseEmulator.SimulateMouseMove(moveX, moveY);
                 }
-                if (rightClick)
+                else if (isMoving)
                 {
-                    Debug.WriteLine("🖱️ Simulating Right Click...");
-                    MouseEmulator.SimulateRightClick();
+                    isMoving = false;
+                    MouseEmulator.StopMouseMovement();
                 }
 
-                MouseDataReceived?.Invoke(this, (x, y, leftClick, rightClick));  
+                if (leftClick && !isLeftPressed) // mobile sends TRUE(pressed), and if its currently not being pressed already then perform press
+                {
+                    Debug.WriteLine("Simulating Left press...");
+                    MouseEmulator.SimulateLeftPress();
+                    isLeftPressed = true;
+                }
+                else if (!leftClick && isLeftPressed) // mobile sends FALSE(released), and if current state is pressing then perform release
+                {
+                    Debug.WriteLine("Simulating Left release...");
+                    MouseEmulator.SimulateLeftRelease();
+                    isLeftPressed = false;
+                }
+
+                if (rightClick && !isRightPressed)
+                {
+                    Debug.WriteLine("Simulating Right Press...");
+                    MouseEmulator.SimulateRightPress();
+                    isRightPressed = true;
+                }
+                else if(!rightClick && isRightPressed)
+                {
+                    Debug.WriteLine("Simulating Right release...");
+                    MouseEmulator.SimulateRightRelease();
+                    isRightPressed = false;
+                }
+
+                    MouseDataReceived?.Invoke(this, (x, y, leftClick, rightClick));  
             }
             finally
             {
