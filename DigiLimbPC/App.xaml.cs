@@ -1,13 +1,24 @@
-﻿
+﻿using System.Collections.ObjectModel;
+
 namespace DigiLimbDesktop
 {
     public partial class App : Application
     {
+        // Global instance of the ServerService to maintain connection state.
+        public static ServerService GlobalServerService { get; private set; }
+
+        // Global log collection for server connection messages.
+        public static ObservableCollection<string> GlobalConnectionLog { get; private set; } = new ObservableCollection<string>();
 
         public App()
         {
             InitializeComponent();
-           
+
+            // Initialize the global server service with a callback that adds messages to the global log.
+            GlobalServerService = new ServerService((message, isRunning) =>
+            {
+                GlobalConnectionLog.Add(message);
+            });
         }
 
         [STAThread]

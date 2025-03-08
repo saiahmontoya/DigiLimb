@@ -38,6 +38,26 @@
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>YOUR CUSTOM MESSAGE</string>
 	<key>CFBundleIdentifier</key>
-	<string>Mobile.Digilimb</string>
+	<string>digilimb.saiahmac</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- (A) Allow all insecure loads (simplest for dev) -->
+		<!--
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		-->
+
+		<!-- (B) Restrict to a specific domain/IP -->
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>192.168.1.15</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 </dict>
 </plist>

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DigiLimbMobile.EmulatorPage"
-             Title="Emulators">
+             x:Class="DigiLimbDesktop.ScreenViewer"
+             Title="Screen Viewer">
     <VerticalStackLayout Padding="20" Spacing="20">
-        <Button Text="Mouse" Clicked="OnMouseClicked" />
-        <Button Text="Screen Viewer" Clicked="OnScreenViewerClicked" />
+        <Label Text="Screen Viewer coming soon..."
+               FontSize="20"
+               HorizontalOptions="Center"
+               VerticalOptions="CenterAndExpand" />
     </VerticalStackLayout>
 </ContentPage>
