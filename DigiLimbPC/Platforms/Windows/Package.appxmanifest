@@ -56,6 +56,8 @@
 		<rescap:Capability Name="runFullTrust" />
 
 		<!-- Bluetooth Permissions -->
+		<DeviceCapability Name="location"/>
+		<DeviceCapability Name="proximity"/>
 		<DeviceCapability Name="bluetooth">
 			<Device Id="any">
 				<Function Type="name:advertisement"/>

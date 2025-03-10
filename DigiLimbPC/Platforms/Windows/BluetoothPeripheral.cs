@@ -26,12 +26,14 @@ namespace DigiLimbDesktop.Platforms.Windows
         private GattServiceProvider _gattServiceProvider;
         private GattLocalCharacteristic _characteristicDeviceInfo;
         private GattLocalCharacteristic _characteristicMouseData;
+        private GattLocalCharacteristic _characteristicKeyboardData; // ✅ New Keyboard Characteristic
         private IAdapter _adapter;
         private IDevice _connectedDevice;
 
         public event EventHandler<IDevice> DeviceConnected;
         public event EventHandler<IDevice> DeviceDisconnected;
         public event EventHandler<(double x, double y, bool leftClick, bool rightClick)> MouseDataReceived;
+        public event EventHandler<string> KeyboardDataReceived; // ✅ New Event for Keyboard Input
         public event EventHandler<ReceivedDeviceInfo> DeviceInfoReceived;
 
         public BluetoothPeripheral(IAdapter adapter)
@@ -67,6 +69,7 @@ namespace DigiLimbDesktop.Platforms.Windows
 
             await CreateDeviceInfoCharacteristic();
             await CreateMouseDataCharacteristic();
+            await CreateKeyboardDataCharacteristic(); // ✅ Added
 
             _gattServiceProvider.StartAdvertising(new GattServiceProviderAdvertisingParameters
             {
@@ -129,6 +132,31 @@ namespace DigiLimbDesktop.Platforms.Windows
             else
             {
                 Debug.WriteLine("❌ Failed to create Mouse Data Characteristic.");
+            }
+        }
+
+        private async Task CreateKeyboardDataCharacteristic()
+        {
+            var characteristicParameters = new GattLocalCharacteristicParameters
+            {
+                CharacteristicProperties = GattCharacteristicProperties.Write |
+                                           GattCharacteristicProperties.Notify,
+                WriteProtectionLevel = GattProtectionLevel.Plain,
+                UserDescription = "Keyboard Emulation Data"
+            };
+
+            var characteristicResult = await _gattServiceProvider.Service.CreateCharacteristicAsync(
+                new Guid("0000FFF4-0000-1000-8000-00805F9B34FB"), characteristicParameters);
+
+            if (characteristicResult.Error == BluetoothError.Success)
+            {
+                _characteristicKeyboardData = characteristicResult.Characteristic;
+                _characteristicKeyboardData.WriteRequested += OnKeyboardDataWriteRequested; // ✅ Added Keyboard Handler
+                Debug.WriteLine("✅ Keyboard Data Characteristic Created.");
+            }
+            else
+            {
+                Debug.WriteLine("❌ Failed to create Keyboard Data Characteristic.");
             }
         }
 
@@ -269,14 +297,40 @@ namespace DigiLimbDesktop.Platforms.Windows
                     MouseEmulator.SimulateRightPress();
                     isRightPressed = true;
                 }
-                else if(!rightClick && isRightPressed)
+                else if (!rightClick && isRightPressed)
                 {
                     Debug.WriteLine("Simulating Right release...");
                     MouseEmulator.SimulateRightRelease();
                     isRightPressed = false;
                 }
 
-                    MouseDataReceived?.Invoke(this, (x, y, leftClick, rightClick));  
+                MouseDataReceived?.Invoke(this, (x, y, leftClick, rightClick));
+            }
+            finally
+            {
+                deferral.Complete();
+            }
+        }
+
+        private async void OnKeyboardDataWriteRequested(GattLocalCharacteristic sender, GattWriteRequestedEventArgs args)
+        {
+            var deferral = args.GetDeferral();
+            try
+            {
+                var request = await args.GetRequestAsync();
+                if (request == null) return;
+
+                var reader = DataReader.FromBuffer(request.Value);
+                byte[] receivedBytes = new byte[reader.UnconsumedBufferLength];
+                reader.ReadBytes(receivedBytes);
+
+                // Extract Key Input
+                string keyData = Encoding.UTF8.GetString(receivedBytes);
+                Debug.WriteLine($"⌨️ Received Keyboard Input: {keyData}");
+
+                // Pass to Emulator
+                KeyboardDataReceived?.Invoke(this, keyData);
+                KeyboardEmulator.ProcessKeyPress(keyData);
             }
             finally
             {

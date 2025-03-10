@@ -32,6 +32,10 @@
 	<string>We need Bluetooth access to scan for devices.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>We need Bluetooth access to connect to nearby devices.</string>
-
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+	</array>
 </dict>
 </plist>

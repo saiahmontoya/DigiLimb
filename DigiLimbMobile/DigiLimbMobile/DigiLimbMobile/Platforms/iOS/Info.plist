@@ -39,5 +39,18 @@
 	<string>YOUR CUSTOM MESSAGE</string>
 	<key>CFBundleIdentifier</key>
 	<string>Mobile.Digilimb</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>192.168.0.237</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 </dict>
 </plist>

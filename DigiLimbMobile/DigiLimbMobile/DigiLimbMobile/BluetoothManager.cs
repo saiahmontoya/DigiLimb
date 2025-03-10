@@ -12,15 +12,14 @@ using Microsoft.Maui.Devices; // Required for DeviceInfo
 using Microsoft.Maui.ApplicationModel;
 using System.Text;
 
-
 namespace DigiLimbMobile
 {
-
     public class DeviceInfo
     {
         public string Name { get; set; }
         public string Id { get; set; }
     }
+
     public class BluetoothManager
     {
         private readonly IBluetoothLE bluetoothLE; // Check Bluetooth state
@@ -29,6 +28,7 @@ namespace DigiLimbMobile
         public ObservableCollection<DeviceInfo> Devices { get; private set; } = new(); // Now uses DeviceInfo
 
         public ICharacteristic? mouseCharacteristic { get; private set; }  // Store the characteristic
+        public ICharacteristic? keyboardCharacteristic { get; private set; } // Keyboard Characteristic
 
         public BluetoothManager()
         {
@@ -39,7 +39,6 @@ namespace DigiLimbMobile
             {
                 bool isDigiLimb = false; // Flag for identifying DigiLimb Desktop
 
-
                 Console.WriteLine($"📡 Scanned Device: {e.Device.Name} ({e.Device.Id})");
 
                 // Check advertisement records
@@ -48,13 +47,11 @@ namespace DigiLimbMobile
                     Console.WriteLine($"🔹 Advertisement Record Type: {record.Type}");
                     Console.WriteLine($"🔹 Data: {BitConverter.ToString(record.Data)}");
 
-                    // Check if this record contains FFF0 (shown as FF-F0 in logs)
                     if (record.Type == AdvertisementRecordType.UuidsComplete16Bit && BitConverter.ToString(record.Data) == "FF-F0")
                     {
                         isDigiLimb = true;
-                    } 
+                    }
                 }
-
 
                 string deviceName = isDigiLimb ? "DigiLimb Desktop" : e.Device.Name ?? "Unknown Device";
                 var deviceInfo = new DeviceInfo
@@ -93,7 +90,6 @@ namespace DigiLimbMobile
             }
 
             Devices.Clear();
-
             await adapter.StartScanningForDevicesAsync();
         }
 
@@ -116,9 +112,11 @@ namespace DigiLimbMobile
                 {
                     var characteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF2-0000-1000-8000-00805F9B34FB"));
                     mouseCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF3-0000-1000-8000-00805F9B34FB"));
+                    keyboardCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF4-0000-1000-8000-00805F9B34FB")); // Keyboard Characteristic
+
                     if (characteristic != null)
                     {
-                        string mobileDeviceName = "iPhone"; // 📱 iPhone, Samsung Galaxy, etc.
+                        string mobileDeviceName = "iPhone";
                         string mobileDeviceId = "12 Pro Max";
                         string manufacturerData = "DigiLimb";
                         string deviceInfoJson = $"{{\"name\":\"{mobileDeviceName}\",\"id\":\"{mobileDeviceId}\",\"manufacturer\":\"{manufacturerData}\"}}";
@@ -134,7 +132,6 @@ namespace DigiLimbMobile
                     }
                 }
 
-
                 return true;
             }
             catch (DeviceConnectionException e)
@@ -144,5 +141,33 @@ namespace DigiLimbMobile
             }
         }
 
+        /// <summary>
+        /// ✅ Send Keyboard Input to Windows via Bluetooth
+        /// </summary>
+        public async Task SendKeyPress(string keyData)
+        {
+            if (keyboardCharacteristic != null)
+            {
+                try
+                {
+                    List<byte> message = new List<byte>
+                    {
+                        0x05 // ✅ Header for keypress data
+                    };
+                    message.AddRange(Encoding.UTF8.GetBytes(keyData));
+
+                    await keyboardCharacteristic.WriteAsync(message.ToArray());
+                    Console.WriteLine($"📡 Sent Key Press: {keyData}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ Failed to send key press: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("❌ No connection to PC (keyboardCharacteristic is null).");
+            }
+        }
     }
 }
