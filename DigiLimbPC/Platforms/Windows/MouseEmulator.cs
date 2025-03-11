@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml.Input;
+using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -84,7 +85,7 @@ namespace DigiLimbDesktop.Platforms.Windows
             currentX = moveX;
             currentY = moveY;
             */
-            double distance = Math.Sqrt(deltaX * deltaY + deltaY * deltaY);
+            double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
             double steps = Math.Ceiling(distance / maxSpeed);
 
             double stepsX = deltaX / steps;

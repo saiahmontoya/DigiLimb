@@ -3,8 +3,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbMobile.EmulatorPage"
              Title="Emulators">
-    <VerticalStackLayout Padding="20" Spacing="20">
-        <Button Text="Mouse" Clicked="OnMouseClicked" />
+    
+    <VerticalStackLayout>
+        <Label 
+            Text="Emulators"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center"
+            Style="{StaticResource Headline}"/>
+        <Button Margin="20,10,20,0"
+                BackgroundColor="#d9ecfa"
+                HeightRequest="60"
+                VerticalOptions="Start"
+                Text="Track Pad"
+                TextColor="#517891"
+                Clicked="OnTrackClicked"/>
+        <Button Margin="20,10,20,0"
+                BackgroundColor="#d9ecfa"
+                HeightRequest="60"
+                VerticalOptions="Start"
+                Text="Mouse"
+                TextColor="#517891"
+                Clicked="OnMouseClicked"/>
         <Button Text="Screen Viewer" Clicked="OnScreenViewerClicked" />
     </VerticalStackLayout>
 </ContentPage>
