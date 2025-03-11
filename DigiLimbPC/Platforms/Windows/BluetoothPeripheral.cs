@@ -214,10 +214,10 @@ namespace DigiLimbDesktop.Platforms.Windows
                     switch (header)
                     {
                         case 0x01:
-                            x = reader.ReadInt32();
+                            x = reader.ReadDouble();
                             break;
                         case 0x02:
-                            y = reader.ReadInt32();
+                            y = reader.ReadDouble();
                             break;
                         case 0x03:
                             leftClick = reader.ReadByte() != 0;
@@ -231,7 +231,7 @@ namespace DigiLimbDesktop.Platforms.Windows
                     }
                 }
 
-                //Debug.WriteLine($"🖱️ Mouse Data Received: X={x}, Y={y}, LeftClick={leftClick}, RightClick={rightClick}");
+                Debug.WriteLine($"🖱️ Mouse Data Received: X={x}, Y={y}, LeftClick={leftClick}, RightClick={rightClick}");
                 if (x != 0 || y != 0)
                 {
                     if (!isMoving)
