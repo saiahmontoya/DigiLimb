@@ -83,10 +83,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="KeyboardPage.xaml.cs">
+	    <DependentUpon>KeyboardPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <MauiXaml Update="ConnectionPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="MousePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="KeyboardPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="View\AddNewDevicePage.xaml">

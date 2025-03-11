@@ -11,6 +11,7 @@ using Plugin.BLE.Abstractions;
 using Microsoft.Maui.Devices; // Required for DeviceInfo
 using Microsoft.Maui.ApplicationModel;
 using System.Text;
+using System.Diagnostics;
 
 namespace DigiLimbMobile
 {
@@ -151,22 +152,22 @@ namespace DigiLimbMobile
                 try
                 {
                     List<byte> message = new List<byte>
-                    {
-                        0x05 // ✅ Header for keypress data
-                    };
+            {
+                0x05 // ✅ Header for keypress data
+            };
                     message.AddRange(Encoding.UTF8.GetBytes(keyData));
 
                     await keyboardCharacteristic.WriteAsync(message.ToArray());
-                    Console.WriteLine($"📡 Sent Key Press: {keyData}");
+                    Debug.WriteLine($"📡 [DEBUG] Sending Key '{keyData}' as Bytes: {BitConverter.ToString(message.ToArray())}");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"❌ Failed to send key press: {ex.Message}");
+                    Debug.WriteLine($"❌ Failed to send key press: {ex.Message}");
                 }
             }
             else
             {
-                Console.WriteLine("❌ No connection to PC (keyboardCharacteristic is null).");
+                Debug.WriteLine("❌ No connection to PC.");
             }
         }
     }

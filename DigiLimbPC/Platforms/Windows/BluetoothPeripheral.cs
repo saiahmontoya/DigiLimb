@@ -212,9 +212,6 @@ namespace DigiLimbDesktop.Platforms.Windows
             }
         }
 
-        private bool isLeftPressed = false;
-        private bool isRightPressed = false;
-        private bool isMoving = false;
         private async void OnMouseDataWriteRequested(GattLocalCharacteristic sender, GattWriteRequestedEventArgs args)
         {
             var deferral = args.GetDeferral();
@@ -223,14 +220,28 @@ namespace DigiLimbDesktop.Platforms.Windows
                 var request = await args.GetRequestAsync();
                 if (request == null) return;
 
-                //print received bytes
-                var rawBytes = new byte[request.Value.Length];
-                DataReader.FromBuffer(request.Value).ReadBytes(rawBytes);
-
-                //Debug.WriteLine($"Raw bytes received: {BitConverter.ToString(rawBytes)}");
-
                 var reader = DataReader.FromBuffer(request.Value);
-                //reader.ByteOrder = ByteORder.LittleEndian;
+                byte[] receivedBytes = new byte[reader.UnconsumedBufferLength];
+                reader.ReadBytes(receivedBytes);
+
+                // Process mouse input asynchronously to prevent blocking keyboard
+                Task.Run(() =>
+                {
+                    ProcessMouseInput(receivedBytes);
+                });
+            }
+            finally
+            {
+                deferral.Complete();
+            }
+        }
+
+        // ✅ New helper function to process mouse data separately
+        private void ProcessMouseInput(byte[] receivedBytes)
+        {
+            try
+            {
+                var reader = DataReader.FromBuffer(receivedBytes.AsBuffer());
 
                 double x = 0, y = 0;
                 bool leftClick = false, rightClick = false;
@@ -259,56 +270,32 @@ namespace DigiLimbDesktop.Platforms.Windows
                     }
                 }
 
-                //Debug.WriteLine($"🖱️ Mouse Data Received: X={x}, Y={y}, LeftClick={leftClick}, RightClick={rightClick}");
                 if (x != 0 || y != 0)
                 {
-                    if (!isMoving)
-                    {
-                        isMoving = true;
-                        MouseEmulator.StartMouseMovement();
-                    }
-                    float scaleFactor = 2;
-                    double moveX = x / scaleFactor;
-                    double moveY = y / scaleFactor;
-                    MouseEmulator.SimulateMouseMove(moveX, moveY);
-                }
-                else if (isMoving)
-                {
-                    isMoving = false;
-                    MouseEmulator.StopMouseMovement();
+                    MouseEmulator.SimulateMouseMove(x / 2, y / 2);
                 }
 
-                if (leftClick && !isLeftPressed) // mobile sends TRUE(pressed), and if its currently not being pressed already then perform press
+                if (leftClick)
                 {
-                    Debug.WriteLine("Simulating Left press...");
                     MouseEmulator.SimulateLeftPress();
-                    isLeftPressed = true;
                 }
-                else if (!leftClick && isLeftPressed) // mobile sends FALSE(released), and if current state is pressing then perform release
+                else
                 {
-                    Debug.WriteLine("Simulating Left release...");
                     MouseEmulator.SimulateLeftRelease();
-                    isLeftPressed = false;
                 }
 
-                if (rightClick && !isRightPressed)
+                if (rightClick)
                 {
-                    Debug.WriteLine("Simulating Right Press...");
                     MouseEmulator.SimulateRightPress();
-                    isRightPressed = true;
                 }
-                else if (!rightClick && isRightPressed)
+                else
                 {
-                    Debug.WriteLine("Simulating Right release...");
                     MouseEmulator.SimulateRightRelease();
-                    isRightPressed = false;
                 }
-
-                MouseDataReceived?.Invoke(this, (x, y, leftClick, rightClick));
             }
-            finally
+            catch (Exception ex)
             {
-                deferral.Complete();
+                Debug.WriteLine($"❌ Mouse Input Processing Error: {ex.Message}");
             }
         }
 
@@ -324,12 +311,26 @@ namespace DigiLimbDesktop.Platforms.Windows
                 byte[] receivedBytes = new byte[reader.UnconsumedBufferLength];
                 reader.ReadBytes(receivedBytes);
 
-                // Extract Key Input
-                string keyData = Encoding.UTF8.GetString(receivedBytes);
-                Debug.WriteLine($"⌨️ Received Keyboard Input: {keyData}");
+                if (receivedBytes.Length < 2)
+                {
+                    Debug.WriteLine("❌ Received incomplete keyboard data.");
+                    return;
+                }
 
-                // Pass to Emulator
-                KeyboardDataReceived?.Invoke(this, keyData);
+                // ✅ Strip the first byte (header 0x05)
+                string keyData = Encoding.UTF8.GetString(receivedBytes, 1, receivedBytes.Length - 1).Trim();
+                Debug.WriteLine($"⌨️ [DEBUG] Extracted Keyboard Input: '{keyData}'");
+
+                if (string.IsNullOrEmpty(keyData))
+                {
+                    Debug.WriteLine("❌ Received empty keyboard input.");
+                    return;
+                }
+
+                // ✅ Ensure mouse input did not override keyboard input
+                Debug.WriteLine($"🖥️ Keyboard Input Processed: '{keyData}'");
+
+                // ✅ Send to Keyboard Emulator
                 KeyboardEmulator.ProcessKeyPress(keyData);
             }
             finally
@@ -337,7 +338,6 @@ namespace DigiLimbDesktop.Platforms.Windows
                 deferral.Complete();
             }
         }
-
 
         public void Start()
         {
