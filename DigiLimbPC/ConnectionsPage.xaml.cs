@@ -379,6 +379,7 @@ namespace DigiLimbDesktop
             }
         }
 
+
         // New event handler for sending chat messages from desktop to mobile.
         private async void OnSendChatClicked(object sender, EventArgs e)
         {
@@ -399,14 +400,32 @@ namespace DigiLimbDesktop
                 await DisplayAlert("Error", $"Failed to send chat message: {ex.Message}", "OK");
             }
         }
+        
+        // ✅ NEW CODE ADDED: Update logs to track game controller inputs modularly
+        private void UpdateLog(string message)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                // Append log normally
+                txtLogs.Text += $"\n{message}";
+
+                // If it's a game controller input, highlight it
+                if (message.StartsWith("Game Controller Input:"))
+                {
+                    txtLogs.Text += $"\n🎮 {message}";
+                }
+
+                Debug.WriteLine($"📡 Log Updated: {message}");
+            });
+        }
 
         // Update UI when the server starts, stops, or a client joins / sends chat messages.
         private void UpdateServerStatus(string message, bool isRunning)
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                // Append the new message to the log.
-                txtLogs.Text += $"\n{message}";
+                // Log the server status updates
+                UpdateLog(message);
 
                 // Display the server status clearly.
                 if (message.StartsWith("WebSocket Server Running"))
@@ -429,6 +448,7 @@ namespace DigiLimbDesktop
                 }
                 lblPairedDevice.IsVisible = true;
             });
+
             Debug.WriteLine($"📡 Server Status: {message}");
         }
     }

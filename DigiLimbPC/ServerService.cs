@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,33 +17,46 @@ namespace DigiLimbDesktop
         private readonly Action<string, bool> _updateStatusCallback;
         private readonly List<WebSocket> _clients;
         private readonly int _port = 8080; // Fixed port for the WebSocket server
+#if WINDOWS
+        private readonly GameControllerManager _controllerManager;
+#endif
 
         // Heartbeat and chat constants
         private const string HEARTBEAT_PING = "PING";
         private const string HEARTBEAT_PONG = "PONG";
         private const string CHAT_PREFIX = "CHAT:";
-
-        // Screen capture fields (optional, can be removed if not needed)
-        private bool _isCapturing = false;
-        private CancellationTokenSource _captureCts;
+        private const string CONTROLLER_PREFIX = "CONTROLLER:";
 
         public ServerService(Action<string, bool> updateStatusCallback)
         {
             _updateStatusCallback = updateStatusCallback;
             _clients = new List<WebSocket>();
+#if WINDOWS
+            Task.Run(async () => await ViGEmDriverManager.EnsureViGEmBusInstalled()).Wait();
+            _controllerManager = new GameControllerManager();
+#endif
         }
 
-        /// <summary>
-        /// Starts the WebSocket server on a fixed port.
-        /// </summary>
         public void StartServer()
         {
-            if (_httpListener != null && _httpListener.IsListening)
+            try
             {
-                Debug.WriteLine("⚠️ WebSocket Server is already running!");
-                return;
+                // Ensure admin privileges to modify firewall and HTTP settings
+                RunNetshCommand($"http add urlacl url=http://+:{_port}/ user=Everyone");
+                RunNetshCommand($"advfirewall firewall add rule name=\"DigiLimb WebSocket\" dir=in action=allow protocol=TCP localport={_port}");
+
+                if (_httpListener != null && _httpListener.IsListening)
+                {
+                    Debug.WriteLine("⚠️ WebSocket Server is already running!");
+                    return;
+                }
+
+                Task.Run(() => StartListener());
             }
-            Task.Run(() => StartListener());
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Error configuring network settings: {ex.Message}");
+            }
         }
 
         public async Task StartListener()
@@ -55,13 +69,10 @@ namespace DigiLimbDesktop
                 _httpListener.Prefixes.Add(prefix);
                 _httpListener.Start();
 
-                // Get the local IP address
                 string localIP = GetLocalIPAddress();
-                // Update UI: send a message that the server is running.
                 _updateStatusCallback?.Invoke($"WebSocket Server Running on {localIP}:{_port}", true);
                 Debug.WriteLine($"✅ WebSocket Server started on {localIP}:{_port}");
 
-                // Start the heartbeat loop in parallel.
                 Task.Run(() => StartHeartbeatLoop(), _cancellationTokenSource.Token);
 
                 while (_httpListener.IsListening)
@@ -85,20 +96,17 @@ namespace DigiLimbDesktop
             }
         }
 
-        /// <summary>
-        /// Sends "PING" messages to connected clients every 30 seconds to check connectivity.
-        /// </summary>
         private async Task StartHeartbeatLoop()
         {
             while (!_cancellationTokenSource.Token.IsCancellationRequested)
             {
-                await Task.Delay(30000, _cancellationTokenSource.Token); // 30-second interval
+                await Task.Delay(30000, _cancellationTokenSource.Token);
                 await BroadcastMessage(HEARTBEAT_PING, null);
                 _updateStatusCallback?.Invoke("Sent heartbeat PING", true);
             }
         }
 
-        private async void ProcessWebSocketRequest(HttpListenerContext context)
+        private async Task ProcessWebSocketRequest(HttpListenerContext context)
         {
             try
             {
@@ -142,28 +150,25 @@ namespace DigiLimbDesktop
 
                         if (message == HEARTBEAT_PONG)
                         {
-                            // A client responded to our ping
                             _updateStatusCallback?.Invoke("Received heartbeat PONG", true);
                         }
                         else if (message == HEARTBEAT_PING)
                         {
-                            // A client is pinging us; respond with a pong
                             await SendMessage(webSocket, HEARTBEAT_PONG);
                         }
                         else if (message.StartsWith(CHAT_PREFIX))
                         {
-                            // A chat message from client
                             string chatText = message.Substring(CHAT_PREFIX.Length);
                             _updateStatusCallback?.Invoke("Chat from client: " + chatText, true);
-
-                            // Optionally broadcast the chat to all clients (except sender)
                             await BroadcastMessage(message, webSocket);
                         }
-                        else
+                        else if (message.StartsWith(CONTROLLER_PREFIX))
                         {
-                            // For any other text message, just broadcast to all connected clients
-                            await BroadcastMessage(message, webSocket);
+                            await ProcessControllerInput(webSocket, message);
                         }
+
+                        // Keep existing broadcast functionality
+                        await BroadcastMessage(message, webSocket);
                     }
                 }
             }
@@ -174,9 +179,22 @@ namespace DigiLimbDesktop
             }
         }
 
-        /// <summary>
-        /// Broadcasts a given message to all connected clients (except the optional sender).
-        /// </summary>
+        private async Task ProcessControllerInput(WebSocket webSocket, string message)
+        {
+        #if WINDOWS
+            if (message.StartsWith("CONTROLLER:"))
+            {
+                string input = message.Substring("CONTROLLER:".Length);
+                _updateStatusCallback?.Invoke($"Game Controller Input: {input}", true);
+                Debug.WriteLine($"🎮 Received Controller Input: {input}");
+
+                await _controllerManager.ProcessControllerInput(input); // No error now
+            }
+        #endif
+        }
+
+
+
         private async Task BroadcastMessage(string message, WebSocket sender)
         {
             var messageBuffer = Encoding.UTF8.GetBytes(message);
@@ -198,9 +216,6 @@ namespace DigiLimbDesktop
             }
         }
 
-        /// <summary>
-        /// Sends a single message to a specific client.
-        /// </summary>
         private async Task SendMessage(WebSocket client, string message)
         {
             if (client != null && client.State == WebSocketState.Open)
@@ -210,9 +225,6 @@ namespace DigiLimbDesktop
             }
         }
 
-        /// <summary>
-        /// Public helper to broadcast a chat message from the desktop side.
-        /// </summary>
         public async Task SendChatMessage(string message)
         {
             string chatMessage = CHAT_PREFIX + message;
@@ -220,9 +232,6 @@ namespace DigiLimbDesktop
             _updateStatusCallback?.Invoke("Sent chat: " + message, true);
         }
 
-        /// <summary>
-        /// Stops the server, cancels all active tasks, and closes any connected clients.
-        /// </summary>
         public void StopServer()
         {
             try
@@ -235,7 +244,6 @@ namespace DigiLimbDesktop
                     _httpListener.Close();
                 }
 
-                // Create a copy of the clients list so that we can iterate without modifying the original.
                 var clientsCopy = new List<WebSocket>(_clients);
                 foreach (var client in clientsCopy)
                 {
@@ -243,15 +251,12 @@ namespace DigiLimbDesktop
                     {
                         if (client != null && client.State == WebSocketState.Open)
                         {
-                            // Send a disconnect message so the client knows to disconnect.
                             string disconnectMsg = "Server Disconnecting";
                             byte[] disconnectBuffer = Encoding.UTF8.GetBytes(disconnectMsg);
                             client.SendAsync(new ArraySegment<byte>(disconnectBuffer), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
 
-                            // Optional: wait briefly to allow the client to process the disconnect message.
                             Task.Delay(500).Wait();
 
-                            // Now close the client connection gracefully.
                             client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Server shutting down", CancellationToken.None).Wait();
                         }
                     }
@@ -260,9 +265,13 @@ namespace DigiLimbDesktop
                         Debug.WriteLine($"❌ Error disconnecting client: {ex.Message}");
                     }
                 }
+
+                // Revert network changes
+                RunNetshCommand($"http delete urlacl url=http://+:{_port}/");
+                RunNetshCommand($"advfirewall firewall delete rule name=\"DigiLimb WebSocket\" protocol=TCP localport={_port}");
+
                 _clients.Clear();
 
-                // Update the UI to indicate the server session has ended.
                 _updateStatusCallback?.Invoke("Server Session Ended", false);
                 Debug.WriteLine("🔴 WebSocket Server stopped.");
             }
@@ -272,9 +281,34 @@ namespace DigiLimbDesktop
             }
         }
 
-        /// <summary>
-        /// Attempts to get a non-loopback IPv4 address for the current machine.
-        /// </summary>
+        private void RunNetshCommand(string command)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "powershell",
+                    Arguments = $"-Command \"Start-Process 'netsh' -ArgumentList '{command}' -Verb RunAs\"",
+                    RedirectStandardOutput = false, // Can't redirect due to UAC prompt
+                    RedirectStandardError = false,
+                    UseShellExecute = true, // Needed for UAC elevation
+                    CreateNoWindow = true // Prevents flashing console window
+                };
+
+                using (Process process = new Process { StartInfo = psi })
+                {
+                    process.Start();
+                    process.WaitForExit();
+                }
+
+                Debug.WriteLine($"✅ netsh command executed with admin privileges: {command}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ netsh execution failed: {ex.Message}");
+            }
+        }
+
         private string GetLocalIPAddress()
         {
             try

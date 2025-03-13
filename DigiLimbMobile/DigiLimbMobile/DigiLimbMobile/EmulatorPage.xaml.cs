@@ -17,5 +17,9 @@ namespace DigiLimbMobile
         {
             await Navigation.PushAsync(new ScreenViewerPage());
         }
+        private async void OnGameControllerClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new GameControllerPage());
+        }
     }
 }
