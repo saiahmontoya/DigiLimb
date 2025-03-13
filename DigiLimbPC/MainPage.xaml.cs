@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using Plugin.BLE.Abstractions;
+using System.Diagnostics;
 
 namespace DigiLimbDesktop
 {
@@ -13,12 +14,29 @@ namespace DigiLimbDesktop
         private readonly IMongoCollection<BsonDocument> _usersCollection;
         private ObjectId? _userID;
 
+        private bool _isConnectedValue = false;
+
+        public bool _isConnected
+        {
+            get => _isConnectedValue;
+            set
+            {
+                Debug.WriteLine($"🔍 Changing _isConnected: {_isConnectedValue} ➡ {value}");
+                _isConnectedValue = value;
+            }
+        }
+
+        public string _deviceName = "";
+        public string _connectionType = ""; // "Bluetooth" or "WiFi"
+
         public MainPage() // ✅ No longer requires email in constructor
         {
             InitializeComponent();
 
             // ✅ Retrieve email from AppShell global state
             _email = AppShell.UserEmail;
+
+            // UpdateConnectionStatus();
 
             // Initialize MongoDB connection
             var client = new MongoClient("mongodb+srv://saiahmontoya01:AQfSCJE5bfDnhYSh@digilimbdatabase.mneoe.mongodb.net/?authSource=admin&w=majority&appName=DigilimbDatabase");
@@ -28,6 +46,24 @@ namespace DigiLimbDesktop
             // Load user data
             LoadUserDeviceNameAsync(_email);
         }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            Debug.WriteLine($"📌 MainPage appeared, loading global connection state. GlobalIsConnected: {App.GlobalIsConnected}");
+
+            // 🔥 Use the globally stored connection state instead of resetting
+            _isConnected = App.GlobalIsConnected;
+            _deviceName = App.GlobalDeviceName;
+            _connectionType = App.GlobalConnectionType;
+
+            UpdateConnectionStatus();
+        }
+
+
+
+
 
         // Navigate to Connections Page
         private async void OnConnectionsClicked(object sender, EventArgs e)
@@ -114,5 +150,38 @@ namespace DigiLimbDesktop
             // Update the label text when the device name is updated in the settings page
             lblDeviceName.Text = updatedDeviceName + "'s Dashboard" ?? "DigiLimb Dashboard";
         }
+
+        private async void OnViewConnectionDashboardClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new ConnectionDashboard(_deviceName, _connectionType));
+        }
+
+        public void UpdateConnectionStatus()
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Debug.WriteLine($"🔄 Updating Connection Status: isConnected = {_isConnected}");
+
+                _isConnected = App.GlobalIsConnected;
+                _deviceName = App.GlobalDeviceName;
+                _connectionType = App.GlobalConnectionType;
+                if (_isConnected)
+                {
+                    Debug.WriteLine("✅ Connection detected, showing connectionStatusBox.");
+
+                    connectionStatusBox.IsVisible = true; // Make the box visible
+                    lblPairedDevice.Text = _deviceName;
+                    connectionIcon.Source = _connectionType == "Bluetooth" ? "bluetoothIcon.png" : "wifiIcon.png";
+                }
+                else
+                {
+                    Debug.WriteLine("❌ No connection, hiding connectionStatusBox.");
+                    connectionStatusBox.IsVisible = false;
+                }
+            });
+        }
+
+
     }
+
 }

@@ -7,6 +7,11 @@ namespace DigiLimbDesktop
         // Global instance of the ServerService to maintain connection state.
         public static ServerService GlobalServerService { get; private set; }
 
+        // Global variables to check connection
+        public static bool GlobalIsConnected { get; set; } = false;
+        public static string GlobalDeviceName { get; set; } = "";
+        public static string GlobalConnectionType { get; set; } = "";
+
         // Global log collection for server connection messages.
         public static ObservableCollection<string> GlobalConnectionLog { get; private set; } = new ObservableCollection<string>();
 
