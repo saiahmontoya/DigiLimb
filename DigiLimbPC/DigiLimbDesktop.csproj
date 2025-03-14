@@ -104,6 +104,9 @@
 	  <Compile Update="DevicesPage.xaml.cs">
 	    <DependentUpon>DevicesPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="ConnectionDashboard.xaml.cs">
+	    <DependentUpon>ConnectionDashboard.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="ScreenViewer.xaml.cs">
 	    <DependentUpon>ScreenViewer.xaml</DependentUpon>
 	  </Compile>
@@ -120,6 +123,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="EmulationsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="ConnectionDashboard.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="ScreenViewer.xaml">

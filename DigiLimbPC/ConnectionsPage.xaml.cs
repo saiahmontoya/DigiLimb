@@ -288,13 +288,46 @@ namespace DigiLimbDesktop
 #if WINDOWS
         private void OnDeviceInfoReceived(object sender, ReceivedDeviceInfo deviceInfo)
         {
-            MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
                 if (lblConnectedDevice != null)
                 {
                     lblConnectedDevice.Text = $"Connected to: {deviceInfo.DeviceName}\nID: {deviceInfo.DeviceId}";
                     lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
                     lblConnectedDevice.IsVisible = true;
+
+                    btnAllowIncomingConnection.IsVisible = false;
+                    lblAwaitingConnection.IsVisible = false;
+                    Debug.WriteLine($"✅ Device Connected: {deviceInfo.DeviceName} (ID: {deviceInfo.DeviceId})");
+
+                    await DisplayAlert("Paired Successfully", $"Paired to {deviceInfo.DeviceName}.", "OK");
+
+                    // ✅ Find MainPage dynamically
+                    var mainPage = FindMainPage();
+                    if (mainPage != null)
+                    {
+                        App.GlobalIsConnected = true;
+                        App.GlobalDeviceName = deviceInfo.DeviceName ?? "Unknown Device";
+                        App.GlobalConnectionType = "Bluetooth"; // Set to "WiFi" if needed
+                        mainPage.UpdateConnectionStatus();
+                        Debug.WriteLine("Connection status updated and main page found");
+                    }
+                    else
+                    {
+                        Debug.WriteLine("❌ Could not find MainPage dynamically.");
+                    }
+
+
+                    await Shell.Current.GoToAsync("//MainPage");
+
+                    /*
+                    await Task.Delay(500); // Give UI a little time to update
+                    var refreshedMainPage = FindMainPage();
+                    if (refreshedMainPage != null)
+                    {
+                        refreshedMainPage.UpdateConnectionStatus();
+                    }
+                    */
                 }
                 else
                 {
@@ -304,6 +337,56 @@ namespace DigiLimbDesktop
             Console.WriteLine($"📡 UI Updated: Connected to {deviceInfo.DeviceName} (ID: {deviceInfo.DeviceId})");
         }
 #endif
+        /// <summary>
+        /// Dynamically finds and returns MainPage from the application's navigation structure.
+        /// </summary>
+        private MainPage FindMainPage()
+        {
+            // 1️⃣ Check if MainPage is the current visible page
+            if (Application.Current.MainPage is MainPage directMainPage)
+                return directMainPage;
+
+            // 2️⃣ Check if MainPage is wrapped in a NavigationPage
+            if (Application.Current.MainPage is NavigationPage navPage)
+            {
+                if (navPage.RootPage is MainPage mainPage)
+                    return mainPage;
+            }
+
+            // 3️⃣ Check if Shell contains MainPage (dealing with deep nesting)
+            if (Application.Current.MainPage is Shell shell)
+            {
+                foreach (var item in shell.Items) // Iterate through ShellItems
+                {
+                    if (item is ShellItem shellItem)
+                    {
+                        foreach (var section in shellItem.Items) // Look in ShellSections
+                        {
+                            if (section is ShellSection shellSection)
+                            {
+                                foreach (var content in shellSection.Items) // Look in ShellContent
+                                {
+                                    if (content is ShellContent shellContent && shellContent.Content is MainPage foundMainPage)
+                                    {
+                                        return foundMainPage;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 4️⃣ LAST RESORT: Search through ALL pages in the Navigation Stack (in case it's been pushed)
+            foreach (var page in Application.Current.MainPage.Navigation.NavigationStack)
+            {
+                if (page is MainPage foundMainPage)
+                    return foundMainPage;
+            }
+
+            Debug.WriteLine("❌ MainPage STILL not found in navigation structure.");
+            return null;
+        }
 
         private void OnDeviceConnected(object? sender, IDevice device)
         {
@@ -329,17 +412,14 @@ namespace DigiLimbDesktop
 
                 Debug.WriteLine($"✅ Device Connected: {device.Name} (ID: {device.Id})");
 
-                await DisplayAlert("Paired Successfully", $"Paired to {device.Name}.", "OK");
+                MainPage mainPage = (MainPage)Application.Current.MainPage;
+                mainPage._isConnected = true;
+                mainPage._deviceName = device.Name ?? "Unknown Device";
+                mainPage._connectionType = "Bluetooth"; // Set to "WiFi" if connected via WiFi
+                mainPage.UpdateConnectionStatus();
 
-                try
-                {
-                    await Shell.Current.GoToAsync("//MainPage");
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Navigation Error: {ex.Message}");
-                    await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
-                }
+                await DisplayAlert("Paired Successfully", $"Paired to {device.Name}.", "OK");
+                await Shell.Current.GoToAsync("//MainPage");
             });
         }
 
@@ -353,6 +433,12 @@ namespace DigiLimbDesktop
 
                 btnAllowIncomingConnection.IsVisible = true;
                 lblAwaitingConnection.IsVisible = true;
+
+                MainPage mainPage = (MainPage)Application.Current.MainPage;
+                mainPage._isConnected = false;
+                mainPage.UpdateConnectionStatus();
+
+                Debug.WriteLine("Device Disconnected.");
             });
             Debug.WriteLine("Device Disconnected.");
         }
