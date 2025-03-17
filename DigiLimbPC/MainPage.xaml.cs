@@ -171,7 +171,7 @@ namespace DigiLimbDesktop
 
                     connectionStatusBox.IsVisible = true; // Make the box visible
                     lblPairedDevice.Text = _deviceName;
-                    connectionIcon.Source = _connectionType == "Bluetooth" ? "bluetoothIcon.png" : "wifiIcon.png";
+                    connectionIcon.Source = _connectionType == "Bluetooth" ? "bluetoothicon.png" : "wifiicon.png";
                 }
                 else
                 {
