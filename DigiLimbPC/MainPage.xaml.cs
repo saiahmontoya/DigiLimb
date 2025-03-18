@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using Plugin.BLE.Abstractions;
 using System.Diagnostics;
+using DigiLimbDesktop.Platforms.Windows;
 
 namespace DigiLimbDesktop
 {
@@ -14,6 +15,8 @@ namespace DigiLimbDesktop
         private readonly IMongoCollection<BsonDocument> _usersCollection;
         private ObjectId? _userID;
 
+        private BluetoothPeripheral _bluetoothPeripheral; // ✅ Reference to BluetoothPeripheral
+
         private bool _isConnectedValue = false;
 
         public bool _isConnected
@@ -21,8 +24,13 @@ namespace DigiLimbDesktop
             get => _isConnectedValue;
             set
             {
-                Debug.WriteLine($"🔍 Changing _isConnected: {_isConnectedValue} ➡ {value}");
-                _isConnectedValue = value;
+                if (_isConnectedValue != value) // ✅ Only trigger updates when value changes
+                {
+                    Debug.WriteLine($"🔍 Changing _isConnected: {_isConnectedValue} ➡ {value}");
+                    _isConnectedValue = value;
+                    App.GlobalIsConnected = value; // ✅ Sync with global state
+                    UpdateConnectionStatus();
+                }
             }
         }
 
@@ -36,7 +44,22 @@ namespace DigiLimbDesktop
             // ✅ Retrieve email from AppShell global state
             _email = AppShell.UserEmail;
 
-            // UpdateConnectionStatus();
+
+
+            // ✅ Subscribe to Bluetooth connection updates
+            // ✅ Prevent event duplication & ensure object is not null
+            // ✅ Prevent event duplication & ensure object is not null
+            if (_bluetoothPeripheral != null)
+            {
+                // ✅ Retrieve global BluetoothPeripheral instance
+                _bluetoothPeripheral = App.GlobalBluetoothPeripheral;
+                _bluetoothPeripheral.DeviceConnectionChanged -= OnDeviceConnectionChanged;
+                _bluetoothPeripheral.DeviceConnectionChanged += OnDeviceConnectionChanged;
+            }
+            else
+            {
+                Debug.WriteLine("⚠️ BluetoothPeripheral is still null after initialization.");
+            }
 
             // Initialize MongoDB connection
             var client = new MongoClient("mongodb+srv://saiahmontoya01:AQfSCJE5bfDnhYSh@digilimbdatabase.mneoe.mongodb.net/?authSource=admin&w=majority&appName=DigilimbDatabase");
@@ -51,12 +74,10 @@ namespace DigiLimbDesktop
         {
             base.OnAppearing();
 
-            Debug.WriteLine($"📌 MainPage appeared, loading global connection state. GlobalIsConnected: {App.GlobalIsConnected}");
+            Debug.WriteLine($"📌 MainPage appeared. GlobalIsConnected: {App.GlobalIsConnected}");
 
-            // 🔥 Use the globally stored connection state instead of resetting
+            // ✅ Ensure `_isConnected` syncs with `GlobalIsConnected`
             _isConnected = App.GlobalIsConnected;
-            _deviceName = App.GlobalDeviceName;
-            _connectionType = App.GlobalConnectionType;
 
             UpdateConnectionStatus();
         }
@@ -153,7 +174,17 @@ namespace DigiLimbDesktop
 
         private async void OnViewConnectionDashboardClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new ConnectionDashboard(_deviceName, _connectionType));
+            await Navigation.PushAsync(new ConnectionDashboard());
+        }
+
+
+        private void OnDeviceConnectionChanged(object sender, bool isConnected)
+        {
+            Debug.WriteLine($"📡 MainPage Detected Connection Change: {(isConnected ? "Connected" : "Disconnected")}");
+
+            _isConnected = isConnected;
+
+            UpdateConnectionStatus();
         }
 
         public void UpdateConnectionStatus()

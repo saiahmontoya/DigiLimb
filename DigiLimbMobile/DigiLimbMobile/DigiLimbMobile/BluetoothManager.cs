@@ -110,30 +110,51 @@ namespace DigiLimbMobile
                 await adapter.ConnectToDeviceAsync(device);
                 Console.WriteLine($"✅ Connected to device: {device.Name}");
 
-                // ✅ Write a connection signal to GATT characteristic
+                // ✅ Get actual device ID
+                string mobileDeviceName = "iPhone"; // 📱 Still hardcoded (iOS 16+ requires entitlement)
+                string mobileDeviceId = device.Id.ToString(); // ✅ Use actual Bluetooth device ID
+                string manufacturerData = "DigiLimb";
+
+                Console.WriteLine($"📡 Sending Device Info: {mobileDeviceName}, {mobileDeviceId}, {manufacturerData}");
+
+                // ✅ Send the correct device ID through the characteristic
                 var service = await device.GetServiceAsync(Guid.Parse("0000FFF0-0000-1000-8000-00805F9B34FB"));
                 if (service != null)
                 {
                     var characteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF2-0000-1000-8000-00805F9B34FB"));
-                    mouseCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF3-0000-1000-8000-00805F9B34FB"));
+                    var heartbeatCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF6-0000-1000-8000-00805F9B34FB")); // ✅ Heartbeat characteristic
+                    var rssiCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF4-0000-1000-8000-00805F9B34FB")); // ✅ RSSI characteristic
+
                     if (characteristic != null)
                     {
-                        string mobileDeviceName = "iPhone"; // 📱 iPhone, Samsung Galaxy, etc.
-                        string mobileDeviceId = "12 Pro Max";
-                        string manufacturerData = "DigiLimb";
-                        string deviceInfoJson = $"{{\"name\":\"{mobileDeviceName}\",\"id\":\"{mobileDeviceId}\",\"manufacturer\":\"{manufacturerData}\"}}";
-
-                        byte[] nameBytes = Encoding.UTF8.GetBytes(mobileDeviceName.PadRight(20)); // 20-byte name
-                        byte[] idBytes = Encoding.UTF8.GetBytes(mobileDeviceId.PadRight(20)); // 20-byte ID
-                        byte[] manufacturerBytes = Encoding.UTF8.GetBytes(manufacturerData.PadRight(20)); // 20-byte Manufacturer
+                        byte[] nameBytes = Encoding.UTF8.GetBytes(mobileDeviceName.PadRight(20));
+                        byte[] idBytes = Encoding.UTF8.GetBytes(mobileDeviceId.PadRight(20)); // ✅ Now sending actual device ID
+                        byte[] manufacturerBytes = Encoding.UTF8.GetBytes(manufacturerData.PadRight(20));
 
                         byte[] messageBytes = nameBytes.Concat(idBytes).Concat(manufacturerBytes).ToArray();
-
                         await characteristic.WriteAsync(messageBytes);
-                        Console.WriteLine($"📡 Sent Mobile Device Info to Desktop: {mobileDeviceName}, {mobileDeviceId}, {manufacturerData}");
+
+                        Console.WriteLine($"📡 Sent Device Info to PC: {mobileDeviceName}, {mobileDeviceId}, {manufacturerData}");
+                    }
+
+                    if (heartbeatCharacteristic != null)
+                    {
+                        Task.Run(() => StartHeartbeat(device, heartbeatCharacteristic)); // ✅ Runs in background
+                    }
+                    else
+                    {
+                        Console.WriteLine("⚠️ Heartbeat characteristic not found.");
+                    }
+                    // ✅ Start tracking RSSI if a characteristic for it exists
+                    if (rssiCharacteristic != null)
+                    {
+                        StartRssiTracking(device, rssiCharacteristic);
+                    }
+                    else
+                    {
+                        Console.WriteLine("⚠️ No RSSI characteristic found on PC GATT Server.");
                     }
                 }
-
 
                 return true;
             }
@@ -144,5 +165,55 @@ namespace DigiLimbMobile
             }
         }
 
-    }
+        private async void StartHeartbeat(IDevice device, ICharacteristic heartbeatCharacteristic)
+        {
+            while (device.State == DeviceState.Connected)
+            {
+                try
+                {
+                    byte[] heartbeatSignal = Encoding.UTF8.GetBytes("ALIVE");
+                    await heartbeatCharacteristic.WriteAsync(heartbeatSignal);
+                    Console.WriteLine("📡 Sent Heartbeat to PC.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ Heartbeat Failed: {ex.Message}");
+                    break; // ✅ Stop sending if the connection is lost
+                }
+
+                await Task.Delay(5000);
+            }
+        }
+
+
+        private async void StartRssiTracking(IDevice device, ICharacteristic rssiCharacteristic)
+        {
+            while (device.State == DeviceState.Connected)
+            {
+                try
+                {
+                    await device.UpdateRssiAsync();
+                    int rssi = device.Rssi;
+                    Console.WriteLine($"📡 RSSI Updated: {rssi} dBm");
+
+                    if (rssiCharacteristic != null) // ✅ Prevents null reference exception
+                    {
+                        byte[] rssiBytes = BitConverter.GetBytes(rssi);
+                        await rssiCharacteristic.WriteAsync(rssiBytes);
+                        Console.WriteLine($"📡 Sent RSSI to PC: {rssi} dBm");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ Error reading RSSI: {ex.Message}");
+                }
+
+                await Task.Delay(5000);
+            }
+
+        }
+
+
+
+        }
 }

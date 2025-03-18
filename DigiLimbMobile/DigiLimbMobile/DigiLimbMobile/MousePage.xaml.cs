@@ -98,7 +98,7 @@ public partial class MousePage : ContentPage
         if (e.StatusType == GestureStatus.Running)
         {
             // label indicating movement
-            //MovementFeedbackLabel.Text = $"Touch at X: {e.TotalX}, Y: {e.TotalY}";
+            Console.WriteLine($"Touch at X: {e.TotalX}, Y: {e.TotalY}");
 
             SendMouseMovement(e.TotalX, e.TotalY);
         }
@@ -120,8 +120,8 @@ public partial class MousePage : ContentPage
             message.AddRange(BitConverter.GetBytes(y).Reverse());
              
             await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
-            //Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");
-            //Console.WriteLine($"Sent Mouse Movement: X={x}, Y={y}");
+            Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");
+            Console.WriteLine($"Sent Mouse Movement: X={x}, Y={y}");
         }
         else
         {
