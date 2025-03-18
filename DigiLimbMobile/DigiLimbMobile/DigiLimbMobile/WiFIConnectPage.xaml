@@ -9,11 +9,11 @@
         <Label Text="Port:" FontSize="18" />
         <!-- Fixed port 8080 -->
         <Entry x:Name="entryPort" Text="8080" IsReadOnly="True" />
-        <Button Text="Connect" Clicked="OnConnectClicked" />
+        <Button Text="Connect" BackgroundColor="#d9ecfa" TextColor="#517891" Clicked="OnConnectClicked" />
         <Label x:Name="lblStatus" Text="Status: Not connected" FontSize="16" TextColor="Gray" />
         <Label Text="Send a message:" FontSize="18" />
         <Entry x:Name="entrySendMessage" Placeholder="Enter message to send" />
-        <Button Text="Send Message" Clicked="OnSendMessageClicked" />
+        <Button Text="Send Message" BackgroundColor="#d9ecfa" TextColor="#517891" Clicked="OnSendMessageClicked" />
         <Label x:Name="lblReceived" Text="Received:" FontSize="16" TextColor="Black" />
     </VerticalStackLayout>
 </ContentPage>

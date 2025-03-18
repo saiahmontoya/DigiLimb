@@ -126,7 +126,7 @@ public partial class RealMousePage : ContentPage
             List<byte> message = new List<byte>();
 
             // scroll Movement (Header 0x08 + 4 Bytes Integer)
-            message.Add(0x08);
+            message.Add(0x05);
             message.AddRange(BitConverter.GetBytes(scrollAmount).Reverse());
 
             await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());

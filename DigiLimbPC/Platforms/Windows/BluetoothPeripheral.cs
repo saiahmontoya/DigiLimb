@@ -323,7 +323,7 @@ namespace DigiLimbDesktop.Platforms.Windows
                 var reader = DataReader.FromBuffer(request.Value);
                 //reader.ByteOrder = ByteORder.LittleEndian;
 
-                double x = 0, y = 0;
+                double x = 0, y = 0, scroll=0;
                 bool leftClick = false, rightClick = false;
 
                 while (reader.UnconsumedBufferLength > 0)
@@ -343,6 +343,9 @@ namespace DigiLimbDesktop.Platforms.Windows
                             break;
                         case 0x04:
                             rightClick = reader.ReadByte() != 0;
+                            break;
+                        case 0x05:
+                            scroll = reader.ReadDouble();
                             break;
                         default:
                             Debug.WriteLine($"⚠️ Unknown Header: {header}");
@@ -367,6 +370,12 @@ namespace DigiLimbDesktop.Platforms.Windows
                 {
                     isMoving = false;
                     MouseEmulator.StopMouseMovement();
+                }
+
+                if (scroll != 0)
+                {
+                    Debug.WriteLine("Simulating Scroll");
+                    MouseEmulator.SimulateMouseScroll(scroll);
                 }
 
                 if (leftClick && !isLeftPressed) // mobile sends TRUE(pressed), and if its currently not being pressed already then perform press

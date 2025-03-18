@@ -67,7 +67,7 @@ public partial class Login : ContentPage
     {
         try
         {
-            string connectionUri = "mongodb+srv://saiahmontoya01:AQfSCJE5bfDnhYSh@digilimbdatabase.mneoe.mongodb.net/?authSource=admin&w=majority&appName=DigilimbDatabase";
+            string connectionUri = "mongodb://saiahmontoya01:AQfSCJE5bfDnhYSh@digilimbdatabase-shard-00-00.mneoe.mongodb.net:27017,digilimbdatabase-shard-00-01.mneoe.mongodb.net:27017,digilimbdatabase-shard-00-02.mneoe.mongodb.net:27017/?ssl=true&replicaSet=atlas-brcqsn-shard-0&authSource=admin&retryWrites=true&w=majority&appName=DigilimbDatabase";
             client = new MongoClient(connectionUri);
             database = client.GetDatabase("DigilimbDatabase");
             userCollection = database.GetCollection<User>("Users");
