@@ -199,7 +199,7 @@ namespace DigiLimbDesktop
 
                 if (!isConnected) // ✅ Only update UI when a device disconnects
                 {
-                    lblConnectedDevice.Text = "No Device Connected";
+                    lblConnectedDevice.Text = "Lost connection to device.";
                     lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Red;
                     lblConnectedDevice.IsVisible = true;
 
