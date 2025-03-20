@@ -17,6 +17,7 @@
                 <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
                     <Label Text="Pair Device" 
                        HorizontalOptions="Center"
+                       TextColor="#333"
                        FontSize="25"/>
                     <Label Text="Make sure Bluetooth is enabled on both devices. &#10;Make sure DigiLimb PC is installed and visible to local devices."
                        HorizontalOptions="Center"

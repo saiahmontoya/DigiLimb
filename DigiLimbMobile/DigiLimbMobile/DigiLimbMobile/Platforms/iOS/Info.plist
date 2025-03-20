@@ -50,7 +50,9 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>CFBundleDisplayName</key>
+	<string>DigiLimb</string>
 	<key>CFBundleIdentifier</key>
-	<string>Bruzz.Digg</string>
+	<string>Mobile.Digilimb</string>
 </dict>
 </plist>

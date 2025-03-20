@@ -16,7 +16,7 @@
         </Grid.ColumnDefinitions>
         <BoxView Grid.Row="0" Grid.ColumnSpan="2" BackgroundColor="#90D5FF" AbsoluteLayout.LayoutBounds="0.5,0.5,300,300" AbsoluteLayout.LayoutFlags="PositionProportional">
                 <BoxView.GestureRecognizers>
-                    <PanGestureRecognizer PanUpdated="OnPanUpdated"/>
+                    <PointerGestureRecognizer PointerMoved="OnPointerUpdated" PointerPressed="OnPointerPressed" PointerReleased="OnPointerReleased"/>
                 </BoxView.GestureRecognizers>
             </BoxView>
 
@@ -49,7 +49,7 @@
                VerticalOptions="End"
                Aspect="AspectFill"
                HeightRequest="150"
-               WidthRequest="150"
+               WidthRequest="300"
                Source="legoat.png" />
         <!-- A label to show feedback of touch movement -->
         <Label Grid.ColumnSpan="2" x:Name="MovementFeedbackLabel" Text="Move your finger on the touchpad" 
