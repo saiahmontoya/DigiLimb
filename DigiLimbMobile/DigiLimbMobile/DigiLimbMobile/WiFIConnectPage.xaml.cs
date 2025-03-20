@@ -1,4 +1,5 @@
-using ZXing.Net.Maui;
+﻿using ZXing.Net.Maui;
+using ZXing.Net.Maui.Controls;
 using Microsoft.Maui.Controls;
 using System;
 using System.Net.WebSockets;
@@ -19,30 +20,26 @@ namespace DigiLimbMobile
 
         private async void OnScanQRCodeClicked(object sender, EventArgs e)
         {
-            var scannerPage = new ContentPage
+            var scannerView = new CameraBarcodeReaderView
             {
-                Content = new ZXing.Net.Maui.Controls.CameraBarcodeReaderView
-                {
-                    BarcodeOptions = new BarcodeReaderOptions
-                    {
-                        Formats = ZXing.BarcodeFormat.QR_CODE, // Ensure it's a QR Code
-                        AutoRotate = true
-                    },
-                    BarcodeDetected = async (result) =>
-                    {
-                        if (result.Count > 0)
-                        {
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                string scannedData = result[0].Value;
-                                ProcessScannedData(scannedData);
+                HorizontalOptions = LayoutOptions.Fill,
+                VerticalOptions = LayoutOptions.Fill
+            };
 
-                                // Stop scanner & close modal
-                                await Navigation.PopModalAsync();
-                            });
-                        }
+            var scannerPage = new ContentPage { Content = scannerView };
+
+            // ✅ Correct event name & checking e.Results.Count properly
+            scannerView.BarcodesDetected += (s, e) =>
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    if (e.Results != null && e.Results.Any()) // ✅ Works for IEnumerable
+                    {
+                        string scannedData = e.Results.First().Value;
+                        ProcessScannedData(scannedData);
+                        await Navigation.PopModalAsync();
                     }
-                }
+                });
             };
 
             await Navigation.PushModalAsync(scannerPage);
