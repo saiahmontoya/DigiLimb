@@ -10,7 +10,8 @@
         <!-- Fixed port 8080 -->
         <Entry x:Name="entryPort" Text="8080" IsReadOnly="True" />
         <Button Text="Connect" Clicked="OnConnectClicked" />
-        <Label x:Name="lblStatus" Text="Status: Not connected" FontSize="16" TextColor="Gray" />
+		<Button Text="Scan QR Code" Clicked="OnScanQRCodeClicked"/>
+		<Label x:Name="lblStatus" Text="Status: Not connected" FontSize="16" TextColor="Gray" />
         <Label Text="Send a message:" FontSize="18" />
         <Entry x:Name="entrySendMessage" Placeholder="Enter message to send" />
         <Button Text="Send Message" Clicked="OnSendMessageClicked" />
