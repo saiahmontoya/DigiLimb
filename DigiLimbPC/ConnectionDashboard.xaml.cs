@@ -5,8 +5,8 @@ namespace DigiLimbDesktop;
 
 public partial class ConnectionDashboard : ContentPage
 {
-    private CancellationTokenSource _strengthTokenSource; // ✅ Separate token for RSSI tracking
-    private CancellationTokenSource _durationTokenSource; // ✅ Separate token for connection duration
+    private CancellationTokenSource? _strengthTokenSource; // ✅ Separate token for RSSI tracking
+    private CancellationTokenSource? _durationTokenSource; // ✅ Separate token for connection duration
     private BluetoothPeripheral _bluetoothPeripheral;
 
     public ConnectionDashboard()
@@ -15,6 +15,8 @@ public partial class ConnectionDashboard : ContentPage
 
         _bluetoothPeripheral = App.GlobalBluetoothPeripheral; // ✅ Use global instance
         _bluetoothPeripheral.RssiUpdated += OnRssiUpdated; // ✅ Subscribe to RSSI updates
+
+  
 
         lblDeviceName.Text = App.GlobalDeviceName;
         lblConnectionType.Text = App.GlobalConnectionType;
@@ -28,65 +30,89 @@ public partial class ConnectionDashboard : ContentPage
 
     private void StartUpdatingConnectionStrength()
     {
-        _strengthTokenSource = new CancellationTokenSource(); // ✅ Separate token for RSSI updates
+        _strengthTokenSource = new CancellationTokenSource();
         var token = _strengthTokenSource.Token;
 
         Task.Run(async () =>
         {
-            while (!token.IsCancellationRequested)
+            try
             {
-                var rssi = await _bluetoothPeripheral?.GetConnectionStrengthAsync();
-                if (rssi != null)
+                while (!token.IsCancellationRequested)
                 {
-                    Debug.WriteLine($"Obtained rssi:{rssi}");
-
-                    string strength = _bluetoothPeripheral.GetConnectionStrengthLabel(rssi.Value);
-                    Debug.WriteLine($"Resulting Connection Strength Label: {strength}" );
-                    MainThread.BeginInvokeOnMainThread(() =>
+                    var rssi = await _bluetoothPeripheral?.GetConnectionStrengthAsync();
+                    if (rssi != null)
                     {
-                        lblConnectionStrength.Text = strength;
-                        connectionStrengthIcon.Source = strength switch
-                        {
-                            "Strong" => "highconn.png",
-                            "Ight" => "mediumconn.png",
-                            _ => "lowconn.png"
-                        };
-                        
-                    });
-                }
+                        Debug.WriteLine($"Obtained rssi: {rssi}");
 
-                await Task.Delay(5000, token); // ✅ Update every 5 seconds
+                        string strength = _bluetoothPeripheral.GetConnectionStrengthLabel(rssi.Value);
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                            lblConnectionStrength.Text = strength;
+                            connectionStrengthIcon.Source = strength switch
+                            {
+                                "Strong" => "highconn.png",
+                                "Ight" => "mediumconn.png",
+                                _ => "lowconn.png"
+                            };
+                        });
+                    }
+
+                    await Task.Delay(5000, token); // ✅ Throws if cancelled
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                Debug.WriteLine("🟡 Connection strength task cancelled gracefully.");
+            }
+            finally
+            {
+                _strengthTokenSource?.Dispose();
+                _strengthTokenSource = null;
+                Debug.WriteLine("✅ Connection strength tracking cleaned up.");
             }
         }, token);
     }
+
     private void StartUpdatingConnectionDuration()
     {
         if (!App.GlobalIsConnected || App.GlobalConnectionStartTime == null)
         {
             lblConnectionDuration.Text = "0 min 0 sec";
-            Debug.WriteLine($"Setting duration to 0 (Failure to start)");
             return;
         }
 
-        _durationTokenSource = new CancellationTokenSource(); // ✅ Separate token for duration updates
+        _durationTokenSource = new CancellationTokenSource();
         var token = _durationTokenSource.Token;
 
         Task.Run(async () =>
         {
-            while (!token.IsCancellationRequested)
+            try
             {
-                MainThread.BeginInvokeOnMainThread(UpdateConnectionDuration);
-                await Task.Delay(1000, token); // ✅ Update every second
+                while (!token.IsCancellationRequested)
+                {
+                    MainThread.BeginInvokeOnMainThread(UpdateConnectionDuration);
+                    await Task.Delay(1000, token);
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                Debug.WriteLine("🟡 Connection duration tracking cancelled.");
+            }
+            finally
+            {
+                _durationTokenSource?.Dispose();
+                _durationTokenSource = null;
+                Debug.WriteLine("✅ Duration tracking cleaned up.");
             }
         }, token);
     }
+
 
     private void UpdateConnectionDuration()
     {
         if (!App.GlobalIsConnected || App.GlobalConnectionStartTime == null)
         {
             lblConnectionDuration.Text = "0 min 0 sec";
-            Debug.WriteLine($"Setting duration to 0 ");
             return;
         }
 
@@ -100,11 +126,11 @@ public partial class ConnectionDashboard : ContentPage
     private void OnRssiUpdated(object sender, int rssi)
     {
         if (!App.GlobalIsConnected)
-        { 
-        Debug.WriteLine($"Can't update RSSI because of connection issue");
+        {
+            Debug.WriteLine($"Can't update RSSI because of connection issue");
 
-        return; // ✅ Prevents updates if disconnected
-    }
+            return; // ✅ Prevents updates if disconnected
+        }
         MainThread.BeginInvokeOnMainThread(() =>
         {
             lblConnectionStrength.Text = $"{rssi} dBm";
@@ -140,20 +166,12 @@ public partial class ConnectionDashboard : ContentPage
             lblConnectionStrength.Text = "N/A";
             lblConnectionDuration.Text = "0 min 0 sec";
 
-            // ✅ Update MainPage (Prevent Exception)
-            var mainPage = ConnectionsPage.FindMainPage(); // ✅ Calling FindMainPage() directly from ConnectionsPage
-
-            if (mainPage != null)
-            {
-                mainPage.UpdateConnectionStatus();
-                Debug.WriteLine("✅ Connection status updated on MainPage.");
-            }
-            else
-            {
-                Debug.WriteLine("❌ Could not find MainPage.");
-            }
 
             Debug.WriteLine("ENDING CONNECTION TO DEVICE");
+
+            // ✅ Send disconnect signal to mobile
+            await _bluetoothPeripheral.SendDisconnectSignalAsync();
+
             await DisplayAlert("Connection Ended", "The connection has been terminated.", "OK");
             await Navigation.PopAsync();
         }
@@ -164,13 +182,16 @@ public partial class ConnectionDashboard : ContentPage
         }
     }
 
-
+   
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        // ✅ Stop both timers when leaving the page
         _strengthTokenSource?.Cancel();
         _durationTokenSource?.Cancel();
+        _bluetoothPeripheral.RssiUpdated -= OnRssiUpdated;
     }
+
+   
+
 }

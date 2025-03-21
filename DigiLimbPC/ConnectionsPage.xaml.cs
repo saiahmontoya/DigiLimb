@@ -47,19 +47,30 @@ namespace DigiLimbDesktop
                 _bluetoothPeripheral.DeviceInfoReceived += OnDeviceInfoReceived;
                 _bluetoothPeripheral.DeviceConnectionChanged -= OnDeviceConnectionChanged;
                 _bluetoothPeripheral.DeviceConnectionChanged += OnDeviceConnectionChanged;
-
                 Debug.WriteLine("✅ Subscribed to BluetoothPeripheral Events.");
+                if (App.GlobalIsConnected == true)
+                {
+                    lblAwaitingConnection.IsVisible = false;
+                    lblConnectedDevice.Text = $"Connected to: {App.GlobalDeviceName} SWAMP IZZO";
+                    lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
+                    lblConnectedDevice.IsVisible = true;
+                    btnAllowIncomingConnection.IsEnabled = false;
+                }
+                else
+                {
+                    // This is aimed towards when the user is forced back to connections after a disconnection occurs
+                    // I can see how this could possibly get bugged if its back nav'd into. 
+                    lblAwaitingConnection.IsVisible = false;
+                    lblConnectedDevice.Text = "Lost connection to device.";
+                    lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Red;
+                    lblConnectedDevice.IsVisible = true;
+                    btnAllowIncomingConnection.Text = "Cancel";
+                }
             }
-
-            if (App.GlobalIsConnected == true)
+            else
             {
-                lblAwaitingConnection.IsVisible = false;
-                lblConnectedDevice.Text = $"Connected to: {App.GlobalDeviceName} SWAMP IZZO";
-                lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
-                lblConnectedDevice.IsVisible = true;
-                btnAllowIncomingConnection.IsEnabled = false;
+                Debug.WriteLine("NO GLOBAL GATT");
             }
-
 #endif
         }
 
@@ -137,6 +148,7 @@ namespace DigiLimbDesktop
                     _bluetoothPeripheral.DeviceInfoReceived += OnDeviceInfoReceived;
                     _bluetoothPeripheral.DeviceConnectionChanged -= OnDeviceConnectionChanged;
                     _bluetoothPeripheral.DeviceConnectionChanged += OnDeviceConnectionChanged;
+                    
 
                     Debug.WriteLine("✅ Subscribed to BluetoothPeripheral Events.");
 
@@ -160,6 +172,10 @@ namespace DigiLimbDesktop
                     _bluetoothPeripheral.StopAdvertising();
                     _bluetoothPeripheral.Dispose(); // ✅ Fully dispose of the GATT server
                     App.GlobalBluetoothPeripheral = null; // ✅ Clears global instance
+                    App.GlobalIsConnected = false;
+                    App.GlobalDeviceName = "No Device";
+                    App.GlobalConnectionType = "";
+                    App.GlobalConnectionStartTime = null;
 
                     lblAwaitingConnection.Text = "No device paired.";
                     btnAllowIncomingConnection.Text = "Allow Incoming Bluetooth Connection";
@@ -232,24 +248,16 @@ namespace DigiLimbDesktop
 
                     await DisplayAlert("Paired Successfully", $"Paired to {deviceInfo.DeviceName}.", "OK");
 
-                    // ✅ Find MainPage dynamically
-                    var mainPage = FindMainPage();
-                    if (mainPage != null)
-                    {
-                        App.GlobalIsConnected = true;
-                        App.GlobalDeviceName = deviceInfo.DeviceName ?? "Unknown Device";
-                        App.GlobalConnectionType = "Bluetooth"; // Set to "WiFi" if needed
-                        App.GlobalConnectionStartTime = DateTime.Now; // Store start time for duration tracking
-                        mainPage.UpdateConnectionStatus();
-                        Debug.WriteLine("Connection status updated and main page found");
-                    }
-                    else
-                    {
-                        Debug.WriteLine("❌ Could not find MainPage dynamically.");
-                    }
 
+                    App.GlobalBluetoothPeripheral = _bluetoothPeripheral;
+                    App.GlobalIsConnected = true;
+                    App.GlobalDeviceName = deviceInfo.DeviceName ?? "Unknown Device";
+                    App.GlobalConnectionType = "Bluetooth"; // Set to "WiFi" if needed
+                    App.GlobalConnectionStartTime = DateTime.Now; // Store start time for duration tracking
+          
+                    Debug.WriteLine("Connection status updated and main page found");
 
-                    await Shell.Current.GoToAsync("//MainPage");
+                    await Shell.Current.GoToAsync("//MainPage", true);
 
 
                 }
@@ -261,56 +269,7 @@ namespace DigiLimbDesktop
             Console.WriteLine($"📡 UI Updated: Connected to {deviceInfo.DeviceName} (ID: {deviceInfo.DeviceId})");
         }
 #endif
-        /// <summary>
-        /// Dynamically finds and returns MainPage from the application's navigation structure.
-        /// </summary>
-        public static MainPage FindMainPage()
-        {
-            // 1️⃣ Check if MainPage is the current visible page
-            if (Application.Current.MainPage is MainPage directMainPage)
-                return directMainPage;
-
-            // 2️⃣ Check if MainPage is wrapped in a NavigationPage
-            if (Application.Current.MainPage is NavigationPage navPage)
-            {
-                if (navPage.RootPage is MainPage mainPage)
-                    return mainPage;
-            }
-
-            // 3️⃣ Check if Shell contains MainPage (dealing with deep nesting)
-            if (Application.Current.MainPage is Shell shell)
-            {
-                foreach (var item in shell.Items) // Iterate through ShellItems
-                {
-                    if (item is ShellItem shellItem)
-                    {
-                        foreach (var section in shellItem.Items) // Look in ShellSections
-                        {
-                            if (section is ShellSection shellSection)
-                            {
-                                foreach (var content in shellSection.Items) // Look in ShellContent
-                                {
-                                    if (content is ShellContent shellContent && shellContent.Content is MainPage foundMainPage)
-                                    {
-                                        return foundMainPage;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 4️⃣ LAST RESORT: Search through ALL pages in the Navigation Stack (in case it's been pushed)
-            foreach (var page in Application.Current.MainPage.Navigation.NavigationStack)
-            {
-                if (page is MainPage foundMainPage)
-                    return foundMainPage;
-            }
-
-            Debug.WriteLine("❌ MainPage STILL not found in navigation structure.");
-            return null;
-        }
+       
 
 
         private void btnStartServer_Click(object sender, EventArgs e)
@@ -387,6 +346,24 @@ namespace DigiLimbDesktop
             });
             Debug.WriteLine($"📡 Server Status: {message}");
         }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+#if WINDOWS
+            if (_bluetoothPeripheral != null)
+            {
+                _bluetoothPeripheral.DeviceInfoReceived -= OnDeviceInfoReceived;
+                _bluetoothPeripheral.DeviceConnectionChanged -= OnDeviceConnectionChanged;
+            }
+#endif
+        }
+
+
+
+
+
     }
 
 }

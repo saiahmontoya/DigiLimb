@@ -40,7 +40,7 @@ namespace DigiLimbDesktop.Platforms.Windows
 
         private int? _lastRssi = null; // ✅ Stores last known RSSI value
         private DateTime _lastHeartbeatTime = DateTime.MinValue;
-        private CancellationTokenSource _heartbeatMonitorTokenSource; // ✅ Used to check if heartbeats stop
+        private CancellationTokenSource? _heartbeatMonitorTokenSource; // ✅ Used to check if heartbeats stop
 
         
         public event EventHandler<(double x, double y, bool leftClick, bool rightClick)> MouseDataReceived;
@@ -143,20 +143,35 @@ namespace DigiLimbDesktop.Platforms.Windows
 
             Task.Run(async () =>
             {
-                while (!token.IsCancellationRequested)
+                try
                 {
-                    if ((DateTime.Now - _lastHeartbeatTime).TotalSeconds > 10)
+                    while (!token.IsCancellationRequested)
                     {
-                        Debug.WriteLine("❌ No heartbeat received for 10 seconds. Assuming device disconnected.");
-                        DeviceConnectionChanged?.Invoke(this, false);
-                        _heartbeatMonitorTokenSource.Cancel();
-                        return;
-                    }
+                        if ((DateTime.Now - _lastHeartbeatTime).TotalSeconds > 10)
+                        {
+                            Debug.WriteLine("❌ No heartbeat received for 10 seconds. Assuming device disconnected.");
+                            DeviceConnectionChanged?.Invoke(this, false);
 
-                    await Task.Delay(5000, token);
+                            break; // ✅ Exit loop naturally
+                        }
+
+                        await Task.Delay(5000, token);
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    Debug.WriteLine("🟡 Heartbeat monitor task cancelled gracefully.");
+                }
+                finally
+                {
+                    _heartbeatMonitorTokenSource?.Dispose();
+                    _heartbeatMonitorTokenSource = null;
+                    Debug.WriteLine("✅ Heartbeat monitor cleaned up.");
                 }
             }, token);
         }
+
+
 
         private async Task CreateDeviceInfoCharacteristic()
         {
@@ -468,6 +483,28 @@ namespace DigiLimbDesktop.Platforms.Windows
                 Debug.WriteLine($"⚠️ Error disposing BluetoothPeripheral: {ex.Message}");
             }
         }
+
+        public async Task SendDisconnectSignalAsync()
+        {
+            if (_characteristicDeviceInfo != null)
+            {
+                try
+                {
+                    byte[] disconnectMessage = Encoding.UTF8.GetBytes("DISCONNECT");
+                    await _characteristicDeviceInfo.NotifyValueAsync(disconnectMessage.AsBuffer());
+                    Debug.WriteLine("📡 Sent DISCONNECT signal to mobile.");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"⚠️ Failed to send DISCONNECT signal: {ex.Message}");
+                }
+            }
+            else
+            {
+                Debug.WriteLine("❌ DeviceInfoCharacteristic is null. Cannot send disconnect signal.");
+            }
+        }
+
 
 
     }

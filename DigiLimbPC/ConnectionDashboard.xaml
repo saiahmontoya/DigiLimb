@@ -35,13 +35,15 @@
 
                     <!-- 🔹 Bluetooth/WiFi Icon -->
                     <Image x:Name="connectionIcon"
-                           WidthRequest="40"
-                           HeightRequest="40"
-                           VerticalOptions="Center"
-                           HorizontalOptions="Start"
+                           MinimumWidthRequest="60"
+                           MinimumHeightRequest="60"
+                           MaximumWidthRequest ="100"
+                           MaximumHeightRequest ="100"
+                           VerticalOptions="CenterAndExpand"
+                           HorizontalOptions="StartAndExpand"
                            Grid.Row="0"
                            Grid.Column="0"
-                           Margin="0,0,15,0"/>
+                           Margin="0,0,0,0"/>
 
                     <!-- 🔹 Paired Device (Header) -->
                     <Label Text="Paired Device:"

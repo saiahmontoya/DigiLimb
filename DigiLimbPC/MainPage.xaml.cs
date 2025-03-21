@@ -49,7 +49,7 @@ namespace DigiLimbDesktop
             // ✅ Subscribe to Bluetooth connection updates
             // ✅ Prevent event duplication & ensure object is not null
             // ✅ Prevent event duplication & ensure object is not null
-            if (_bluetoothPeripheral != null)
+            if (App.GlobalBluetoothPeripheral is not null)
             {
                 // ✅ Retrieve global BluetoothPeripheral instance
                 _bluetoothPeripheral = App.GlobalBluetoothPeripheral;
@@ -78,6 +78,8 @@ namespace DigiLimbDesktop
 
             // ✅ Ensure `_isConnected` syncs with `GlobalIsConnected`
             _isConnected = App.GlobalIsConnected;
+            // _deviceName = App.GlobalDeviceName;
+            // _connectionType = App.GlobalConnectionType;
 
             UpdateConnectionStatus();
         }
@@ -174,7 +176,7 @@ namespace DigiLimbDesktop
 
         private async void OnViewConnectionDashboardClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new ConnectionDashboard());
+            await Shell.Current.GoToAsync("ConnectionDashboard");
         }
 
 
@@ -193,6 +195,7 @@ namespace DigiLimbDesktop
             {
                 Debug.WriteLine($"🔄 Updating Connection Status: isConnected = {_isConnected}");
 
+                _bluetoothPeripheral = App.GlobalBluetoothPeripheral;
                 _isConnected = App.GlobalIsConnected;
                 _deviceName = App.GlobalDeviceName;
                 _connectionType = App.GlobalConnectionType;

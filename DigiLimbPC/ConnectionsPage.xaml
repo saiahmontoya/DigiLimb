@@ -112,8 +112,24 @@
 
                     <!-- Row 3: Chat Section -->
                     <Label Text="Chat" FontSize="20" FontAttributes="Bold" Margin="0,15,0,5" TextColor="#333"/>
-                    <Entry x:Name="entryChatMessage" Placeholder="Enter message to send" />
-                    <Button x:Name="btnSendChat" Text="Send Chat" Clicked="OnSendChatClicked" Style="{StaticResource HoverButtonStyle}" TextColor="White"/>
+                    <VerticalStackLayout Padding="30,0" Spacing="10">
+                        <Entry x:Name="entryChatMessage"
+                               Placeholder="Enter message to send"
+                               HorizontalOptions="FillAndExpand"
+                               Margin="0" />
+
+                        <Button x:Name="btnSendChat"
+                                Text="Send"
+                                Clicked="OnSendChatClicked"
+                                Style="{StaticResource HoverButtonStyle}"
+                                TextColor="White"
+                                HorizontalOptions="FillAndExpand"
+                                MaximumWidthRequest="450"
+                                MaximumHeightRequest="70"/>
+                    </VerticalStackLayout>
+
+
+
 
                     <!-- Row 4: Log Area -->
                     <Label Text="Connection Logs" FontSize="18" FontAttributes="Bold" Margin="0,15,0,5" TextColor="#333"/>
