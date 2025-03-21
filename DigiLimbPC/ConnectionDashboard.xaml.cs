@@ -153,6 +153,7 @@ public partial class ConnectionDashboard : ContentPage
                 Debug.WriteLine("❌ Could not find MainPage.");
             }
 
+            Debug.WriteLine("ENDING CONNECTION TO DEVICE");
             await DisplayAlert("Connection Ended", "The connection has been terminated.", "OK");
             await Navigation.PopAsync();
         }

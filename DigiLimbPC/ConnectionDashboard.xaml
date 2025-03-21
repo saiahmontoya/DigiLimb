@@ -99,6 +99,7 @@
                                TextColor="Black"
                                VerticalOptions="Center"/>
                     </StackLayout>
+                    
 
                     <!-- 🔹 Connection Duration -->
                     <Label Text="Connection Duration:"
@@ -134,7 +135,7 @@
 
             <!-- 🔹 End Connection Button -->
             <Button Text="End Connection"
-                    BackgroundColor="#D9534F"
+                    Style="{StaticResource QuitButtonStyle}"
                     TextColor="White"
                     FontSize="18"
                     HeightRequest="55"

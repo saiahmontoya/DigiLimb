@@ -15,7 +15,8 @@
                     Stroke="Black"
                     StrokeShape="RoundRectangle 15"
                     Padding="20"
-                    Margin="5">
+                    Margin="5"
+                    HeightRequest="200">
 
                 <!-- ✅ Corrected Shadow Implementation -->
                 <Border.Shadow>
@@ -54,9 +55,10 @@
                     <Button x:Name="btnAllowIncomingConnection"
                             Text="Allow Incoming Bluetooth Connection"
                             Clicked="btnAllowIncomingConnection_Click"
-                            BackgroundColor="#037ffc"
+                            Style="{StaticResource HoverButtonStyle}"
                             TextColor="White"
                             HeightRequest="50"
+                            WidthRequest="350"
                             FontSize="16"
                             HorizontalOptions="Center"/>
                 </VerticalStackLayout>
@@ -96,13 +98,13 @@
                         <Button x:Name="btnStartServer"
                                 Text="Start WiFi Server"
                                 Clicked="btnStartServer_Click"
-                                BackgroundColor="#037ffc"
+                                Style="{StaticResource HoverButtonStyle}"
                                 TextColor="White"
                                 HeightRequest="50"/>
                         <Button x:Name="btnStopServer"
                                 Text="Stop WiFi Server"
                                 Clicked="btnStopServer_Click"
-                                BackgroundColor="#4e92bf"
+                                Style="{StaticResource QuitButtonStyle}"
                                 TextColor="White"
                                 IsEnabled="False"
                                 HeightRequest="50"/>
@@ -111,7 +113,7 @@
                     <!-- Row 3: Chat Section -->
                     <Label Text="Chat" FontSize="20" FontAttributes="Bold" Margin="0,15,0,5" TextColor="#333"/>
                     <Entry x:Name="entryChatMessage" Placeholder="Enter message to send" />
-                    <Button x:Name="btnSendChat" Text="Send Chat" Clicked="OnSendChatClicked" BackgroundColor="#037ffc" TextColor="White"/>
+                    <Button x:Name="btnSendChat" Text="Send Chat" Clicked="OnSendChatClicked" Style="{StaticResource HoverButtonStyle}" TextColor="White"/>
 
                     <!-- Row 4: Log Area -->
                     <Label Text="Connection Logs" FontSize="18" FontAttributes="Bold" Margin="0,15,0,5" TextColor="#333"/>
@@ -126,7 +128,7 @@
             <Button x:Name="btnBack"
                     Text="Back"
                     Clicked="btnBack_Click"
-                    BackgroundColor="Gray"
+                    Style="{StaticResource QuitButtonStyle}"
                     TextColor="White"
                     HeightRequest="50"
                     FontSize="16"
