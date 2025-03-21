@@ -21,6 +21,8 @@ namespace DigiLimbDesktop
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit() // If you're using MAUI Toolkit
+                .UseBarcodeReader()  // ✅ Register the barcode reader here
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

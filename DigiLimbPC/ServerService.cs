@@ -43,6 +43,8 @@ namespace DigiLimbDesktop
         private readonly int _port = 8080; // Fixed port for the WebSocket server
 #if WINDOWS
         private readonly GameControllerManager _controllerManager;
+        private readonly GameControllerManager _controllerManager = new();
+
 #endif
 
         // Heartbeat and chat constants
@@ -384,6 +386,10 @@ private static byte[] ConvertIBufferToByteArray(Windows.Storage.Streams.IBuffer 
                         else if (message.StartsWith(CONTROLLER_PREFIX))
                         {
                             await ProcessControllerInput(webSocket, message);
+                        }
+                        else if (message.StartsWith("{"))
+                        {
+                            _controllerManager.HandleIncomingMessage(message);
                         }
 
                         // Keep existing broadcast functionality

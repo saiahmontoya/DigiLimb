@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -12,6 +12,7 @@ namespace DigiLimbMobile
         public GameControllerPage()
         {
             InitializeComponent();
+            SetupJoystick();
         }
 
         private async void OnButtonPress(object sender, EventArgs e)
@@ -28,9 +29,54 @@ namespace DigiLimbMobile
             await App.GlobalWebSocket.SendAsync(new ArraySegment<byte>(messageBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
-        private async void OnBackClicked(object sender, EventArgs e)
+        private async void SendJoystickData(float x, float y)
         {
-            await Navigation.PopAsync();
+            if (App.GlobalWebSocket == null || App.GlobalWebSocket.State != WebSocketState.Open)
+            {
+                System.Diagnostics.Debug.WriteLine("❌ WebSocket not connected. Cannot send joystick data.");
+                return;
+            }
+
+            var payload = new
+            {
+                type = "joystick",
+                x,
+                y,
+                buttonPressed = false
+            };
+
+            string json = System.Text.Json.JsonSerializer.Serialize(payload);
+            System.Diagnostics.Debug.WriteLine($"📤 Sending Joystick JSON: {json}");
+
+            byte[] messageBuffer = Encoding.UTF8.GetBytes(json);
+            await App.GlobalWebSocket.SendAsync(new ArraySegment<byte>(messageBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+
+
+        private void SetupJoystick()
+        {
+            var pan = new PanGestureRecognizer();
+            pan.PanUpdated += OnJoystickMoved;
+            JoystickPad.GestureRecognizers.Add(pan);
+        }
+
+        private void OnJoystickMoved(object sender, PanUpdatedEventArgs e)
+        {
+            if (e.StatusType == GestureStatus.Running)
+            {
+                double padWidth = JoystickPad.Width;
+                double padHeight = JoystickPad.Height;
+
+                float normalizedX = (float)Math.Max(-1, Math.Min(1, e.TotalX / (padWidth / 2)));
+                float normalizedY = (float)Math.Max(-1, Math.Min(1, -e.TotalY / (padHeight / 2))); // invert Y
+
+                _ = SendJoystickData(normalizedX, normalizedY);
+            }
+
+            if (e.StatusType == GestureStatus.Completed)
+            {
+                _ = SendJoystickData(0, 0);
+            }
         }
     }
 }
