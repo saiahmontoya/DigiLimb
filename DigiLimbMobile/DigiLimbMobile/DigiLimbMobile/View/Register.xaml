@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbMobile.View.Register"
+             Title="Register">
+
+    <Grid RowDefinitions=".3*, .7*">
+        <Image Aspect="AspectFill" Source="digilogin.webp"/>
+        <Grid BackgroundColor="#90D5FF" Opacity=".9"/>
+        <Grid ColumnDefinitions="*,*">
+            <Image Aspect="AspectFit"
+                   HeightRequest="120"
+                   Source="applogo.jpg!sw800" />
+        </Grid>
+        <Grid Grid.Row="1">
+            <RoundRectangle Margin="-5, -30, -5, -2"
+                            CornerRadius="30, 30, 0, 0"
+                            Fill="White" />
+            <VerticalStackLayout Margin="30,0,30,0">
+                <Label
+                    FontFamily="medium"
+                    Text="Register to continue"
+                    TextColor="#A3A3A4"/>
+                <Grid Margin="0,30,0,0" ColumnDefinitions=".1*,.8*">
+                    <Entry x:Name="Username"
+                           Grid.Column="1"
+                           Placeholder="USERNAME*"
+                           TextColor="Black"
+                           VerticalOptions="Center"/>
+                </Grid>
+                <Grid Margin="0,30,0,0" ColumnDefinitions=".1*,.8*">
+                    <Entry x:Name="Email"
+                           Grid.Column="1"
+                           Placeholder="EMAIL*"
+                           TextColor="Black"
+                           VerticalOptions="Center"/>
+                </Grid>
+                <Grid Margin="0,30,0,0" ColumnDefinitions=".1*,.8*">
+                    
+                    <Entry x:Name="Password"
+                           Grid.Column="1"
+                           IsPassword="true"
+                           Placeholder="PASSWORD*"
+                           TextColor="Black"
+                           VerticalOptions="Center"/>
+                </Grid>
+                <Grid Margin="0,30,0,0" ColumnDefinitions=".1*,.8*">
+                    <Entry x:Name="ConfirmPassword"
+                           Grid.Column="1"
+                           IsPassword="true"
+                           Placeholder="CONFIRM PASSWORD*"
+                           TextColor="Black"
+                           VerticalOptions="Center"/>
+                </Grid>
+                <Button Margin="0,20,0,0"
+                        BackgroundColor="#d9ecfa"
+                        HeightRequest="60"
+                        Clicked="OnRegisterClicked"
+                        Text="Register"
+                        TextColor="#517891"/>
+            </VerticalStackLayout>
+        </Grid>
+
+    </Grid>
+</ContentPage>
