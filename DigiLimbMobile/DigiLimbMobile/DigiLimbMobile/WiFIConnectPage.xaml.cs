@@ -6,6 +6,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace DigiLimbMobile
 {
@@ -20,31 +21,73 @@ namespace DigiLimbMobile
 
         private async void OnScanQRCodeClicked(object sender, EventArgs e)
         {
-            var scannerView = new CameraBarcodeReaderView
-            {
-                HorizontalOptions = LayoutOptions.Fill,
-                VerticalOptions = LayoutOptions.Fill
-            };
+            CameraBarcodeReaderView scannerView = null;
+            ContentPage scannerPage = null;
+            bool hasScanned = false; // ✅ Prevents double-processing
 
-            var scannerPage = new ContentPage { Content = scannerView };
-
-            // ✅ Correct event name & checking e.Results.Count properly
-            scannerView.BarcodesDetected += (s, e) =>
+            try
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                scannerView = new CameraBarcodeReaderView
                 {
-                    if (e.Results != null && e.Results.Any()) // ✅ Works for IEnumerable
+                    HorizontalOptions = LayoutOptions.Fill,
+                    VerticalOptions = LayoutOptions.Fill,
+                    IsDetecting = true
+                };
+
+                scannerPage = new ContentPage
+                {
+                    Content = new Grid
                     {
-                        string scannedData = e.Results.First().Value;
-                        ProcessScannedData(scannedData);
-                        await Navigation.PopModalAsync();
+                        Children = { scannerView }
                     }
-                });
-            };
+                };
 
-            await Navigation.PushModalAsync(scannerPage);
+                scannerView.BarcodesDetected += async (s, e) =>
+                {
+                    if (hasScanned) return;
+
+                    try
+                    {
+                        if (e?.Results != null && e.Results.Any())
+                        {
+                            hasScanned = true;
+
+                            var scannedValue = e.Results.FirstOrDefault()?.Value;
+                            if (!string.IsNullOrEmpty(scannedValue))
+                            {
+                                await MainThread.InvokeOnMainThreadAsync(async () =>
+                                {
+                                    scannerView.IsDetecting = false;
+                                    ProcessScannedData(scannedValue);
+
+                                    // ✅ Delay slightly to allow camera to release cleanly before closing modal
+                                    await Task.Delay(100);
+                                    if (Application.Current.MainPage.Navigation.ModalStack.Contains(scannerPage))
+                                    {
+                                        await Application.Current.MainPage.Navigation.PopModalAsync();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"❌ Error during scanning: {ex.Message}");
+                        await MainThread.InvokeOnMainThreadAsync(() =>
+                        {
+                            lblStatus.Text = "QR scan error.";
+                        });
+                    }
+                };
+
+                await Navigation.PushModalAsync(scannerPage);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Failed to initialize QR scanner: {ex.Message}");
+                lblStatus.Text = $"Scanner init error: {ex.Message}";
+            }
         }
-
         private void ProcessScannedData(string scannedData)
         {
             try

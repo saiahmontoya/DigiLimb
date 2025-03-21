@@ -29,7 +29,7 @@ namespace DigiLimbMobile
             await App.GlobalWebSocket.SendAsync(new ArraySegment<byte>(messageBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
-        private async void SendJoystickData(float x, float y)
+        private async Task SendJoystickData(float x, float y)
         {
             if (App.GlobalWebSocket == null || App.GlobalWebSocket.State != WebSocketState.Open)
             {

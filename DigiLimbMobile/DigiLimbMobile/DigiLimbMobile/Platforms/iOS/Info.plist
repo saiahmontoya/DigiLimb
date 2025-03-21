@@ -37,17 +37,8 @@
 	<string>YOUR CUSTOM MESSAGE</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>YOUR CUSTOM MESSAGE</string>
-	<key>CFBundleIdentifier</key>
-	<string>digilimb.saiahmac</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<!-- (A) Allow all insecure loads (simplest for dev) -->
-		<!--
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-		-->
-
-		<!-- (B) Restrict to a specific domain/IP -->
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>192.168.1.15</key>
@@ -59,5 +50,9 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>CFBundleIdentifier</key>
+	<string>Dig.Digg</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera to scan QR codes.</string>
 </dict>
 </plist>

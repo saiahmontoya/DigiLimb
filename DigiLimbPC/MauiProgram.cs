@@ -4,6 +4,7 @@ using Microsoft.Maui.Hosting;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using ZXing.Net.Maui;
 
 namespace DigiLimbDesktop
 {
@@ -21,8 +22,8 @@ namespace DigiLimbDesktop
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .UseMauiCommunityToolkit() // If you're using MAUI Toolkit
-                .UseBarcodeReader()  // ✅ Register the barcode reader here
+                // .UseMauiCommunityToolkit() // If you're using MAUI Toolkit
+                //.UseBarcodeReader()  // ✅ Register the barcode reader here
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

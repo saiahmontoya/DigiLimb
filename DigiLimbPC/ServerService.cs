@@ -43,7 +43,6 @@ namespace DigiLimbDesktop
         private readonly int _port = 8080; // Fixed port for the WebSocket server
 #if WINDOWS
         private readonly GameControllerManager _controllerManager;
-        private readonly GameControllerManager _controllerManager = new();
 
 #endif
 

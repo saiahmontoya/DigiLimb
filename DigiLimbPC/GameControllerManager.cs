@@ -63,7 +63,7 @@ namespace DigiLimbDesktop
                 _ => null
             };
 
-            if (button.HasValue)
+            if (button != null)
             {
                 _controller.SetButtonState(button.Value, true);
                 Task.Delay(100).Wait();
