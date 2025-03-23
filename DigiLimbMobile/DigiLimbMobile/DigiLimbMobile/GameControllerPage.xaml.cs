@@ -4,29 +4,73 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
+using MauiTimer = System.Timers.Timer;
 
 namespace DigiLimbMobile
 {
     public partial class GameControllerPage : ContentPage
     {
+        private readonly Dictionary<string, MauiTimer> _buttonTimers = new();
+
         public GameControllerPage()
         {
             InitializeComponent();
             SetupJoystick();
         }
 
-        private async void OnButtonPress(object sender, EventArgs e)
+        private void OnButtonDown(object sender, EventArgs e)
         {
-            if (App.GlobalWebSocket == null || App.GlobalWebSocket.State != WebSocketState.Open)
-            {
-                await DisplayAlert("Error", "Not connected to the server.", "OK");
-                return;
-            }
+            if (sender is not Button btn) return;
 
-            Button button = sender as Button;
-            string buttonData = $"CONTROLLER:{button.Text}";
-            byte[] messageBuffer = Encoding.UTF8.GetBytes(buttonData);
-            await App.GlobalWebSocket.SendAsync(new ArraySegment<byte>(messageBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            string buttonText = btn.Text;
+            if (_buttonTimers.ContainsKey(buttonText))
+                return;
+
+            var timer = new MauiTimer(100)
+            {
+                AutoReset = true
+            };
+
+            timer.Elapsed += async (_, _) =>
+            {
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    await SendControllerInput(buttonText);
+                });
+            };
+
+            _buttonTimers[buttonText] = timer;
+            timer.Start();
+        }
+
+        private void OnButtonUp(object sender, EventArgs e)
+        {
+            if (sender is not Button btn) return;
+
+            string buttonText = btn.Text;
+            if (_buttonTimers.TryGetValue(buttonText, out var timer))
+            {
+                timer.Stop();
+                timer.Dispose();
+                _buttonTimers.Remove(buttonText);
+            }
+        }
+
+        private async Task SendControllerInput(string button)
+        {
+            try
+            {
+                if (App.GlobalWebSocket == null || App.GlobalWebSocket.State != WebSocketState.Open)
+                    return;
+
+                string data = $"CONTROLLER:{button}";
+                byte[] buffer = Encoding.UTF8.GetBytes(data);
+                await App.GlobalWebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ WebSocket Send Failed: {ex.Message}");
+            }
         }
 
         private async Task SendJoystickData(float x, float y)
@@ -52,7 +96,6 @@ namespace DigiLimbMobile
             await App.GlobalWebSocket.SendAsync(new ArraySegment<byte>(messageBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
-
         private void SetupJoystick()
         {
             var pan = new PanGestureRecognizer();
@@ -68,7 +111,7 @@ namespace DigiLimbMobile
                 double padHeight = JoystickPad.Height;
 
                 float normalizedX = (float)Math.Max(-1, Math.Min(1, e.TotalX / (padWidth / 2)));
-                float normalizedY = (float)Math.Max(-1, Math.Min(1, -e.TotalY / (padHeight / 2))); // invert Y
+                float normalizedY = (float)Math.Max(-1, Math.Min(1, -e.TotalY / (padHeight / 2)));
 
                 _ = SendJoystickData(normalizedX, normalizedY);
             }

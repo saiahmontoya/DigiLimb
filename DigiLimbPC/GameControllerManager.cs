@@ -4,6 +4,7 @@ using System.Text.Json;
 using Nefarius.ViGEm.Client;
 using Nefarius.ViGEm.Client.Targets;
 using Nefarius.ViGEm.Client.Targets.Xbox360;
+using Xbox360Button = Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Button;
 #endif
 
 namespace DigiLimbDesktop
@@ -46,32 +47,47 @@ namespace DigiLimbDesktop
         public Task ProcessControllerInput(string input)
         {
 #if WINDOWS
-            if (!_isInitialized) return Task.CompletedTask;
+            if (!_isInitialized || _controller == null) return Task.CompletedTask;
 
-            Debug.WriteLine($"🎮 Processing Controller Input: {input}");
-
-            Xbox360Button? button = input.ToUpper() switch
+            try
             {
-                "A" => Xbox360Button.A,
-                "B" => Xbox360Button.B,
-                "X" => Xbox360Button.X,
-                "Y" => Xbox360Button.Y,
-                "⬆" => Xbox360Button.Up,
-                "⬇" => Xbox360Button.Down,
-                "⬅" => Xbox360Button.Left,
-                "➡" => Xbox360Button.Right,
-                _ => null
-            };
+                string cleanInput = input.ToUpper().Trim();
+                Debug.WriteLine($"🧼 Sanitized input: '{cleanInput}'");
+                Debug.WriteLine("🧠 REACHED ENUM SWITCH. EXECUTING MAPPING...");
 
-            if (button != null)
-            {
-                _controller.SetButtonState(button.Value, true);
-                Task.Delay(100).Wait();
-                _controller.SetButtonState(button.Value, false);
+                Xbox360Button? button = cleanInput switch
+                {
+                    "A" => Xbox360Button.A,
+                    "B" => Xbox360Button.B,
+                    "X" => Xbox360Button.X,
+                    "Y" => Xbox360Button.Y,
+                    "⬆" => Xbox360Button.Up,
+                    "⬇" => Xbox360Button.Down,
+                    "⬅" => Xbox360Button.Left,
+                    "➡" => Xbox360Button.Right,
+                    _ => null
+                };
+
+                if (button != null)
+                {
+                    var enumType = button.Value.GetType().FullName;
+                    Debug.WriteLine($"🎮 Sending button press for: {button.Value} ({(int)button.Value})");
+                    Debug.WriteLine($"🧪 Enum type: {enumType}");
+                    Debug.WriteLine($"✅ ENUM RESULT: {button.Value}, Raw: {(int)button.Value}");
+                    Debug.WriteLine("🧩 Method called from: " + new StackTrace().GetFrame(0)?.GetMethod()?.DeclaringType?.FullName);
+
+                    _controller.SetButtonState(button, true);
+                    Task.Delay(100).Wait();
+                    _controller.SetButtonState(button, false);
+                }
+                else
+                {
+                    Debug.WriteLine($"⚠️ Unknown or unsupported input: {cleanInput}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Debug.WriteLine($"⚠️ Unknown button: {input}");
+                Debug.WriteLine($"❌ Exception in ProcessControllerInput: {ex.Message}");
             }
 #endif
             return Task.CompletedTask;
@@ -83,8 +99,21 @@ namespace DigiLimbDesktop
 
             if (message.StartsWith("CONTROLLER:"))
             {
+                if (message.Length <= "CONTROLLER:".Length)
+                {
+                    Debug.WriteLine("⚠️ Malformed controller input: No button value provided.");
+                    return;
+                }
+
                 string input = message.Substring("CONTROLLER:".Length).Trim();
-                _ = ProcessControllerInput(input); // trigger button input
+
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    Debug.WriteLine("⚠️ Empty controller input after parsing.");
+                    return;
+                }
+
+                _ = ProcessControllerInput(input);
                 return;
             }
 
@@ -106,25 +135,15 @@ namespace DigiLimbDesktop
         private void SimulateJoystickMovement(float x, float y, bool buttonPressed)
         {
 #if WINDOWS
-            if (!_isInitialized) return;
+            if (!_isInitialized || _controller == null) return;
 
-            // Convert float range [-1, 1] to short range [-32768, 32767]
             short lx = (short)(x * short.MaxValue);
-            short ly = (short)(-y * short.MaxValue); // Y is inverted in most gamepad APIs
+            short ly = (short)(-y * short.MaxValue); // Y is inverted
 
             _controller.SetAxisValue(Xbox360Axis.LeftThumbX, lx);
             _controller.SetAxisValue(Xbox360Axis.LeftThumbY, ly);
 
             Debug.WriteLine($"🕹️ [Mapped] LeftStick X={lx}, Y={ly}");
-
-            // Optionally simulate button press if joystick button is flagged
-            if (buttonPressed)
-            {
-                Debug.WriteLine("🎮 Simulating Joystick Button Press: A");
-                _controller.SetButtonState(Xbox360Button.A, true);
-                Task.Delay(100).Wait();
-                _controller.SetButtonState(Xbox360Button.A, false);
-            }
 #endif
         }
 

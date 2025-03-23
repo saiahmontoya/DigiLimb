@@ -10,16 +10,16 @@
           ColumnDefinitions="*,*,*,*">
 
         <!-- Directional Pad -->
-        <Button Text="⬅" Grid.Row="1" Grid.Column="0" Clicked="OnButtonPress" WidthRequest="70" HeightRequest="70"/>
-        <Button Text="⬆" Grid.Row="0" Grid.Column="1" Clicked="OnButtonPress" WidthRequest="70" HeightRequest="70"/>
-        <Button Text="⬇" Grid.Row="2" Grid.Column="1" Clicked="OnButtonPress" WidthRequest="70" HeightRequest="70"/>
-        <Button Text="➡" Grid.Row="1" Grid.Column="2" Clicked="OnButtonPress" WidthRequest="70" HeightRequest="70"/>
+        <Button Text="⬅" Grid.Row="1" Grid.Column="0" Pressed="OnButtonDown" Released="OnButtonUp" WidthRequest="70" HeightRequest="70"/>
+        <Button Text="⬆" Grid.Row="0" Grid.Column="1" Pressed="OnButtonDown" Released="OnButtonUp" WidthRequest="70" HeightRequest="70"/>
+        <Button Text="⬇" Grid.Row="2" Grid.Column="1" Pressed="OnButtonDown" Released="OnButtonUp" WidthRequest="70" HeightRequest="70"/>
+        <Button Text="➡" Grid.Row="1" Grid.Column="2" Pressed="OnButtonDown" Released="OnButtonUp" WidthRequest="70" HeightRequest="70"/>
 
         <!-- Action Buttons -->
-        <Button Text="X" Grid.Row="5" Grid.Column="1" Clicked="OnButtonPress" WidthRequest="70" HeightRequest="70"/>
-        <Button Text="A" Grid.Row="6" Grid.Column="0" Clicked="OnButtonPress" WidthRequest="70" HeightRequest="70"/>
-        <Button Text="Y" Grid.Row="6" Grid.Column="2" Clicked="OnButtonPress" WidthRequest="70" HeightRequest="70"/>
-        <Button Text="B" Grid.Row="7" Grid.Column="1" Clicked="OnButtonPress" WidthRequest="70" HeightRequest="70"/>
+        <Button Text="X" Grid.Row="5" Grid.Column="1" Pressed="OnButtonDown" Released="OnButtonUp" WidthRequest="70" HeightRequest="70"/>
+        <Button Text="A" Grid.Row="6" Grid.Column="0" Pressed="OnButtonDown" Released="OnButtonUp" WidthRequest="70" HeightRequest="70"/>
+        <Button Text="Y" Grid.Row="6" Grid.Column="2" Pressed="OnButtonDown" Released="OnButtonUp" WidthRequest="70" HeightRequest="70"/>
+        <Button Text="B" Grid.Row="7" Grid.Column="1" Pressed="OnButtonDown" Released="OnButtonUp" WidthRequest="70" HeightRequest="70"/>
 
         <!-- Joystick Title -->
         <Label Text="Joystick Controller"

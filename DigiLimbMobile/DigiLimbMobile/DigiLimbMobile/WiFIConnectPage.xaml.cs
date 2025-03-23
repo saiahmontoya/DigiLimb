@@ -101,6 +101,8 @@ namespace DigiLimbMobile
                     App.GlobalPasskey = parts[2]; // Store passkey globally
                 }
                 lblStatus.Text = "QR Code Scanned Successfully!";
+                Debug.WriteLine($"📤 Sending passkey: '{App.GlobalPasskey}'");
+
             }
             catch (Exception ex)
             {
@@ -110,31 +112,30 @@ namespace DigiLimbMobile
 
         private async void OnConnectClicked(object sender, EventArgs e)
         {
-            if (App.GlobalWebSocket != null && App.GlobalWebSocket.State == WebSocketState.Open)
-            {
-                lblStatus.Text = "Already connected.";
-                return;
-            }
-
             string serverIP = entryServerIP.Text?.Trim();
             string port = entryPort.Text?.Trim();
+            string url = $"ws://{serverIP}:{port}/";
+
+            Debug.WriteLine($"🌐 Attempting to connect to {url}");
+
             if (string.IsNullOrEmpty(serverIP) || string.IsNullOrEmpty(port))
             {
                 lblStatus.Text = "Please enter a valid server IP and port.";
                 return;
             }
 
-            string url = $"ws://{serverIP}:{port}/";
             try
             {
                 _webSocket = new ClientWebSocket();
                 await _webSocket.ConnectAsync(new Uri(url), CancellationToken.None);
                 App.GlobalWebSocket = _webSocket;
 
-                // Send passkey for authentication
+                Debug.WriteLine("✅ WebSocket connection established.");
+
                 if (!string.IsNullOrEmpty(App.GlobalPasskey))
                 {
                     byte[] passkeyBuffer = Encoding.UTF8.GetBytes(App.GlobalPasskey);
+                    Debug.WriteLine($"📤 Sending passkey: {App.GlobalPasskey}");
                     await _webSocket.SendAsync(new ArraySegment<byte>(passkeyBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
 
@@ -143,9 +144,11 @@ namespace DigiLimbMobile
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"❌ WebSocket connection failed: {ex.Message}");
                 lblStatus.Text = $"Connection failed: {ex.Message}";
             }
         }
+
 
         private async void StartReceiveLoop()
         {
@@ -180,6 +183,13 @@ namespace DigiLimbMobile
                         {
                             lblReceived.Text = $"Received: {message}";
                         }
+                    }
+                    if (!string.IsNullOrEmpty(App.GlobalPasskey))
+                    {
+                        byte[] passkeyBuffer = Encoding.UTF8.GetBytes(App.GlobalPasskey);
+
+                        Debug.WriteLine($"📤 Sending passkey: {App.GlobalPasskey}"); // ✅ Add this
+                        await _webSocket.SendAsync(new ArraySegment<byte>(passkeyBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                     }
                 }
             }

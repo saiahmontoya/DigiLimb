@@ -87,6 +87,7 @@ namespace DigiLimbDesktop
                 // Generate and display QR code
                 string qrData = $"{_serverIP}:{_port}:{_generatedPasskey}";
                 ShowQRCodePopup(qrData);
+                Debug.WriteLine($"🔑 Generated Passkey: {_generatedPasskey}");
 
                 Task.Run(() => StartListener());
             }
@@ -163,8 +164,10 @@ namespace DigiLimbDesktop
                 var buffer = new byte[256];
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 string receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                Debug.WriteLine($"📥 Received passkey: '{receivedMessage}'");
+                Debug.WriteLine($"🔐 Expected passkey: '{_generatedPasskey}'");
 
-                if (receivedMessage == _generatedPasskey)
+                if (receivedMessage.Trim() == _generatedPasskey)
                 {
                     _clientConnected = true;
                     _clients.Add(webSocket);
@@ -177,7 +180,7 @@ namespace DigiLimbDesktop
                 }
                 else
                 {
-                    Debug.WriteLine("❌ Authentication failed. Rejecting client.");
+                    Debug.WriteLine($"❌ Passkey mismatch! Received '{receivedMessage.Trim()}' vs expected '{_generatedPasskey}'");
                     await webSocket.CloseAsync(WebSocketCloseStatus.PolicyViolation, "Authentication failed", CancellationToken.None);
                 }
             }
@@ -386,10 +389,12 @@ private static byte[] ConvertIBufferToByteArray(Windows.Storage.Streams.IBuffer 
                         {
                             await ProcessControllerInput(webSocket, message);
                         }
+#if WINDOWS
                         else if (message.StartsWith("{"))
                         {
                             _controllerManager.HandleIncomingMessage(message);
                         }
+#endif
 
                         // Keep existing broadcast functionality
                         await BroadcastMessage(message, webSocket);
@@ -405,7 +410,7 @@ private static byte[] ConvertIBufferToByteArray(Windows.Storage.Streams.IBuffer 
 
         private async Task ProcessControllerInput(WebSocket webSocket, string message)
         {
-        #if WINDOWS
+#if WINDOWS
             if (message.StartsWith("CONTROLLER:"))
             {
                 string input = message.Substring("CONTROLLER:".Length);
@@ -414,7 +419,7 @@ private static byte[] ConvertIBufferToByteArray(Windows.Storage.Streams.IBuffer 
 
                 await _controllerManager.ProcessControllerInput(input); // No error now
             }
-        #endif
+#endif
         }
 
 
@@ -511,21 +516,26 @@ private static byte[] ConvertIBufferToByteArray(Windows.Storage.Streams.IBuffer 
             {
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
-                    FileName = "netsh",  // Execute netsh directly, avoiding PowerShell
-                    Arguments = command,  // Pass the command
-                    UseShellExecute = true, // Required for UAC elevation
-                    Verb = "runas",  // Requests admin privileges
-                    WindowStyle = ProcessWindowStyle.Hidden, // Fully hides the command window
-                    CreateNoWindow = true  // Ensures no console window appears
+                    FileName = "netsh",
+                    Arguments = command,
+                    UseShellExecute = false,           // ❌ Do NOT request elevation
+                    RedirectStandardOutput = true,     // ✅ Optional: capture output
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 };
 
                 using (Process process = new Process { StartInfo = psi })
                 {
                     process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
-                }
 
-                Debug.WriteLine($"✅ netsh command executed with admin privileges: {command}");
+                    Debug.WriteLine($"✅ netsh output: {output}");
+                    if (!string.IsNullOrEmpty(error))
+                        Debug.WriteLine($"⚠️ netsh error: {error}");
+                }
             }
             catch (Exception ex)
             {
@@ -535,16 +545,31 @@ private static byte[] ConvertIBufferToByteArray(Windows.Storage.Streams.IBuffer 
 
 
 
+
         private string GetLocalIPAddress()
         {
             try
             {
-                var host = Dns.GetHostEntry(Dns.GetHostName());
-                foreach (var ip in host.AddressList)
+                foreach (var ni in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
                 {
-                    if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !ip.ToString().StartsWith("127"))
+                    if (ni.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up ||
+                        ni.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback ||
+                        ni.Description.ToLower().Contains("virtual") ||
+                        ni.Description.ToLower().Contains("vmware") ||
+                        ni.Description.ToLower().Contains("hyper-v") ||
+                        ni.Description.ToLower().Contains("docker"))
                     {
-                        return ip.ToString();
+                        continue;
+                    }
+
+                    var ipProps = ni.GetIPProperties();
+                    foreach (var addr in ipProps.UnicastAddresses)
+                    {
+                        if (addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            Debug.WriteLine($"✅ Selected IP: {addr.Address}");
+                            return addr.Address.ToString(); // ✅ This is your actual LAN IP
+                        }
                     }
                 }
             }
@@ -552,7 +577,8 @@ private static byte[] ConvertIBufferToByteArray(Windows.Storage.Streams.IBuffer 
             {
                 Debug.WriteLine($"❌ Error getting local IP: {ex.Message}");
             }
-            return "127.0.0.1";
+
+            return "127.0.0.1"; // ✅ Default fallback return
         }
     }
 }
