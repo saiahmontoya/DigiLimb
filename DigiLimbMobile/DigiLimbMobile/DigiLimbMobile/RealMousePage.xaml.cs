@@ -126,8 +126,8 @@ public partial class RealMousePage : ContentPage
             List<byte> message = new List<byte>();
 
             // scroll Movement (Header 0x08 + 4 Bytes Integer)
-            message.Add(0x08);
-            message.AddRange(BitConverter.GetBytes(scrollAmount).Reverse());
+            message.Add(0x05);
+            message.AddRange(BitConverter.GetBytes(scrollAmount*-1).Reverse()); //multiply by negative 1 bc scrolling on pc side works like track pad
 
             await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
             //Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");

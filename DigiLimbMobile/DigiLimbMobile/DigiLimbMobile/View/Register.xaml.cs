@@ -9,14 +9,14 @@ using Microsoft.Maui.Devices;
 
 namespace DigiLimbMobile.View;
 
-public partial class Login : ContentPage
+public partial class Register : ContentPage
 {
     private MongoClient client;
     private IMongoDatabase database;
     private IMongoCollection<User> userCollection;
     private IMongoCollection<Device> deviceCollection;
 
-    public Login()
+    public Register()
     {
         InitializeComponent();
         InitializeMongoDbConnection();
@@ -40,9 +40,6 @@ public partial class Login : ContentPage
 
         [BsonElement("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        [BsonElement("deviceIds")] // ✅ FIX: Add this field to match MongoDB
-        public List<string> DeviceIds { get; set; } = new List<string>(); 
     }
 
     // 📌 Device Model (MAC Address Only)
@@ -53,28 +50,13 @@ public partial class Login : ContentPage
         public string Id { get; set; }
 
         [BsonElement("userId")]
-        public ObjectId UserId { get; set; }
+        public string UserId { get; set; }
 
         [BsonElement("deviceModel")]
-        public string DeviceModel { get; set; }
-
-        [BsonElement("manufacturer")]
-        public string Manufacturer { get; set; }
-
-        [BsonElement("platform")]
-        public string Platform { get; set; }
-
-        [BsonElement("osVersion")]
-        public string OsVersion { get; set; }
-
-        [BsonElement("deviceType")]
-        public string DeviceType { get; set; }
+        public string DeviceModel { get; set; } // We'll hardcode "Unknown Device" or any custom string
 
         [BsonElement("macAddress")]
-        public string MacAddress { get; set; }
-
-        [BsonElement("createdAt")]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string MacAddress { get; set; }  // Only MAC Address
 
         [BsonElement("lastUpdated")]
         public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
@@ -111,50 +93,14 @@ public partial class Login : ContentPage
             await DisplayAlert("Connection Test Failed", ex.Message, "OK");
         }
     }
-
-    // 📌 Login Process
-    private async void OnLoginClicked(object sender, EventArgs e)
-    {
-        string email = Username.Text.Trim();
-        string password = Password.Text;
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-        {
-            await DisplayAlert("Login Error", "Please enter valid credentials.", "OK");
-            return;
-        }
-
-        try
-        {
-            var user = await userCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
-            if (user == null)
-            {
-                await DisplayAlert("Login Error", "User not found.", "OK");
-                return;
-            }
-
-            if (VerifyPassword(password, user.PasswordHash, user.Salt))
-            {
-                await UpdateDeviceInfo(user.Id);
-
-                await DisplayAlert("Success", "Login Successful!", "OK");
-                await Shell.Current.GoToAsync("//ConnectionPage");
-            }
-            else
-            {
-                await DisplayAlert("Login Error", "Invalid password.", "OK");
-            }
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Login Error", ex.Message, "OK");
-        }
-    }
+   
 
     // 📌 Update or Insert Device Info (MAC Address Only, No IP or DeviceInfo properties)
     private async Task UpdateDeviceInfo(string userId)
     {
-        string macAddress = GetMacAddress();
-        var filter = Builders<Device>.Filter.Eq(d => d.UserId, ObjectId.Parse(userId));
+        string macAddress = GetMacAddress();  // Get MAC Address
+
+        var filter = Builders<Device>.Filter.Eq(d => d.UserId, userId);
         var update = Builders<Device>.Update
             .Set(d => d.MacAddress, macAddress)
             .Set(d => d.LastUpdated, DateTime.UtcNow);
@@ -163,25 +109,22 @@ public partial class Login : ContentPage
 
         if (result.MatchedCount == 0)
         {
+            // If no existing device record was found, insert a new one
             var newDevice = new Device
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                UserId = ObjectId.Parse(userId),
-                DeviceModel = Microsoft.Maui.Devices.DeviceInfo.Model,              // ✅ FIXED
-                Manufacturer = Microsoft.Maui.Devices.DeviceInfo.Manufacturer,      // ✅ FIXED
-                Platform = Microsoft.Maui.Devices.DeviceInfo.Platform.ToString(),   // ✅ FIXED
-                OsVersion = Microsoft.Maui.Devices.DeviceInfo.VersionString,        // ✅ FIXED
-                DeviceType = Microsoft.Maui.Devices.DeviceInfo.Idiom.ToString(),    // ✅ FIXED
+                UserId = userId,
+                DeviceModel = "Unknown Device", // Hardcode or any custom logic
                 MacAddress = macAddress,
-                CreatedAt = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow
             };
 
             await deviceCollection.InsertOneAsync(newDevice);
         }
 
-        Console.WriteLine($"✅ Updated Device Info - MAC: {macAddress}");
+        Console.WriteLine($"Updated Device Info - MAC: {macAddress}");
     }
+
     // 📌 Get MAC Address
     private static string GetMacAddress()
     {
@@ -225,26 +168,17 @@ public partial class Login : ContentPage
         }
     }
 
-    private static bool VerifyPassword(string password, string storedHash, string salt)
-    {
-        string hashedPassword = HashPassword(password, salt);
-        return hashedPassword == storedHash;
-    }
-
-    private async void OnRegisterClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new Register());
-    }
-
     // 📌 Register Process
-    public async void OnRegisterUserClicked(object sender, EventArgs e)
+    public async void OnRegisterClicked(object sender, EventArgs e)
     {
-        string email = Username.Text?.Trim();
+        string email = Email.Text?.Trim();
         string password = Password.Text;
+        string confirmPassword = ConfirmPassword.Text;
+        string username = Username.Text?.Trim();
 
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(confirmPassword) || string.IsNullOrWhiteSpace(username))
         {
-            await DisplayAlert("Registration Error", "Please enter both email and password.", "OK");
+            await DisplayAlert("Registration Error", "Please enter your information in all required fields.", "OK");
             return;
         }
 
@@ -254,19 +188,25 @@ public partial class Login : ContentPage
             await DisplayAlert("Registration Error", "User already exists.", "OK");
             return;
         }
+        if (password == confirmPassword) { 
+            string salt = GenerateSalt();
+            string passwordHash = HashPassword(password, salt);
 
-        string salt = GenerateSalt();
-        string passwordHash = HashPassword(password, salt);
+            var newUser = new User
+            {
+                Email = email,
+                PasswordHash = passwordHash,
+                Salt = salt,
+                CreatedAt = DateTime.UtcNow
+            };
 
-        var newUser = new User
+            await userCollection.InsertOneAsync(newUser);
+            await DisplayAlert("Success", "User registered successfully!", "OK");
+            await Navigation.PopAsync();
+        }
+        else
         {
-            Email = email,
-            PasswordHash = passwordHash,
-            Salt = salt,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        await userCollection.InsertOneAsync(newUser);
-        await DisplayAlert("Success", "User registered successfully!", "OK");
+            await DisplayAlert("Registration Error", "Passwords do not match.", "OK");
+        }
     }
 }

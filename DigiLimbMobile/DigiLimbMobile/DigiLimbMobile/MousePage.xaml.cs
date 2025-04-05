@@ -90,20 +90,102 @@ public partial class MousePage : ContentPage
             SendRelease(false, true);
         }
     }
+       
+    // ------------------------ mouse movement---------------------------------------
+    
+    //Handle Pointer gesture updates
+    private int activeTouchPoints = 0;
+    private Point lastPosition;
 
-    //Handle pan gesture updates
-    private void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+
+    private void OnPointerPressed(object sender, PointerEventArgs e)
     {
-        // map touch movement to mouse movement
-        if (e.StatusType == GestureStatus.Running)
+        activeTouchPoints++;
+        if (activeTouchPoints == 1)
         {
-            // label indicating movement
-            //MovementFeedbackLabel.Text = $"Touch at X: {e.TotalX}, Y: {e.TotalY}";
+            Point? currentPositionNullable = e.GetPosition(sender as Element);
+            if (currentPositionNullable.HasValue)
+            {
+                lastPosition = currentPositionNullable.Value;
+            }
+        }
+        Console.WriteLine($"Pointer pressed. Active touches: {activeTouchPoints}");
+    }
+    private void OnPointerReleased(object sender, PointerEventArgs e)
+    {
+        activeTouchPoints = Math.Max(0, activeTouchPoints - 1); // prevent negative touch points
+        if (activeTouchPoints < 2)
+        {
+            lastPosition = default(Point);  // Reset last position if scrolling is over
+        }
 
-            SendMouseMovement(e.TotalX, e.TotalY);
+        Console.WriteLine($"Pointer released. Active touches: {activeTouchPoints}");
+    }
+    
+    private void OnPointerUpdated(object sender, PointerEventArgs e)
+    {
+        Point? currentPositionNullable = e.GetPosition(sender as Element);
+
+        if (!currentPositionNullable.HasValue)
+        {
+            return; // exit early if position is null
+        }
+
+        Point currentPosition = currentPositionNullable.Value;
+        // map touch movement to mouse movement
+        if (activeTouchPoints == 1)
+        {
+            if (lastPosition == default(Point) || Math.Abs(lastPosition.X - currentPosition.X) > 100 || Math.Abs(lastPosition.Y - currentPosition.Y) > 100)
+            {
+                lastPosition = currentPosition;
+                return;
+            }
+            double dx = currentPosition.X - lastPosition.X;
+            double dy = currentPosition.Y - lastPosition.Y;
+
+            if (Math.Abs(dx) > 1 || Math.Abs(dy) > 1)
+            {
+                SendMouseMovement(dx, dy);
+            }
+            lastPosition = currentPosition;
+            // label indicating movement
+            Console.WriteLine($"Touch at X: {dx}, Y: {dy}");
+        }
+        //handle two finger inputs
+        else if(activeTouchPoints == 2)
+        {
+            double scrollAmount = currentPosition.Y - lastPosition.Y;
+
+            if (Math.Abs(scrollAmount) > 1) //ignor small movements
+            {
+                SendScrollEvent(scrollAmount); 
+            }
+
+            lastPosition = currentPosition; 
         }
     }
+    
+    // ----------------------------scroll----------------------------------------------------------
+    private async void SendScrollEvent(double scrollAmount)
+    {
+        // send scroll data
+        if (_bluetoothManager.mouseCharacteristic != null)
+        {
+            List<byte> message = new List<byte>();
 
+            // scroll Movement (Header 0x08 + 4 Bytes Integer)
+            message.Add(0x05);
+            message.AddRange(BitConverter.GetBytes(scrollAmount).Reverse());
+
+            await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
+            //Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");
+            //Console.WriteLine($"Sent Mouse Movement: X={x}, Y={y}");
+        }
+        else
+        {
+            Console.WriteLine("Send failed (scroll): no connection");
+        }
+    }
     // send movements to PC
     private async void SendMouseMovement(double x, double y)
     {
@@ -120,8 +202,8 @@ public partial class MousePage : ContentPage
             message.AddRange(BitConverter.GetBytes(y).Reverse());
              
             await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
-            //Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");
-            //Console.WriteLine($"Sent Mouse Movement: X={x}, Y={y}");
+            Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");
+            Console.WriteLine($"Sent Mouse Movement: X={x}, Y={y}");
         }
         else
         {

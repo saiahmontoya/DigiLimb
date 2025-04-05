@@ -75,8 +75,9 @@
                     <!-- Buttons -->
                     <Button Text="Login"
                             Clicked="OnLoginClicked"
-                            BackgroundColor="#57b9FF"
+                            Style="{StaticResource HoverButtonStyle}"
                             TextColor="White"
+                            HorizontalOptions="FillAndExpand"
                             HeightRequest="55"
                             FontSize="18"
                             CornerRadius="10"

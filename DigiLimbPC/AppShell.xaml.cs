@@ -8,6 +8,9 @@
         public AppShell()
         {
             InitializeComponent();
+
+            Routing.RegisterRoute("ConnectionsPage", typeof(ConnectionsPage));
+            Routing.RegisterRoute("ConnectionDashboard", typeof(ConnectionDashboard));
         }
     }
 }

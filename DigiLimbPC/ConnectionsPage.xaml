@@ -2,64 +2,153 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.ConnectionsPage"
-             Title="Bluetooth Device Scanner">
+             Title="Connections"
+             BackgroundColor="#EAEAEA">
+    <!-- ✅ Updated Page Background -->
 
-    <VerticalStackLayout Padding="20" Spacing="20">
-        <!-- Start Scan Button -->
-        <Button x:Name="btnScan" Text="Start Scan" Clicked="btnScan_Click" IsVisible="True" />
+    <!-- Scrollable Layout -->
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="25">
 
-        <!-- Allow Incoming Connection Button -->
-        <Button x:Name="btnAllowIncomingConnection" Text="Allow Incoming Connection" Clicked="btnAllowIncomingConnection_Click" IsVisible="True" />
+            <!-- 🔹 Bluetooth Connection Card -->
+            <Border Background="LightBlue"
+                    Stroke="Black"
+                    StrokeShape="RoundRectangle 15"
+                    Padding="20"
+                    Margin="5"
+                    HeightRequest="200">
 
-        <!-- Awaiting Connection Message -->
-        <Label x:Name="lblAwaitingConnection" Text="Awaiting connection..." IsVisible="False" FontSize="18" Margin="0,10,0,5" TextColor="OrangeRed" />
+                <!-- ✅ Corrected Shadow Implementation -->
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Offset="8,8"/>
+                </Border.Shadow>
 
-        <Label x:Name="lblConnectedDevice"
-           Text="No device connected"
-           TextColor="Red"
-           FontSize="16"
-           IsVisible="False"
-           HorizontalOptions="Center"
-           VerticalOptions="Center"/>
+                <VerticalStackLayout Spacing="15">
 
-        <!-- Discovered Devices List -->
-        <Label Text="Discovered Devices:" FontSize="18" Margin="0,10,0,5" IsVisible="False" x:Name="lblDevicesList" />
+                    <!-- Row 1: Bluetooth Icon + Label -->
+                    <HorizontalStackLayout>
+                        <Image Source="bluetoothicon.png"
+                               WidthRequest="30"
+                               HeightRequest="30"
+                               VerticalOptions="Center"
+                               Margin="0,0,10,0"/>
 
-        <ScrollView HeightRequest="300" IsVisible="False" x:Name="devicesScrollView">
-            <CollectionView x:Name="DevicesListView" SelectionMode="Single" SelectionChanged="OnDeviceSelected">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame Padding="10" Margin="5" BorderColor="Gray" BackgroundColor="LightGray">
-                            <VerticalStackLayout>
-                                <Label Text="{Binding DisplayName}" FontSize="16" FontAttributes="Bold"/>
-                                <Label Text="{Binding DeviceId}" FontSize="14" />
-                                <Label Text="{Binding ManufacturerData}" FontSize="12" />
-                            </VerticalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </ScrollView>
+                        <!-- Labels (Only One is Visible at a Time) -->
+                        <Label x:Name="lblAwaitingConnection"
+                               Text="No device paired."
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#333"
+                               VerticalOptions="Center"
+                               IsVisible="True"/>
 
-        <!-- Connect Button -->
-        <Button x:Name="btnConnect" Text="Connect to Selected Device" Clicked="btnConnect_Click" IsEnabled="False" />
+                        <Label x:Name="lblConnectedDevice"
+                               Text="Connected to: Device Name"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#333"
+                               VerticalOptions="Center"
+                               IsVisible="False"/>
+                    </HorizontalStackLayout>
 
-        <!-- Server Control Buttons -->
-        <Button x:Name="btnStartServer" Text="Start WiFi Server" Clicked="btnStartServer_Click" BackgroundColor="Green" TextColor="White" />
-        <Button x:Name="btnStopServer" Text="Stop WiFi Server" Clicked="btnStopServer_Click" BackgroundColor="Red" TextColor="White" IsEnabled="False" />
+                    <!-- Row 2: Bluetooth Button -->
+                    <Button x:Name="btnAllowIncomingConnection"
+                            Text="Allow Incoming Bluetooth Connection"
+                            Clicked="btnAllowIncomingConnection_Click"
+                            Style="{StaticResource HoverButtonStyle}"
+                            TextColor="White"
+                            HeightRequest="50"
+                            WidthRequest="350"
+                            FontSize="16"
+                            HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Border>
 
-        <!-- Chat Section -->
-        <Label Text="Chat" FontSize="18" Margin="0,10,0,5"/>
-        <Entry x:Name="entryChatMessage" Placeholder="Enter message to send" />
-        <Button x:Name="btnSendChat" Text="Send Chat" Clicked="OnSendChatClicked" />
+            <!-- 🔹 WiFi Connection Card -->
+            <Border Background="LightBlue"
+                    Stroke="Black"
+                    StrokeShape="RoundRectangle 15"
+                    Padding="20"
+                    Margin="5">
 
-        <!-- Back Button -->
-        <Button x:Name="btnBack" Text="Back" Clicked="btnBack_Click" IsVisible="True" />
+                <!-- ✅ Corrected Shadow Implementation -->
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Offset="8,8"/>
+                </Border.Shadow>
 
-        <!-- Paired Device Info -->
-        <Label x:Name="lblPairedDevice" FontSize="18" Text="No device paired" Margin="0,10,0,5" TextColor="Green" IsVisible="False" />
+                <VerticalStackLayout Spacing="15">
 
-        <!-- Log Area -->
-        <Editor x:Name="txtLogs" HeightRequest="150" IsReadOnly="True" BackgroundColor="LightGray"/>
-    </VerticalStackLayout>
+                    <!-- Row 1: WiFi Icon + Label -->
+                    <HorizontalStackLayout>
+                        <Image Source="wifiicon.png"
+                               WidthRequest="30"
+                               HeightRequest="30"
+                               VerticalOptions="Center"
+                               Margin="0,0,10,0"/>
+
+                        <Label x:Name="lblPairedDevice"
+                               FontSize="18"
+                               Text="No device paired"
+                               TextColor="#333"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Row 2: WiFi Server Buttons -->
+                    <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
+                        <Button x:Name="btnStartServer"
+                                Text="Start WiFi Server"
+                                Clicked="btnStartServer_Click"
+                                Style="{StaticResource HoverButtonStyle}"
+                                TextColor="White"
+                                HeightRequest="50"/>
+                        <Button x:Name="btnStopServer"
+                                Text="Stop WiFi Server"
+                                Clicked="btnStopServer_Click"
+                                Style="{StaticResource QuitButtonStyle}"
+                                TextColor="White"
+                                IsEnabled="False"
+                                HeightRequest="50"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Row 3: Chat Section -->
+                    <Label Text="Chat" FontSize="20" FontAttributes="Bold" Margin="0,15,0,5" TextColor="#333"/>
+                    <VerticalStackLayout Padding="30,0" Spacing="10">
+                        <Entry x:Name="entryChatMessage"
+                               Placeholder="Enter message to send"
+                               HorizontalOptions="FillAndExpand"
+                               Margin="0" />
+
+                        <Button x:Name="btnSendChat"
+                                Text="Send"
+                                Clicked="OnSendChatClicked"
+                                Style="{StaticResource HoverButtonStyle}"
+                                TextColor="White"
+                                HorizontalOptions="FillAndExpand"
+                                MaximumWidthRequest="450"
+                                MaximumHeightRequest="70"/>
+                    </VerticalStackLayout>
+
+
+
+
+                    <!-- Row 4: Log Area -->
+                    <Label Text="Connection Logs" FontSize="18" FontAttributes="Bold" Margin="0,15,0,5" TextColor="#333"/>
+                    <Editor x:Name="txtLogs"
+                            HeightRequest="150"
+                            IsReadOnly="True"
+                            BackgroundColor="#ffffff"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Back Button -->
+            <Button x:Name="btnBack"
+                    Text="Back"
+                    Clicked="btnBack_Click"
+                    Style="{StaticResource QuitButtonStyle}"
+                    TextColor="White"
+                    HeightRequest="50"
+                    FontSize="16"
+                    HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

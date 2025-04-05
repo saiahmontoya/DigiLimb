@@ -11,17 +11,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Collections.Specialized;
+using Microsoft.Maui.Devices;
 
 namespace DigiLimbDesktop
 {
     public partial class ConnectionsPage : ContentPage
     {
-        // Bluetooth Private Variables
-        private readonly IAdapter _adapter;
-        private readonly ObservableCollection<BluetoothDeviceInfo> _deviceList;
-        private IDevice _selectedDevice;
-        private bool _isScanning = false;
-
+       
         // Reference to the global ServerService
         private ServerService _serverService;
         private bool _isServerRunning = false;   // Tracks server status
@@ -33,9 +29,7 @@ namespace DigiLimbDesktop
         public ConnectionsPage()
         {
             InitializeComponent();
-            _adapter = CrossBluetoothLE.Current.Adapter;
-            _deviceList = new ObservableCollection<BluetoothDeviceInfo>();
-            DevicesListView.ItemsSource = _deviceList;
+
 
             RequestBluetoothPermissions();
 
@@ -46,20 +40,40 @@ namespace DigiLimbDesktop
             App.GlobalConnectionLog.CollectionChanged += GlobalLog_CollectionChanged;
 
 #if WINDOWS
-            _bluetoothPeripheral = new BluetoothPeripheral(_adapter);
-            _bluetoothPeripheral.DeviceInfoReceived += OnDeviceInfoReceived;
-
-            // Ensure event subscription is active.
-            _bluetoothPeripheral.DeviceConnected -= OnDeviceConnected;
-            _bluetoothPeripheral.DeviceConnected += OnDeviceConnected;
-
-            _bluetoothPeripheral.DeviceDisconnected -= OnDeviceDisconnected;
-            _bluetoothPeripheral.DeviceDisconnected += OnDeviceDisconnected;
-
-            _bluetoothPeripheral.MonitorDeviceConnections();
-            Console.WriteLine("?? Subscribed to BluetoothPeripheral Events.");
+            if (App.GlobalBluetoothPeripheral != null) // ✅ Only create GATT server if it doesn't exist
+            {
+                _bluetoothPeripheral = App.GlobalBluetoothPeripheral;
+                _bluetoothPeripheral.DeviceInfoReceived -= OnDeviceInfoReceived;
+                _bluetoothPeripheral.DeviceInfoReceived += OnDeviceInfoReceived;
+                _bluetoothPeripheral.DeviceConnectionChanged -= OnDeviceConnectionChanged;
+                _bluetoothPeripheral.DeviceConnectionChanged += OnDeviceConnectionChanged;
+                Debug.WriteLine("✅ Subscribed to BluetoothPeripheral Events.");
+                if (App.GlobalIsConnected == true)
+                {
+                    lblAwaitingConnection.IsVisible = false;
+                    lblConnectedDevice.Text = $"Connected to: {App.GlobalDeviceName} SWAMP IZZO";
+                    lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
+                    lblConnectedDevice.IsVisible = true;
+                    btnAllowIncomingConnection.IsEnabled = false;
+                }
+                else
+                {
+                    // This is aimed towards when the user is forced back to connections after a disconnection occurs
+                    // I can see how this could possibly get bugged if its back nav'd into. 
+                    lblAwaitingConnection.IsVisible = false;
+                    lblConnectedDevice.Text = "Lost connection to device.";
+                    lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Red;
+                    lblConnectedDevice.IsVisible = true;
+                    btnAllowIncomingConnection.Text = "Cancel";
+                }
+            }
+            else
+            {
+                Debug.WriteLine("NO GLOBAL GATT");
+            }
 #endif
         }
+
 
         private void GlobalLog_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -111,126 +125,7 @@ namespace DigiLimbDesktop
             txtLogs.Text = string.Join("\n", App.GlobalConnectionLog);
         }
 
-        private async Task ToggleScan()
-        {
-            try
-            {
-                if (_isScanning)
-                {
-                    await _adapter.StopScanningForDevicesAsync();
-                    _isScanning = false;
-                    btnScan.Text = "Start Scan";
-                    btnAllowIncomingConnection.IsVisible = true;
-                    lblDevicesList.IsVisible = false;
-                    devicesScrollView.IsVisible = false;
-                    _deviceList.Clear();
-                    Debug.WriteLine("Scan stopped.");
-                    return;
-                }
 
-                if (CrossBluetoothLE.Current.State != BluetoothState.On)
-                {
-                    Debug.WriteLine("Bluetooth is off. Please enable it.");
-                    return;
-                }
-
-                _deviceList.Clear();
-                btnConnect.IsEnabled = false;
-                _isScanning = true;
-                btnScan.Text = "Stop Scan";
-                btnAllowIncomingConnection.IsVisible = false;
-
-                _adapter.DeviceDiscovered -= OnDeviceDiscovered;
-                _adapter.DeviceDiscovered += OnDeviceDiscovered;
-
-                lblDevicesList.IsVisible = true;
-                devicesScrollView.IsVisible = true;
-                Debug.WriteLine("Scanning for Bluetooth devices...");
-                await _adapter.StartScanningForDevicesAsync();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Scan error: {ex.Message}");
-            }
-        }
-
-        private void OnDeviceDiscovered(object sender, DeviceEventArgs args)
-        {
-            var device = args.Device;
-            if (device == null)
-                return;
-
-            var manufacturerData = device.AdvertisementRecords?
-                .FirstOrDefault(record => record.Type == Plugin.BLE.Abstractions.AdvertisementRecordType.ManufacturerSpecificData);
-            if (manufacturerData == null || manufacturerData.Data.Length < 4)
-                return;
-
-            int manufacturerId = manufacturerData.Data[0] | (manufacturerData.Data[1] << 8);
-            if (manufacturerId != 0x004C)
-                return;
-
-            string deviceType = "Unknown Device";
-            byte productId = manufacturerData.Data[2];
-
-            deviceType = productId switch
-            {
-                0x12 => "Apple iPhone",
-                0x19 => "Apple Watch",
-                _ => "Unknown Apple Device"
-            };
-
-            if (!_deviceList.Any(d => d.DeviceId == device.Id.ToString()))
-            {
-                var deviceInfo = new BluetoothDeviceInfo
-                {
-                    DisplayName = deviceType,
-                    DeviceId = device.Id.ToString(),
-                    ManufacturerData = $"Manufacturer ID: {manufacturerId} - {deviceType}"
-                };
-
-                MainThread.BeginInvokeOnMainThread(() => _deviceList.Add(deviceInfo));
-                Debug.WriteLine($"Discovered: {deviceType}");
-            }
-        }
-
-        private async void btnScan_Click(object sender, EventArgs e)
-        {
-            await ToggleScan();
-        }
-
-        private void OnDeviceSelected(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.CurrentSelection.FirstOrDefault() is BluetoothDeviceInfo selected)
-            {
-                _selectedDevice = _adapter.DiscoveredDevices.FirstOrDefault(d => d.Id.ToString() == selected.DeviceId);
-                btnConnect.IsEnabled = _selectedDevice != null;
-                Debug.WriteLine($"Selected: {selected.DisplayName}");
-            }
-        }
-
-        private async void btnConnect_Click(object sender, EventArgs e)
-        {
-            if (_selectedDevice == null) return;
-
-            try
-            {
-                await _adapter.ConnectToDeviceAsync(_selectedDevice);
-                Debug.WriteLine($"Connected to {_selectedDevice.Name}");
-
-                lblPairedDevice.Text = $"Connected to: {_selectedDevice.Name}";
-                lblPairedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
-                lblPairedDevice.IsVisible = true;
-
-                lblDevicesList.IsVisible = false;
-                devicesScrollView.IsVisible = false;
-                btnScan.IsVisible = true;
-                btnConnect.IsEnabled = false;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Connection failed: {ex.Message}");
-            }
-        }
 
         private async void btnBack_Click(object sender, EventArgs e)
         {
@@ -241,24 +136,50 @@ namespace DigiLimbDesktop
         private void btnAllowIncomingConnection_Click(object sender, EventArgs e)
         {
 #if WINDOWS
-            if (btnAllowIncomingConnection.Text == "Allow Incoming Connection")
+            if (btnAllowIncomingConnection.Text == "Allow Incoming Bluetooth Connection")
             {
-                _bluetoothPeripheral.Start();
-                Debug.WriteLine("Started BLE Peripheral Mode: Advertising DigiLimb Device.");
-                Debug.WriteLine("GATT started");
+
+                if (App.GlobalBluetoothPeripheral == null)
+                {
+                    Debug.WriteLine("✅ Starting GATT Server (Allowing Incoming Connections)");
+                    _bluetoothPeripheral = new BluetoothPeripheral();
+                    App.GlobalBluetoothPeripheral = _bluetoothPeripheral;
+                    _bluetoothPeripheral.DeviceInfoReceived -= OnDeviceInfoReceived;
+                    _bluetoothPeripheral.DeviceInfoReceived += OnDeviceInfoReceived;
+                    _bluetoothPeripheral.DeviceConnectionChanged -= OnDeviceConnectionChanged;
+                    _bluetoothPeripheral.DeviceConnectionChanged += OnDeviceConnectionChanged;
+                    
+
+                    Debug.WriteLine("✅ Subscribed to BluetoothPeripheral Events.");
+
+                }
+                else
+                {
+                    Debug.WriteLine("🔄 GATT Server is already running.");
+                }
+
 
                 btnAllowIncomingConnection.Text = "Cancel";
-                lblAwaitingConnection.IsVisible = true;
-                btnScan.IsVisible = false;
-            }
-            else
-            {
-                _bluetoothPeripheral.StopAdvertising();
-                Debug.WriteLine("Stopped BLE Peripheral Mode.");
+                lblAwaitingConnection.Text = "Awaiting connection...";
 
-                btnAllowIncomingConnection.Text = "Allow Incoming Connection";
-                lblAwaitingConnection.IsVisible = false;
-                btnScan.IsVisible = true;
+            }
+            else // User clicks cancel
+            {
+                if (_bluetoothPeripheral != null)
+                {
+                    Debug.WriteLine("❌ Stopping GATT Server and Clearing Global Variables");
+
+                    _bluetoothPeripheral.StopAdvertising();
+                    _bluetoothPeripheral.Dispose(); // ✅ Fully dispose of the GATT server
+                    App.GlobalBluetoothPeripheral = null; // ✅ Clears global instance
+                    App.GlobalIsConnected = false;
+                    App.GlobalDeviceName = "No Device";
+                    App.GlobalConnectionType = "";
+                    App.GlobalConnectionStartTime = null;
+
+                    lblAwaitingConnection.Text = "No device paired.";
+                    btnAllowIncomingConnection.Text = "Allow Incoming Bluetooth Connection";
+                }
             }
 #else
             Debug.WriteLine("BLE Peripheral Mode is not available on this platform.");
@@ -286,6 +207,31 @@ namespace DigiLimbDesktop
         }
 
 #if WINDOWS
+        private void OnDeviceConnectionChanged(object sender, bool isConnected)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Debug.WriteLine($"📡 Device Connection Status Changed: {(isConnected ? "Connected" : "Disconnected")}");
+
+                if (!isConnected) // ✅ Only update UI when a device disconnects
+                {
+                    lblConnectedDevice.Text = "Lost connection to device.";
+                    lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Red;
+                    lblConnectedDevice.IsVisible = true;
+
+                    // ✅ Reset global connection state when a device disconnects
+                    App.GlobalIsConnected = false;
+                    App.GlobalDeviceName = "No Device";
+                    App.GlobalConnectionType = "";
+                    App.GlobalConnectionStartTime = null;
+                }
+            });
+        }
+#endif
+
+
+
+#if WINDOWS
         private void OnDeviceInfoReceived(object sender, ReceivedDeviceInfo deviceInfo)
         {
             MainThread.BeginInvokeOnMainThread(async () =>
@@ -302,32 +248,18 @@ namespace DigiLimbDesktop
 
                     await DisplayAlert("Paired Successfully", $"Paired to {deviceInfo.DeviceName}.", "OK");
 
-                    // ✅ Find MainPage dynamically
-                    var mainPage = FindMainPage();
-                    if (mainPage != null)
-                    {
-                        App.GlobalIsConnected = true;
-                        App.GlobalDeviceName = deviceInfo.DeviceName ?? "Unknown Device";
-                        App.GlobalConnectionType = "Bluetooth"; // Set to "WiFi" if needed
-                        mainPage.UpdateConnectionStatus();
-                        Debug.WriteLine("Connection status updated and main page found");
-                    }
-                    else
-                    {
-                        Debug.WriteLine("❌ Could not find MainPage dynamically.");
-                    }
+
+                    App.GlobalBluetoothPeripheral = _bluetoothPeripheral;
+                    App.GlobalIsConnected = true;
+                    App.GlobalDeviceName = deviceInfo.DeviceName ?? "Unknown Device";
+                    App.GlobalConnectionType = "Bluetooth"; // Set to "WiFi" if needed
+                    App.GlobalConnectionStartTime = DateTime.Now; // Store start time for duration tracking
+          
+                    Debug.WriteLine("Connection status updated and main page found");
+
+                    await Shell.Current.GoToAsync("//MainPage", true);
 
 
-                    await Shell.Current.GoToAsync("//MainPage");
-
-                    /*
-                    await Task.Delay(500); // Give UI a little time to update
-                    var refreshedMainPage = FindMainPage();
-                    if (refreshedMainPage != null)
-                    {
-                        refreshedMainPage.UpdateConnectionStatus();
-                    }
-                    */
                 }
                 else
                 {
@@ -337,111 +269,8 @@ namespace DigiLimbDesktop
             Console.WriteLine($"📡 UI Updated: Connected to {deviceInfo.DeviceName} (ID: {deviceInfo.DeviceId})");
         }
 #endif
-        /// <summary>
-        /// Dynamically finds and returns MainPage from the application's navigation structure.
-        /// </summary>
-        private MainPage FindMainPage()
-        {
-            // 1️⃣ Check if MainPage is the current visible page
-            if (Application.Current.MainPage is MainPage directMainPage)
-                return directMainPage;
+       
 
-            // 2️⃣ Check if MainPage is wrapped in a NavigationPage
-            if (Application.Current.MainPage is NavigationPage navPage)
-            {
-                if (navPage.RootPage is MainPage mainPage)
-                    return mainPage;
-            }
-
-            // 3️⃣ Check if Shell contains MainPage (dealing with deep nesting)
-            if (Application.Current.MainPage is Shell shell)
-            {
-                foreach (var item in shell.Items) // Iterate through ShellItems
-                {
-                    if (item is ShellItem shellItem)
-                    {
-                        foreach (var section in shellItem.Items) // Look in ShellSections
-                        {
-                            if (section is ShellSection shellSection)
-                            {
-                                foreach (var content in shellSection.Items) // Look in ShellContent
-                                {
-                                    if (content is ShellContent shellContent && shellContent.Content is MainPage foundMainPage)
-                                    {
-                                        return foundMainPage;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 4️⃣ LAST RESORT: Search through ALL pages in the Navigation Stack (in case it's been pushed)
-            foreach (var page in Application.Current.MainPage.Navigation.NavigationStack)
-            {
-                if (page is MainPage foundMainPage)
-                    return foundMainPage;
-            }
-
-            Debug.WriteLine("❌ MainPage STILL not found in navigation structure.");
-            return null;
-        }
-
-        private void OnDeviceConnected(object? sender, IDevice device)
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                if (lblConnectedDevice == null)
-                {
-                    Debug.WriteLine("❌ lblConnectedDevice is null! UI is not ready.");
-                    return;
-                }
-
-                if (device == null)
-                {
-                    Debug.WriteLine("❌ Device is null! No valid connection.");
-                    return;
-                }
-                lblConnectedDevice.Text = $"Connected to: {device.Name ?? "Unknown Device"}\nID: {device.Id}";
-                lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Green;
-                lblConnectedDevice.IsVisible = true;
-
-                btnAllowIncomingConnection.IsVisible = false;
-                lblAwaitingConnection.IsVisible = false;
-
-                Debug.WriteLine($"✅ Device Connected: {device.Name} (ID: {device.Id})");
-
-                MainPage mainPage = (MainPage)Application.Current.MainPage;
-                mainPage._isConnected = true;
-                mainPage._deviceName = device.Name ?? "Unknown Device";
-                mainPage._connectionType = "Bluetooth"; // Set to "WiFi" if connected via WiFi
-                mainPage.UpdateConnectionStatus();
-
-                await DisplayAlert("Paired Successfully", $"Paired to {device.Name}.", "OK");
-                await Shell.Current.GoToAsync("//MainPage");
-            });
-        }
-
-        private void OnDeviceDisconnected(object sender, IDevice device)
-        {
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                lblConnectedDevice.Text = "Device Disconnected";
-                lblConnectedDevice.TextColor = Microsoft.Maui.Graphics.Colors.Red;
-                lblConnectedDevice.IsVisible = false;
-
-                btnAllowIncomingConnection.IsVisible = true;
-                lblAwaitingConnection.IsVisible = true;
-
-                MainPage mainPage = (MainPage)Application.Current.MainPage;
-                mainPage._isConnected = false;
-                mainPage.UpdateConnectionStatus();
-
-                Debug.WriteLine("Device Disconnected.");
-            });
-            Debug.WriteLine("Device Disconnected.");
-        }
 
         private void btnStartServer_Click(object sender, EventArgs e)
         {
@@ -532,10 +361,23 @@ namespace DigiLimbDesktop
 
     }
 
-    public class BluetoothDeviceInfo
-    {
-        public string DisplayName { get; set; }
-        public string DeviceId { get; set; }
-        public string ManufacturerData { get; set; }
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+#if WINDOWS
+            if (_bluetoothPeripheral != null)
+            {
+                _bluetoothPeripheral.DeviceInfoReceived -= OnDeviceInfoReceived;
+                _bluetoothPeripheral.DeviceConnectionChanged -= OnDeviceConnectionChanged;
+            }
+#endif
+        }
+
+
+
+
+
     }
+
 }
