@@ -40,6 +40,9 @@ public partial class Login : ContentPage
 
         [BsonElement("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [BsonElement("deviceIds")] // ✅ FIX: Add this field to match MongoDB
+        public List<string> DeviceIds { get; set; } = new List<string>(); 
     }
 
     // 📌 Device Model (MAC Address Only)
@@ -50,13 +53,28 @@ public partial class Login : ContentPage
         public string Id { get; set; }
 
         [BsonElement("userId")]
-        public string UserId { get; set; }
+        public ObjectId UserId { get; set; }
 
         [BsonElement("deviceModel")]
-        public string DeviceModel { get; set; } // We'll hardcode "Unknown Device" or any custom string
+        public string DeviceModel { get; set; }
+
+        [BsonElement("manufacturer")]
+        public string Manufacturer { get; set; }
+
+        [BsonElement("platform")]
+        public string Platform { get; set; }
+
+        [BsonElement("osVersion")]
+        public string OsVersion { get; set; }
+
+        [BsonElement("deviceType")]
+        public string DeviceType { get; set; }
 
         [BsonElement("macAddress")]
-        public string MacAddress { get; set; }  // Only MAC Address
+        public string MacAddress { get; set; }
+
+        [BsonElement("createdAt")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [BsonElement("lastUpdated")]
         public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
@@ -67,7 +85,7 @@ public partial class Login : ContentPage
     {
         try
         {
-            string connectionUri = "mongodb+srv://saiahmontoya01:AQfSCJE5bfDnhYSh@digilimbdatabase.mneoe.mongodb.net/?authSource=admin&w=majority&appName=DigilimbDatabase";
+            string connectionUri = "mongodb://saiahmontoya01:AQfSCJE5bfDnhYSh@digilimbdatabase-shard-00-00.mneoe.mongodb.net:27017,digilimbdatabase-shard-00-01.mneoe.mongodb.net:27017,digilimbdatabase-shard-00-02.mneoe.mongodb.net:27017/?ssl=true&replicaSet=atlas-brcqsn-shard-0&authSource=admin&retryWrites=true&w=majority&appName=DigilimbDatabase";
             client = new MongoClient(connectionUri);
             database = client.GetDatabase("DigilimbDatabase");
             userCollection = database.GetCollection<User>("Users");
@@ -135,9 +153,8 @@ public partial class Login : ContentPage
     // 📌 Update or Insert Device Info (MAC Address Only, No IP or DeviceInfo properties)
     private async Task UpdateDeviceInfo(string userId)
     {
-        string macAddress = GetMacAddress();  // Get MAC Address
-
-        var filter = Builders<Device>.Filter.Eq(d => d.UserId, userId);
+        string macAddress = GetMacAddress();
+        var filter = Builders<Device>.Filter.Eq(d => d.UserId, ObjectId.Parse(userId));
         var update = Builders<Device>.Update
             .Set(d => d.MacAddress, macAddress)
             .Set(d => d.LastUpdated, DateTime.UtcNow);
@@ -146,22 +163,25 @@ public partial class Login : ContentPage
 
         if (result.MatchedCount == 0)
         {
-            // If no existing device record was found, insert a new one
             var newDevice = new Device
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                UserId = userId,
-                DeviceModel = "Unknown Device", // Hardcode or any custom logic
+                UserId = ObjectId.Parse(userId),
+                DeviceModel = Microsoft.Maui.Devices.DeviceInfo.Model,              // ✅ FIXED
+                Manufacturer = Microsoft.Maui.Devices.DeviceInfo.Manufacturer,      // ✅ FIXED
+                Platform = Microsoft.Maui.Devices.DeviceInfo.Platform.ToString(),   // ✅ FIXED
+                OsVersion = Microsoft.Maui.Devices.DeviceInfo.VersionString,        // ✅ FIXED
+                DeviceType = Microsoft.Maui.Devices.DeviceInfo.Idiom.ToString(),    // ✅ FIXED
                 MacAddress = macAddress,
+                CreatedAt = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow
             };
 
             await deviceCollection.InsertOneAsync(newDevice);
         }
 
-        Console.WriteLine($"Updated Device Info - MAC: {macAddress}");
+        Console.WriteLine($"✅ Updated Device Info - MAC: {macAddress}");
     }
-
     // 📌 Get MAC Address
     private static string GetMacAddress()
     {

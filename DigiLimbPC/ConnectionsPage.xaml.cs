@@ -517,6 +517,19 @@ namespace DigiLimbDesktop
             });
             Debug.WriteLine($"📡 Server Status: {message}");
         }
+
+        /// <summary>
+        /// Sends a chat message to all connected clients.
+        /// </summary>
+        public async Task SendChatMessage(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            string chatMessage = $"CHAT:{message}";
+            await _serverService.SendChatMessage(chatMessage); // ✅ Correct way to call it
+        }
+
     }
 
     public class BluetoothDeviceInfo

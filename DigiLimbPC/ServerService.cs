@@ -15,16 +15,16 @@ namespace DigiLimbDesktop
         private CancellationTokenSource _cancellationTokenSource;
         private readonly Action<string, bool> _updateStatusCallback;
         private readonly List<WebSocket> _clients;
-        private readonly int _port = 8080; // Fixed port for the WebSocket server
+        private readonly int _port = 8080; // Fixed port for WebSocket server
+
+        public bool IsRunning { get; private set; } = false;
+        public int ConnectedClientCount => _clients.Count;
+
 
         // Heartbeat and chat constants
         private const string HEARTBEAT_PING = "PING";
         private const string HEARTBEAT_PONG = "PONG";
         private const string CHAT_PREFIX = "CHAT:";
-
-        // Screen capture fields (optional, can be removed if not needed)
-        private bool _isCapturing = false;
-        private CancellationTokenSource _captureCts;
 
         public ServerService(Action<string, bool> updateStatusCallback)
         {
@@ -37,15 +37,17 @@ namespace DigiLimbDesktop
         /// </summary>
         public void StartServer()
         {
-            if (_httpListener != null && _httpListener.IsListening)
+            if (IsRunning)
             {
                 Debug.WriteLine("⚠️ WebSocket Server is already running!");
                 return;
             }
+
+            IsRunning = true; // ✅ Now correctly tracks if the server is running
             Task.Run(() => StartListener());
         }
 
-        public async Task StartListener()
+        private async Task StartListener()
         {
             try
             {
@@ -55,13 +57,10 @@ namespace DigiLimbDesktop
                 _httpListener.Prefixes.Add(prefix);
                 _httpListener.Start();
 
-                // Get the local IP address
                 string localIP = GetLocalIPAddress();
-                // Update UI: send a message that the server is running.
-                _updateStatusCallback?.Invoke($"WebSocket Server Running on {localIP}:{_port}", true);
+                _updateStatusCallback?.Invoke($"✅ WebSocket Server Running on {localIP}:{_port}", true);
                 Debug.WriteLine($"✅ WebSocket Server started on {localIP}:{_port}");
 
-                // Start the heartbeat loop in parallel.
                 Task.Run(() => StartHeartbeatLoop(), _cancellationTokenSource.Token);
 
                 while (_httpListener.IsListening)
@@ -82,17 +81,15 @@ namespace DigiLimbDesktop
             {
                 Debug.WriteLine($"❌ WebSocket Server error: {ex.Message}");
                 _updateStatusCallback?.Invoke("Error starting WebSocket server", false);
+                IsRunning = false; // Reset status
             }
         }
 
-        /// <summary>
-        /// Sends "PING" messages to connected clients every 30 seconds to check connectivity.
-        /// </summary>
         private async Task StartHeartbeatLoop()
         {
             while (!_cancellationTokenSource.Token.IsCancellationRequested)
             {
-                await Task.Delay(30000, _cancellationTokenSource.Token); // 30-second interval
+                await Task.Delay(30000, _cancellationTokenSource.Token);
                 await BroadcastMessage(HEARTBEAT_PING, null);
                 _updateStatusCallback?.Invoke("Sent heartbeat PING", true);
             }
@@ -107,7 +104,7 @@ namespace DigiLimbDesktop
                 _clients.Add(webSocket);
 
                 string clientIP = context.Request.RemoteEndPoint.ToString();
-                _updateStatusCallback?.Invoke($"Client Connected: {clientIP}", true);
+                _updateStatusCallback?.Invoke($"🔵 Client Connected: {clientIP}", true);
                 Debug.WriteLine($"🔵 Client connected: {clientIP}");
 
                 await ReceiveLoop(webSocket);
@@ -131,7 +128,7 @@ namespace DigiLimbDesktop
                     {
                         await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                         _clients.Remove(webSocket);
-                        _updateStatusCallback?.Invoke("Client disconnected", true);
+                        _updateStatusCallback?.Invoke("🔴 Client disconnected", true);
                         Debug.WriteLine("🔴 Client disconnected.");
                         break;
                     }
@@ -142,26 +139,16 @@ namespace DigiLimbDesktop
 
                         if (message == HEARTBEAT_PONG)
                         {
-                            // A client responded to our ping
                             _updateStatusCallback?.Invoke("Received heartbeat PONG", true);
-                        }
-                        else if (message == HEARTBEAT_PING)
-                        {
-                            // A client is pinging us; respond with a pong
-                            await SendMessage(webSocket, HEARTBEAT_PONG);
                         }
                         else if (message.StartsWith(CHAT_PREFIX))
                         {
-                            // A chat message from client
                             string chatText = message.Substring(CHAT_PREFIX.Length);
                             _updateStatusCallback?.Invoke("Chat from client: " + chatText, true);
-
-                            // Optionally broadcast the chat to all clients (except sender)
                             await BroadcastMessage(message, webSocket);
                         }
                         else
                         {
-                            // For any other text message, just broadcast to all connected clients
                             await BroadcastMessage(message, webSocket);
                         }
                     }
@@ -173,6 +160,16 @@ namespace DigiLimbDesktop
                 _clients.Remove(webSocket);
             }
         }
+        public async Task SendChatMessage(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            string chatMessage = $"CHAT:{message}";
+            await BroadcastMessage(chatMessage, null);
+            _updateStatusCallback?.Invoke($"Sent chat: {message}", true);
+        }
+
 
         /// <summary>
         /// Broadcasts a given message to all connected clients (except the optional sender).
@@ -211,59 +208,55 @@ namespace DigiLimbDesktop
         }
 
         /// <summary>
-        /// Public helper to broadcast a chat message from the desktop side.
+        /// Sends a screen frame safely over WebSocket.
         /// </summary>
-        public async Task SendChatMessage(string message)
+        public async Task BroadcastScreenFrame(string base64Image)
         {
-            string chatMessage = CHAT_PREFIX + message;
-            await BroadcastMessage(chatMessage, null);
-            _updateStatusCallback?.Invoke("Sent chat: " + message, true);
+            if (string.IsNullOrWhiteSpace(base64Image)) return;
+
+            string frameMessage = $"FRAME_START:{base64Image}:FRAME_END";
+            byte[] messageBytes = Encoding.UTF8.GetBytes(frameMessage);
+            var segment = new ArraySegment<byte>(messageBytes);
+
+            foreach (var client in _clients)
+            {
+                if (client.State == WebSocketState.Open)
+                {
+                    try
+                    {
+                        await client.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"❌ Error broadcasting frame: {ex.Message}");
+                    }
+                }
+            }
         }
 
+
         /// <summary>
-        /// Stops the server, cancels all active tasks, and closes any connected clients.
+        /// Stops the server and disconnects all clients.
         /// </summary>
         public void StopServer()
         {
             try
             {
+                IsRunning = false; // ✅ Ensure status is reset
+
                 _cancellationTokenSource?.Cancel();
+                _httpListener?.Stop();
 
-                if (_httpListener != null && _httpListener.IsListening)
+                foreach (var client in new List<WebSocket>(_clients))
                 {
-                    _httpListener.Stop();
-                    _httpListener.Close();
-                }
-
-                // Create a copy of the clients list so that we can iterate without modifying the original.
-                var clientsCopy = new List<WebSocket>(_clients);
-                foreach (var client in clientsCopy)
-                {
-                    try
+                    if (client.State == WebSocketState.Open)
                     {
-                        if (client != null && client.State == WebSocketState.Open)
-                        {
-                            // Send a disconnect message so the client knows to disconnect.
-                            string disconnectMsg = "Server Disconnecting";
-                            byte[] disconnectBuffer = Encoding.UTF8.GetBytes(disconnectMsg);
-                            client.SendAsync(new ArraySegment<byte>(disconnectBuffer), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
-
-                            // Optional: wait briefly to allow the client to process the disconnect message.
-                            Task.Delay(500).Wait();
-
-                            // Now close the client connection gracefully.
-                            client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Server shutting down", CancellationToken.None).Wait();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"❌ Error disconnecting client: {ex.Message}");
+                        client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Server shutting down", CancellationToken.None).Wait();
                     }
                 }
+
                 _clients.Clear();
-
-                // Update the UI to indicate the server session has ended.
-                _updateStatusCallback?.Invoke("Server Session Ended", false);
+                _updateStatusCallback?.Invoke("🔴 Server stopped", false);
                 Debug.WriteLine("🔴 WebSocket Server stopped.");
             }
             catch (Exception ex)
@@ -273,24 +266,17 @@ namespace DigiLimbDesktop
         }
 
         /// <summary>
-        /// Attempts to get a non-loopback IPv4 address for the current machine.
+        /// Returns the local IPv4 address of the current machine.
         /// </summary>
-        private string GetLocalIPAddress()
+        public string GetLocalIPAddress()
         {
-            try
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
             {
-                var host = Dns.GetHostEntry(Dns.GetHostName());
-                foreach (var ip in host.AddressList)
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                 {
-                    if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !ip.ToString().StartsWith("127"))
-                    {
-                        return ip.ToString();
-                    }
+                    return ip.ToString();
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"❌ Error getting local IP: {ex.Message}");
             }
             return "127.0.0.1";
         }

@@ -1,117 +1,68 @@
-using Microsoft.Maui.Controls;
+﻿using Microsoft.Maui.Controls;
 using System;
+using System.IO;
 using System.Net.WebSockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.IO;
+using System.Diagnostics;
+using System.Text;
 
 namespace DigiLimbMobile
 {
     public partial class ScreenViewerPage : ContentPage
     {
-        // Here we create a new ClientWebSocket; alternatively, you may reuse a shared connection.
         private ClientWebSocket _webSocket;
-        private bool _isViewing = false;
+        private bool _isReceiving;
         private CancellationTokenSource _receiveCts;
 
         public ScreenViewerPage()
         {
             InitializeComponent();
-            // Optionally, set the connection info if available.
-            // In this example, it's hardcoded.
-            lblConnectionInfo.Text = "Connected to: 192.168.1.15:8080";
+            SetupConnection();
         }
 
-        private async void OnScreenViewerToggled(object sender, ToggledEventArgs e)
+        private void SetupConnection()
         {
-            if (e.Value)
+            if (App.GlobalWebSocket != null && App.GlobalWebSocket.State == WebSocketState.Open)
             {
-                await StartScreenViewer();
+                _webSocket = App.GlobalWebSocket;
+                lblStatus.Text = "✅ Connected to server. Waiting for screen...";
+                StartReceiving();
             }
             else
             {
-                await StopScreenViewer();
+                lblStatus.Text = "❌ Not connected to server.";
             }
         }
 
-        private async Task StartScreenViewer()
+        private void StartReceiving()
         {
-            try
-            {
-                // Establish WebSocket connection if not already connected.
-                if (_webSocket == null || _webSocket.State != WebSocketState.Open)
-                {
-                    _webSocket = new ClientWebSocket();
-                    // Use the desktop IP and port as shown in the connection info.
-                    string url = "ws://192.168.1.15:8080/";
-                    await _webSocket.ConnectAsync(new Uri(url), CancellationToken.None);
-                }
-                lblStatus.Text = "Requesting screen...";
-                // Send command to desktop to start screen capture.
-                await SendTextAsync("START_SCREEN");
-                _isViewing = true;
-                _receiveCts = new CancellationTokenSource();
-                _ = Task.Run(() => ReceiveLoop(_receiveCts.Token));
-            }
-            catch (Exception ex)
-            {
-                lblStatus.Text = $"Error: {ex.Message}";
-            }
+            _isReceiving = true;
+            _receiveCts = new CancellationTokenSource();
+            Task.Run(() => ReceiveScreenFrames(_receiveCts.Token), _receiveCts.Token);
         }
 
-        private async Task StopScreenViewer()
+        private async Task ReceiveScreenFrames(CancellationToken token)
         {
-            try
-            {
-                _isViewing = false;
-                if (_webSocket != null && _webSocket.State == WebSocketState.Open)
-                {
-                    // Send command to desktop to stop screen capture.
-                    await SendTextAsync("STOP_SCREEN");
-                    _receiveCts?.Cancel();
-                    lblStatus.Text = "Screen viewer stopped.";
-                }
-            }
-            catch (Exception ex)
-            {
-                lblStatus.Text = $"Error: {ex.Message}";
-            }
-        }
+            byte[] buffer = new byte[5 * 1024 * 1024];
 
-        private async Task ReceiveLoop(CancellationToken token)
-        {
-            var buffer = new byte[300_000]; // Adjust the size based on expected frame size.
             try
             {
-                while (_isViewing && _webSocket.State == WebSocketState.Open && !token.IsCancellationRequested)
+                while (_isReceiving && _webSocket.State == WebSocketState.Open && !token.IsCancellationRequested)
                 {
-                    var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
-                    if (result.MessageType == WebSocketMessageType.Close)
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                        lblStatus.Text = "Server closed connection.";
-                        break;
-                    }
-                    else if (result.MessageType == WebSocketMessageType.Text)
-                    {
-                        string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                        if (message.StartsWith("FRAME:"))
+                        WebSocketReceiveResult result;
+                        do
                         {
-                            string base64Data = message.Substring("FRAME:".Length);
-                            byte[] imageBytes = Convert.FromBase64String(base64Data);
-                            MainThread.BeginInvokeOnMainThread(() =>
-                            {
-                                imgScreen.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
-                                lblStatus.Text = "Receiving screen frames...";
-                            });
-                        }
-                        else
+                            result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
+                            ms.Write(buffer, 0, result.Count);
+                        } while (!result.EndOfMessage);
+
+                        byte[] imageData = ms.ToArray();
+                        if (imageData.Length > 0)
                         {
-                            MainThread.BeginInvokeOnMainThread(() =>
-                            {
-                                lblStatus.Text = $"Received: {message}";
-                            });
+                            UpdateScreenImage(imageData);
                         }
                     }
                 }
@@ -120,18 +71,50 @@ namespace DigiLimbMobile
             {
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    lblStatus.Text = $"Receive error: {ex.Message}";
+                    lblStatus.Text = $"❌ Receive error: {ex.Message}";
                 });
             }
         }
 
-        private async Task SendTextAsync(string message)
+        /// <summary>
+        /// Updates the UI with the received screen frame.
+        /// </summary>
+        private void UpdateScreenImage(byte[] imageData)
         {
-            if (_webSocket != null && _webSocket.State == WebSocketState.Open)
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                byte[] bytes = Encoding.UTF8.GetBytes(message);
-                await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
-            }
+                try
+                {
+                    string base64String = Encoding.UTF8.GetString(imageData).Trim();
+
+                    // ✅ Ensure we only decode full frames
+                    if (base64String.StartsWith("FRAME_START:") && base64String.EndsWith(":FRAME_END"))
+                    {
+                        string imageDataBase64 = base64String.Replace("FRAME_START:", "").Replace(":FRAME_END", "").Trim();
+
+                        // ✅ Ensure proper padding
+                        while (imageDataBase64.Length % 4 != 0)
+                        {
+                            imageDataBase64 += "=";
+                        }
+
+                        byte[] decodedImage = Convert.FromBase64String(imageDataBase64);
+                        imgScreen.Source = ImageSource.FromStream(() => new MemoryStream(decodedImage));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"❌ Image decode error: {ex.Message}");
+                }
+            });
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            _isReceiving = false;
+            _receiveCts?.Cancel();
+            lblStatus.Text = "❌ Screen viewing stopped.";
         }
     }
 }

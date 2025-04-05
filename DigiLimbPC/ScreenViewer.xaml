@@ -3,10 +3,45 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.ScreenViewer"
              Title="Screen Viewer">
+
     <VerticalStackLayout Padding="20" Spacing="20">
-        <Label Text="Screen Viewer coming soon..."
-               FontSize="20"
+
+        <Label Text="Screen Viewer"
+               FontSize="22"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <!-- Screen Image Display -->
+        <Frame HasShadow="True" BorderColor="Gray" Padding="3">
+            <Image x:Name="ScreenImage" 
+                   Aspect="AspectFit" 
+                   HeightRequest="400" 
+                   BackgroundColor="Black" />
+        </Frame>
+
+        <!-- Start Screen Sharing Button -->
+        <Button x:Name="StartScreenViewerButton"
+                Text="Start Screen Viewer"
+                BackgroundColor="Green"
+                TextColor="White"
+                Clicked="OnStartScreenViewerClicked"
+                HeightRequest="50"/>
+
+        <!-- Stop Screen Sharing Button -->
+        <Button x:Name="StopScreenViewerButton"
+                Text="Stop Screen Viewer"
+                BackgroundColor="Red"
+                TextColor="White"
+                Clicked="OnStopScreenViewerClicked"
+                HeightRequest="50"
+                IsVisible="False"/>
+        <!-- Initially Hidden -->
+
+        <!-- Status Message -->
+        <Label x:Name="StatusLabel"
+               Text="Waiting for connection..."
+               FontSize="16"
                HorizontalOptions="Center"
-               VerticalOptions="CenterAndExpand" />
+               TextColor="Gray"/>
     </VerticalStackLayout>
 </ContentPage>

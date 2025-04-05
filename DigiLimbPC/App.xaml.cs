@@ -26,7 +26,6 @@ namespace DigiLimbDesktop
             });
         }
 
-        [STAThread]
         protected override Window CreateWindow(IActivationState? activationState)
         {
             return new Window(new AppShell()); // This ensures AppShell is the entry point
