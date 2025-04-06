@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.ConnectionsPage"
              Title="Connections"
-             BackgroundColor="#EAEAEA">
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
     <!-- ✅ Updated Page Background -->
 
     <!-- Scrollable Layout -->
@@ -11,7 +11,7 @@
         <VerticalStackLayout Padding="30" Spacing="25">
 
             <!-- 🔹 Bluetooth Connection Card -->
-            <Border Background="LightBlue"
+            <Border Background="{DynamicResource CardBackgroundColor}"
                     Stroke="Black"
                     StrokeShape="RoundRectangle 15"
                     Padding="20"
@@ -38,7 +38,7 @@
                                Text="No device paired."
                                FontSize="20"
                                FontAttributes="Bold"
-                               TextColor="#333"
+                               TextColor="{DynamicResource PrimaryTextColor}"
                                VerticalOptions="Center"
                                IsVisible="True"/>
 
@@ -46,7 +46,7 @@
                                Text="Connected to: Device Name"
                                FontSize="20"
                                FontAttributes="Bold"
-                               TextColor="#333"
+                               TextColor="{DynamicResource PrimaryTextColor}"
                                VerticalOptions="Center"
                                IsVisible="False"/>
                     </HorizontalStackLayout>
@@ -65,7 +65,7 @@
             </Border>
 
             <!-- 🔹 WiFi Connection Card -->
-            <Border Background="LightBlue"
+            <Border Background="{DynamicResource CardBackgroundColor}"
                     Stroke="Black"
                     StrokeShape="RoundRectangle 15"
                     Padding="20"
@@ -89,7 +89,7 @@
                         <Label x:Name="lblPairedDevice"
                                FontSize="18"
                                Text="No device paired"
-                               TextColor="#333"
+                               TextColor="{DynamicResource PrimaryTextColor}"
                                VerticalOptions="Center"/>
                     </HorizontalStackLayout>
 
@@ -111,11 +111,12 @@
                     </HorizontalStackLayout>
 
                     <!-- Row 3: Chat Section -->
-                    <Label Text="Chat" FontSize="20" FontAttributes="Bold" Margin="0,15,0,5" TextColor="#333"/>
+                    <Label Text="Chat" FontSize="20" FontAttributes="Bold" Margin="0,15,0,5" TextColor="{DynamicResource PrimaryTextColor}"/>
                     <VerticalStackLayout Padding="30,0" Spacing="10">
                         <Entry x:Name="entryChatMessage"
                                Placeholder="Enter message to send"
                                HorizontalOptions="FillAndExpand"
+                               BackgroundColor="{DynamicResource EntryBackgroundColor}"
                                Margin="0" />
 
                         <Button x:Name="btnSendChat"
@@ -132,11 +133,11 @@
 
 
                     <!-- Row 4: Log Area -->
-                    <Label Text="Connection Logs" FontSize="18" FontAttributes="Bold" Margin="0,15,0,5" TextColor="#333"/>
+                    <Label Text="Connection Logs" FontSize="18" FontAttributes="Bold" Margin="0,15,0,5" TextColor="{DynamicResource PrimaryTextColor}"/>
                     <Editor x:Name="txtLogs"
                             HeightRequest="150"
                             IsReadOnly="True"
-                            BackgroundColor="#ffffff"/>
+                            BackgroundColor="{DynamicResource EntryBackgroundColor}"/>
                 </VerticalStackLayout>
             </Border>
 

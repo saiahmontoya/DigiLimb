@@ -2,31 +2,96 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.SettingsPage"
-             Title="Settings">
+             Title="Settings"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
 
-    <VerticalStackLayout Padding="20,50,20,20" Spacing="25">
+    <ScrollView x:Name="MainScroll">
+        <VerticalStackLayout Padding="30" Spacing="25">
 
-        <!-- Device Name Entry -->
-        <Label Text="Device Name"
-               FontSize="16"
-               HorizontalOptions="Start"/>
-        <Entry x:Name="txtName" Placeholder="Enter device name" />
+            <!-- 🔹 Device Name Card -->
+            <Border Background="{DynamicResource CardBackgroundColor}"
+                    Stroke="Black"
+                    StrokeShape="RoundRectangle 15"
+                    Padding="20"
+                    Margin="5">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Offset="8,8"/>
+                </Border.Shadow>
 
-        <!-- DPI Entry -->
-        <Label Text="DPI Level"
-               FontSize="16"
-               HorizontalOptions="Start"/>
-        <Entry x:Name="txtDPI" Placeholder="Enter DPI level" Keyboard="Numeric" />
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Device Name"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+                    <Entry x:Name="txtName"
+                           Placeholder="Enter device name"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                            BackgroundColor="{DynamicResource EntryBackgroundColor}"/>
+                </VerticalStackLayout>
+            </Border>
 
-        <!-- Save Button -->
-        <Button Text="Save" 
-                x:Name="btnSave" 
-                Clicked="OnSaveClicked" 
-                BackgroundColor="Black" 
-                TextColor="White"
-                BorderColor="Cyan" 
-                BorderWidth="2" 
-                HeightRequest="60"/>
+            <!-- 🔹 DPI Card -->
+            <Border Background="{DynamicResource CardBackgroundColor}"
+                    Stroke="Black"
+                    StrokeShape="RoundRectangle 15"
+                    Padding="20"
+                    Margin="5">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Offset="8,8"/>
+                </Border.Shadow>
 
-    </VerticalStackLayout>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="DPI Level"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+                    <Entry x:Name="txtDPI"
+                           Placeholder="Enter DPI level"
+                           Keyboard="Numeric"
+                           TextColor = "{DynamicResource SecondaryTextColor}"
+                           BackgroundColor="{DynamicResource EntryBackgroundColor}"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 🔹 Display Mode Card -->
+            <Border Background="{DynamicResource CardBackgroundColor}"
+                    Stroke="Black"
+                    StrokeShape="RoundRectangle 15"
+                    Padding="20"
+                    Margin="5">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Offset="8,8"/>
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="20"  Padding="0, 0, 0, 15" >
+                    <Label Text="Display Mode"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+
+                    <HorizontalStackLayout Spacing="30" Margin="5">
+                        <Button x:Name="btnLightMode"
+                                Text="Light Mode"
+                                Clicked="OnLightModeClicked"/>
+
+                        <Button x:Name="btnDarkMode"
+                                Text="Dark Mode"
+                                Clicked="OnDarkModeClicked"/>
+
+
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Save Button -->
+            <Button Text="Save"
+                    x:Name="btnSave"
+                    Clicked="OnSaveClicked"
+                    Style="{StaticResource HoverButtonStyle}"
+                    TextColor="White"
+                    HorizontalOptions="Center"
+                    WidthRequest="200"
+                    HeightRequest="60"/>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
