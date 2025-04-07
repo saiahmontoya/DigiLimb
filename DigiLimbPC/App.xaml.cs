@@ -9,7 +9,6 @@ namespace DigiLimbDesktop
         // Global instance of the ServerService to maintain connection state.
         public static ServerService GlobalServerService { get; private set; }
 
-
         private static BluetoothPeripheral? _globalPeripheral;
         public static BluetoothPeripheral? GlobalBluetoothPeripheral
         {

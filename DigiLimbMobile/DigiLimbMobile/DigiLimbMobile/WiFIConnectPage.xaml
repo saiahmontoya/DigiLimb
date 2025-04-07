@@ -6,14 +6,22 @@
     <VerticalStackLayout Padding="20" Spacing="20">
         <Label Text="Enter Desktop IP Address:" FontSize="18" />
         <Entry x:Name="entryServerIP" Placeholder="192.168.x.x" />
+
         <Label Text="Port:" FontSize="18" />
-        <!-- Fixed port 8080 -->
         <Entry x:Name="entryPort" Text="8080" IsReadOnly="True" />
-        <Button Text="Connect" BackgroundColor="#d9ecfa" TextColor="#517891" Clicked="OnConnectClicked" />
+
+        <Label Text="Passkey:" FontSize="18" />
+        <Entry x:Name="entryPasskey" Placeholder="Enter passkey from desktop" />
+
+        <Button Text="Connect" Clicked="OnConnectClicked" />
+        <Button Text="Scan QR Code" Clicked="OnScanQRCodeClicked"/>
+
         <Label x:Name="lblStatus" Text="Status: Not connected" FontSize="16" TextColor="Gray" />
+
         <Label Text="Send a message:" FontSize="18" />
         <Entry x:Name="entrySendMessage" Placeholder="Enter message to send" />
-        <Button Text="Send Message" BackgroundColor="#d9ecfa" TextColor="#517891" Clicked="OnSendMessageClicked" />
+        <Button Text="Send Message" Clicked="OnSendMessageClicked" />
+
         <Label x:Name="lblReceived" Text="Received:" FontSize="16" TextColor="Black" />
     </VerticalStackLayout>
 </ContentPage>

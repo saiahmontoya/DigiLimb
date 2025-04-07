@@ -108,6 +108,12 @@
                                 TextColor="White"
                                 IsEnabled="False"
                                 HeightRequest="50"/>
+						<Button x:Name="btnShowQR"
+                                Text="Show QR Code"
+                                Clicked="btnShowQR_Click"
+                                IsVisible="False"
+                                Style="{StaticResource HoverButtonStyle}"
+                                TextColor="White"/>
                     </HorizontalStackLayout>
 
                     <!-- Row 3: Chat Section -->
