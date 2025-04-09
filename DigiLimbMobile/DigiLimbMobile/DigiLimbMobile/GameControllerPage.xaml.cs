@@ -11,11 +11,17 @@ namespace DigiLimbMobile
     public partial class GameControllerPage : ContentPage
     {
         private readonly Dictionary<string, MauiTimer> _buttonTimers = new();
+        private Microsoft.Maui.Controls.View _leftThumb, _rightThumb;
+        private AbsoluteLayout _leftJoystickBase, _rightJoystickBase;
 
         public GameControllerPage()
         {
             InitializeComponent();
-            SetupJoystick();
+
+#if ANDROID
+            Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.RequestedOrientation = Android.Content.PM.ScreenOrientation.Landscape;
+#endif
+            SetupJoysticks();
         }
 
         private void OnButtonDown(object sender, EventArgs e)
@@ -26,10 +32,8 @@ namespace DigiLimbMobile
             if (_buttonTimers.ContainsKey(buttonText))
                 return;
 
-            // 🔸 Send the initial DOWN immediately
             _ = SendControllerButtonEvent(buttonText, "DOWN");
 
-            // 🔁 Create and start a timer for repeated sends
             var timer = new MauiTimer(100) { AutoReset = true };
             timer.Elapsed += async (_, _) =>
             {
@@ -49,10 +53,8 @@ namespace DigiLimbMobile
 
             string buttonText = btn.Text;
 
-            // 🔹 Immediately send button release event
             _ = SendControllerButtonEvent(buttonText, "UP");
 
-            // ❌ Stop timer
             if (_buttonTimers.TryGetValue(buttonText, out var timer))
             {
                 timer.Stop();
@@ -65,8 +67,7 @@ namespace DigiLimbMobile
         {
             try
             {
-                if (App.GlobalWebSocket == null || App.GlobalWebSocket.State != WebSocketState.Open)
-                    return;
+                if (App.GlobalWebSocket?.State != WebSocketState.Open) return;
 
                 string data = $"CONTROLLER:{button}:{state}";
                 byte[] buffer = Encoding.UTF8.GetBytes(data);
@@ -78,58 +79,76 @@ namespace DigiLimbMobile
             }
         }
 
-        private async Task SendJoystickData(float x, float y)
+        private void SetupJoysticks()
         {
-            if (App.GlobalWebSocket == null || App.GlobalWebSocket.State != WebSocketState.Open)
+            _leftJoystickBase = this.FindByName<AbsoluteLayout>("LeftJoystickBase");
+            _rightJoystickBase = this.FindByName<AbsoluteLayout>("RightJoystickBase");
+
+            _leftThumb = this.FindByName<Microsoft.Maui.Controls.View>("LeftThumb");
+            _rightThumb = this.FindByName<Microsoft.Maui.Controls.View>("RightThumb");
+
+            var leftPan = new PanGestureRecognizer();
+            leftPan.PanUpdated += (s, e) => HandleJoystickPan(e, _leftJoystickBase, _leftThumb, "left");
+            _leftJoystickBase.GestureRecognizers.Add(leftPan);
+
+            var rightPan = new PanGestureRecognizer();
+            rightPan.PanUpdated += (s, e) => HandleJoystickPan(e, _rightJoystickBase, _rightThumb, "right");
+            _rightJoystickBase.GestureRecognizers.Add(rightPan);
+        }
+
+        private void HandleJoystickPan(PanUpdatedEventArgs e, AbsoluteLayout baseLayout, Microsoft.Maui.Controls.View thumb, string id)
+        {
+            double radius = baseLayout.Width / 2;
+            double maxDist = radius - (thumb.Width / 2);
+            double centerX = radius;
+            double centerY = radius;
+
+            if (e.StatusType == GestureStatus.Running)
             {
-                System.Diagnostics.Debug.WriteLine("❌ WebSocket not connected. Cannot send joystick data.");
-                return;
+                double dx = e.TotalX;
+                double dy = e.TotalY;
+                double distance = Math.Sqrt(dx * dx + dy * dy);
+
+                if (distance > maxDist)
+                {
+                    double ratio = maxDist / distance;
+                    dx *= ratio;
+                    dy *= ratio;
+                }
+
+                double newX = centerX + dx;
+                double newY = centerY + dy;
+
+                AbsoluteLayout.SetLayoutBounds(thumb, new Rect(newX - thumb.Width / 2, newY - thumb.Height / 2, thumb.Width, thumb.Height));
+
+                float normX = (float)(dx / maxDist);
+                float normY = (float)(dy / maxDist);
+                _ = SendJoystickData(id, normX, normY);
             }
+
+            if (e.StatusType == GestureStatus.Completed || e.StatusType == GestureStatus.Canceled)
+            {
+                AbsoluteLayout.SetLayoutBounds(thumb, new Rect(centerX - thumb.Width / 2, centerY - thumb.Height / 2, thumb.Width, thumb.Height));
+                _ = SendJoystickData(id, 0, 0);
+            }
+        }
+
+        private async Task SendJoystickData(string id, float x, float y)
+        {
+            if (App.GlobalWebSocket?.State != WebSocketState.Open) return;
 
             var payload = new
             {
                 type = "joystick",
+                id,
                 x,
                 y,
                 buttonPressed = false
             };
 
             string json = System.Text.Json.JsonSerializer.Serialize(payload);
-            System.Diagnostics.Debug.WriteLine($"📤 Sending Joystick JSON: {json}");
-
-            byte[] messageBuffer = Encoding.UTF8.GetBytes(json);
-            await App.GlobalWebSocket.SendAsync(new ArraySegment<byte>(messageBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
-        }
-
-        private void SetupJoystick()
-        {
-            var pan = new PanGestureRecognizer();
-            pan.PanUpdated += OnJoystickMoved;
-            JoystickPad.GestureRecognizers.Add(pan);
-        }
-
-        private void OnJoystickMoved(object sender, PanUpdatedEventArgs e)
-        {
-            if (e.StatusType == GestureStatus.Running)
-            {
-                double padWidth = JoystickPad.Width;
-                double padHeight = JoystickPad.Height;
-
-                float normalizedX = (float)Math.Max(-1, Math.Min(1, e.TotalX / (padWidth / 2)));
-                float normalizedY = (float)Math.Max(-1, Math.Min(1, -e.TotalY / (padHeight / 2)));
-
-                _ = SendJoystickData(normalizedX, normalizedY);
-            }
-
-            if (e.StatusType == GestureStatus.Completed)
-            {
-                _ = SendJoystickData(0, 0);
-            }
+            byte[] buffer = Encoding.UTF8.GetBytes(json);
+            await App.GlobalWebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
-
 }
-
-
-
-
