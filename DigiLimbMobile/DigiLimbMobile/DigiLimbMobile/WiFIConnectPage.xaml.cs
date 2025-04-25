@@ -12,7 +12,7 @@ namespace DigiLimbMobile
         // We'll still use a private variable for local reference,
         // but also assign it to the global variable.
         private ClientWebSocket _webSocket;
-
+        public bool WiFiConnectionFlag;
         public WiFiConnectPage()
         {
             InitializeComponent();
@@ -42,12 +42,15 @@ namespace DigiLimbMobile
                 await _webSocket.ConnectAsync(new Uri(url), CancellationToken.None);
                 // Save connection globally
                 App.GlobalWebSocket = _webSocket;
-                lblStatus.Text = "Connected to server.";
+                Console.WriteLine("Connected to server.");
+                WiFiConnectionFlag = true; 
+                Console.WriteLine("connection flag set");
                 StartReceiveLoop();
             }
             catch (Exception ex)
             {
                 lblStatus.Text = $"Connection failed: {ex.Message}";
+                WiFiConnectionFlag = false;
             }
         }
 

@@ -6,7 +6,7 @@ namespace DigiLimbMobile
     public partial class App : Application
     {
         public static BluetoothManager BluetoothManager { get; private set; }
-        public static ClientWebSocket GlobalWebSocket { get; set; }  // Global lifetime connection
+        public static ClientWebSocket GlobalWebSocket { get; set; } = null; // Global lifetime connection
 
         public App()
         {
