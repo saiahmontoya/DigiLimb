@@ -3,14 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.MainPage"
              Title="Main Menu"
-             BackgroundColor="#EAEAEA">
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
 
     <!-- Wrap everything in a ScrollView to ensure full scrolling -->
     <ScrollView HorizontalScrollBarVisibility="Never">
         <VerticalStackLayout Padding="0,20" Spacing="25">
 
             <!-- 🔹 Title Box (Replaced Frame with Border) -->
-            <Border Background="White"
+            <Border Background="{DynamicResource CardBackgroundColor}"
                     Stroke="Gray"
                     StrokeShape="RoundRectangle 15"
                     Padding="0, 15"
@@ -29,7 +29,7 @@
                        FontSize="40"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center"
-                       TextColor="#2D2D2D"
+                       TextColor="{DynamicResource PrimaryTextColor}"
                        VerticalOptions="Center"/>
             </Border>
 
@@ -37,7 +37,7 @@
             <Border x:Name="connectionStatusBox"
                     IsVisible="False"
                     HorizontalOptions="FillAndExpand"
-                    Background="White"
+                    Background="{DynamicResource CardBackgroundColor}"
                     Stroke="Gray"
                     StrokeShape="RoundRectangle 15"
                     Padding="0, 15"
@@ -78,7 +78,7 @@
                             Style="{StaticResource HoverButtonStyle}"
                             FontSize="14"
                             Padding="0"
-                            TextColor="White"
+                            TextColor="{DynamicResource PrimaryTextColor}"
                             HorizontalOptions="End"
                             VerticalOptions="EndAndExpand"
                             Grid.Row="1"
@@ -92,7 +92,7 @@
                     Padding="40,40,40,40"
                     Stroke="Gray"
                     StrokeShape="RoundRectangle 20"
-                    Background="White"
+                    Background="{DynamicResource CardBackgroundColor}"
                     MinimumWidthRequest="450"
                     MaximumWidthRequest="800"
                     HorizontalOptions="FillAndExpand"
