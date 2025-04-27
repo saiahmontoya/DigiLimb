@@ -338,7 +338,8 @@ namespace DigiLimbDesktop.Platforms.Windows
                 var reader = DataReader.FromBuffer(request.Value);
                 //reader.ByteOrder = ByteORder.LittleEndian;
 
-                double x = 0, y = 0, scroll=0;
+                double x = 0, y = 0;
+                int scroll=0;
                 bool leftClick = false, rightClick = false;
 
                 while (reader.UnconsumedBufferLength > 0)
@@ -360,7 +361,7 @@ namespace DigiLimbDesktop.Platforms.Windows
                             rightClick = reader.ReadByte() != 0;
                             break;
                         case 0x05:
-                            scroll = reader.ReadDouble();
+                            scroll = reader.ReadInt32();
                             break;
                         default:
                             Debug.WriteLine($"⚠️ Unknown Header: {header}");

@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if WINDOWS
+using DigiLimbDesktop.Platforms.Windows;
+#endif
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -165,6 +168,13 @@ namespace DigiLimbDesktop
                             await BroadcastMessage(message, webSocket);
                         }
                     }
+                    else if (result.MessageType == WebSocketMessageType.Binary)
+                    {
+                        byte[] rawBytes = buffer.Take(result.Count).ToArray();
+                        //Debug.WriteLine($"received binary: {BitConverter.ToString(rawBytes)}");
+
+                        HandleMouseData(rawBytes);
+                    }
                 }
             }
             catch (Exception ex)
@@ -173,6 +183,116 @@ namespace DigiLimbDesktop
                 _clients.Remove(webSocket);
             }
         }
+
+        //Handle received mouse data
+
+        private bool isLeftPressed = false;
+        private bool isRightPressed = false;
+        private bool isMoving = false;
+
+        private void HandleMouseData(byte[] data)
+        {
+            using var stream = new MemoryStream(data);
+            using var reader = new BinaryReader(stream);
+            double x = 0, y = 0;
+            int scroll = 0;
+            bool leftClick = false, rightClick = false;
+
+            while (stream.Position < stream.Length)
+            {
+                byte header = reader.ReadByte();
+                //Debug.WriteLine($"reader val {header:X2}");
+
+                switch (header)
+                {
+                    case 0x01:
+                        x = reader.ReadDouble();
+                        break;
+                    case 0x02:
+                        y = reader.ReadDouble();
+                        break;
+                    case 0x03:
+                        leftClick = reader.ReadByte() != 0;
+                        break;
+                    case 0x04:
+                        rightClick = reader.ReadByte() != 0;
+                        break;
+                    case 0x05:
+                        scroll = reader.ReadInt32();
+                        //Debug.WriteLine($"scroll detected: {scroll}");
+                        break;
+                    default:
+                        Debug.WriteLine($"⚠️ Unknown header: {header}");
+                        break;
+                }
+            }
+
+            if (x != 0 || y != 0)
+            {
+                if (!isMoving)
+                {
+                    isMoving = true;
+#if WINDOWS
+                    MouseEmulator.StartMouseMovement();
+#endif
+                }
+
+                double scaleFactor = 1;
+                double moveX = x / scaleFactor;
+                double moveY = y / scaleFactor;
+#if WINDOWS
+                MouseEmulator.SimulateMouseMove(moveX, moveY);
+#endif
+            }
+            else if (isMoving)
+            {
+                isMoving = false;
+#if WINDOWS
+                MouseEmulator.StopMouseMovement();
+#endif
+            }
+
+            if (scroll != 0)
+            {
+                //Debug.WriteLine("scrolling...");
+#if WINDOWS
+                //Debug.WriteLine($"windows scroll {scroll}");
+                MouseEmulator.SimulateMouseScroll(scroll);
+#endif
+            }
+
+            if (leftClick && !isLeftPressed)
+            {
+#if WINDOWS
+                MouseEmulator.SimulateLeftPress();
+#endif
+                isLeftPressed = true;
+            }
+            else if (!leftClick && isLeftPressed)
+            {
+#if WINDOWS
+                MouseEmulator.SimulateLeftRelease();
+#endif
+                isLeftPressed = false;
+            }
+
+            if (rightClick && !isRightPressed)
+            {
+#if WINDOWS
+                MouseEmulator.SimulateRightPress();
+#endif
+                isRightPressed = true;
+            }
+            else if (!rightClick && isRightPressed)
+            {
+#if WINDOWS
+                MouseEmulator.SimulateRightRelease();
+#endif
+                isRightPressed = false;
+            }
+        }
+
+
 
         /// <summary>
         /// Broadcasts a given message to all connected clients (except the optional sender).
