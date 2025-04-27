@@ -23,5 +23,8 @@
                 Text="Keyboard"
                 TextColor="#517891"
                 Clicked="OnKeyboardClicked"/>
+    <VerticalStackLayout Padding="20" Spacing="20">
+        <Button Text="Mouse" Clicked="OnMouseClicked" />
+        <Button Text="Screen Viewer" Clicked="OnScreenViewerClicked" />
     </VerticalStackLayout>
 </ContentPage>

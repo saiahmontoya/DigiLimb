@@ -55,6 +55,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<!-- Ensure you have the System.Drawing.Common package -->
+	<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+	  
     <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 
@@ -86,6 +89,7 @@
     <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.40" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.2" />
     <PackageReference Include="Plugin.BLE" Version="3.1.0" />
+	  <PackageReference Include="WebRTCme" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,28 +101,37 @@
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="ConnectionsPage.xaml.cs">
-      <DependentUpon>ConnectionsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="DevicesPage.xaml.cs">
-      <DependentUpon>DevicesPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="SupportPage.xaml.cs">
-      <DependentUpon>SupportPage.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+	  <Compile Update="ConnectionsPage.xaml.cs">
+	    <DependentUpon>ConnectionsPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="DevicesPage.xaml.cs">
+	    <DependentUpon>DevicesPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="ScreenViewer.xaml.cs">
+	    <DependentUpon>ScreenViewer.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="SupportPage.xaml.cs">
+	    <DependentUpon>SupportPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <MauiXaml Update="ConnectionsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="DevicesPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="SupportPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-  </ItemGroup>
+	<ItemGroup>
+	  <MauiXaml Update="ConnectionsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="DevicesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="EmulationsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="ScreenViewer.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="SupportPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
 
 </Project>

@@ -1,11 +1,11 @@
-namespace DigiLimbMobile;
-
-public partial class EmulatorPage : ContentPage
+namespace DigiLimbMobile
 {
-    public EmulatorPage()
+    public partial class EmulatorPage : ContentPage
     {
-        InitializeComponent();
-    }
+        public EmulatorPage()
+        {
+            InitializeComponent();
+        }
 
     private async void OnMouseClicked(object sender, EventArgs e)
     {
@@ -15,5 +15,17 @@ public partial class EmulatorPage : ContentPage
     private async void OnKeyboardClicked(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new KeyboardPage());
+    }
+}
+        private async void OnMouseClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new MousePage());
+        }
+
+        // New event handler for the Screen Viewer button
+        private async void OnScreenViewerClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new ScreenViewerPage());
+        }
     }
 }

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbDesktop.EmulationsPage"
+             Title="Emulators"
+             BackgroundColor="#EAEAEA">
+    <ScrollView>
+        <VerticalStackLayout Padding="30,50" Spacing="25" HorizontalOptions="Center">
+            <!-- Title Box -->
+            <Frame BackgroundColor="White"
+                   CornerRadius="15"
+                   HeightRequest="80"
+                   Margin="30,50,30,20"
+                   Padding="15"
+                   HasShadow="True"
+                   HorizontalOptions="Fill">
+                <Label Text="Emulators"
+                       FontSize="30"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TextColor="#2D2D2D"
+                       VerticalOptions="Center"/>
+            </Frame>
+
+            <!-- Menu Container -->
+            <Frame Margin="30"
+                   Padding="40,30,40,40"
+                   CornerRadius="20"
+                   BackgroundColor="White"
+                   HasShadow="True"
+                   HorizontalOptions="Fill">
+                <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
+                    <!-- Screen Viewer Button -->
+                    <Button x:Name="btnScreenViewer"
+                            Text="Screen Viewer"
+                            Clicked="OnScreenViewerClicked"
+                            BackgroundColor="#57b9FF"
+                            TextColor="White"
+                            HeightRequest="55"
+                            FontSize="18"
+                            CornerRadius="10"
+                            WidthRequest="250"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Back Button -->
+            <Button Text="Back"
+                    Clicked="OnBackClicked"
+                    BackgroundColor="#d9534f"
+                    TextColor="White"
+                    HeightRequest="50"
+                    FontSize="18"
+                    CornerRadius="10"
+                    WidthRequest="250"
+                    HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

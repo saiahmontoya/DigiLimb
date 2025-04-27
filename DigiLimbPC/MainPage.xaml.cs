@@ -61,7 +61,7 @@ namespace DigiLimbDesktop
         // Navigate to Emulation Page
         private async void OnEmulationClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new EmulationPage());
+            await Navigation.PushAsync(new EmulationsPage());
         }
 
         // Quit the Application

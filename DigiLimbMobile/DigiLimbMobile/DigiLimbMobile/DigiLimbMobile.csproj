@@ -89,10 +89,25 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="ScreenViewerPage.xaml.cs">
+	    <DependentUpon>ScreenViewerPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="WiFIConnectPage.xaml.cs">
+	    <DependentUpon>WiFIConnectPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <MauiXaml Update="ConnectionPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="MousePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="ScreenViewerPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="WiFIConnectPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="KeyboardPage.xaml">
