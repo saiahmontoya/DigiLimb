@@ -280,6 +280,7 @@ namespace DigiLimbDesktop
                 _isServerRunning = true;
                 btnStartServer.IsEnabled = false;
                 btnStopServer.IsEnabled = true;
+                btnShowQR.IsVisible = true;
             }
         }
 
@@ -291,7 +292,19 @@ namespace DigiLimbDesktop
                 _isServerRunning = false;
                 btnStartServer.IsEnabled = true;
                 btnStopServer.IsEnabled = false;
+                btnShowQR.IsVisible = false;
             }
+        }
+        
+        private void OnShowQRCodeClicked(object sender, EventArgs e)
+        {
+            _serverService?.ShowQRCodePopupAgain();
+        }
+
+        private void btnShowQR_Click(object sender, EventArgs e)
+        {
+            _serverService?.ShowQRCodePopupAgain();
+
         }
 
         // New event handler for sending chat messages from desktop to mobile.

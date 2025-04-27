@@ -7,8 +7,29 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
+using ZXing;
+using ZXing.QrCode;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
+using ZXing.Net.Maui;
+using ZXing.Rendering;
+#if ANDROID
+using Android.Graphics;
+#endif
+
+#if IOS || MACCATALYST
+using UIKit;
+#endif
+
+#if WINDOWS
+using Windows.Graphics.Imaging;
+using Windows.Storage.Streams;
+using Microsoft.UI.Xaml.Media.Imaging;
+#endif
 
 namespace DigiLimbDesktop
 {
@@ -19,11 +40,21 @@ namespace DigiLimbDesktop
         private readonly Action<string, bool> _updateStatusCallback;
         private readonly List<WebSocket> _clients;
         private readonly int _port = 8080; // Fixed port for the WebSocket server
+        private string _qrData;
+#if WINDOWS
+        private readonly GameControllerManager _controllerManager;
+
+#endif
 
         // Heartbeat and chat constants
         private const string HEARTBEAT_PING = "PING";
         private const string HEARTBEAT_PONG = "PONG";
         private const string CHAT_PREFIX = "CHAT:";
+        private const string CONTROLLER_PREFIX = "CONTROLLER:";
+
+        private string _generatedPasskey;
+        private bool _clientConnected = false; // Ensures only one client per session
+        private string _serverIP;
 
         // Screen capture fields (optional, can be removed if not needed)
         private bool _isCapturing = false;
@@ -33,6 +64,10 @@ namespace DigiLimbDesktop
         {
             _updateStatusCallback = updateStatusCallback;
             _clients = new List<WebSocket>();
+#if WINDOWS
+            Task.Run(async () => await ViGEmDriverManager.EnsureViGEmBusInstalled()).Wait();
+            _controllerManager = new GameControllerManager();
+#endif
         }
 
         /// <summary>
@@ -40,12 +75,33 @@ namespace DigiLimbDesktop
         /// </summary>
         public void StartServer()
         {
-            if (_httpListener != null && _httpListener.IsListening)
+            try
             {
-                Debug.WriteLine("⚠️ WebSocket Server is already running!");
-                return;
+                // Ensure admin privileges to modify firewall and HTTP settings
+                RunNetshCommand($"http add urlacl url=http://+:{_port}/ user=Everyone");
+                RunNetshCommand($"advfirewall firewall add rule name=\"DigiLimb WebSocket\" dir=in action=allow protocol=TCP localport={_port}");
+
+                if (_httpListener != null && _httpListener.IsListening)
+                {
+                    Debug.WriteLine("⚠️ WebSocket Server is already running!");
+                    return;
+                }
+
+                // Generate new passkey and get IP
+                _generatedPasskey = GeneratePasskey();
+                _serverIP = GetLocalIPAddress();
+
+                // Generate and display QR code
+                string qrData = $"{_serverIP}:{_port}:{_generatedPasskey}";
+                _qrData = qrData;
+                Debug.WriteLine($"🔑 Generated Passkey: {_generatedPasskey}");
+
+                Task.Run(() => StartListener());
             }
-            Task.Run(() => StartListener());
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Error configuring network settings: {ex.Message}");
+            }
         }
 
         public async Task StartListener()
@@ -105,19 +161,201 @@ namespace DigiLimbDesktop
         {
             try
             {
+                if (_clientConnected)
+                {
+                    Debug.WriteLine("⚠️ New connection attempt rejected: Only one client allowed per session.");
+                    context.Response.StatusCode = 403;
+                    context.Response.Close();
+                    return;
+                }
+
                 HttpListenerWebSocketContext wsContext = await context.AcceptWebSocketAsync(null);
                 WebSocket webSocket = wsContext.WebSocket;
-                _clients.Add(webSocket);
 
-                string clientIP = context.Request.RemoteEndPoint.ToString();
-                _updateStatusCallback?.Invoke($"Client Connected: {clientIP}", true);
-                Debug.WriteLine($"🔵 Client connected: {clientIP}");
+                // Read authentication message
+                var buffer = new byte[256];
+                WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                string receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                Debug.WriteLine($"📥 Received passkey: '{receivedMessage}'");
+                Debug.WriteLine($"🔐 Expected passkey: '{_generatedPasskey}'");
 
-                await ReceiveLoop(webSocket);
+                if (receivedMessage.Trim() == _generatedPasskey)
+                {
+                    _clientConnected = true;
+                    _clients.Add(webSocket);
+
+                    string clientIP = context.Request.RemoteEndPoint.ToString();
+                    _updateStatusCallback?.Invoke($"Client Connected: {clientIP}", true);
+                    Debug.WriteLine($"🔵 Client authenticated and connected: {clientIP}");
+
+                    await ReceiveLoop(webSocket);
+                }
+                else
+                {
+                    Debug.WriteLine($"❌ Passkey mismatch! Received '{receivedMessage.Trim()}' vs expected '{_generatedPasskey}'");
+                    await webSocket.CloseAsync(WebSocketCloseStatus.PolicyViolation, "Authentication failed", CancellationToken.None);
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"❌ Error processing WebSocket request: {ex.Message}");
+            }
+        }
+        
+        public void ShowQRCodePopup(string qrData)
+        {
+            var qrImage = GenerateQRCode(qrData);
+
+            if (qrImage != null)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    var qrPopup = new ContentPage
+                    {
+                        Content = new VerticalStackLayout
+                        {
+                            Padding = 20,
+                            Spacing = 20,
+                            VerticalOptions = LayoutOptions.Center,
+                            HorizontalOptions = LayoutOptions.Center,
+                            Children =
+                    {
+                        new Label
+                        {
+                            Text = "Scan this QR Code to connect:",
+                            FontSize = 18,
+                            HorizontalOptions = LayoutOptions.Center
+                        },
+                        new Image
+                        {
+                            Source = qrImage, // ✅ Uses AsImageSource() correctly
+                            WidthRequest = 250,
+                            HeightRequest = 250,
+                            HorizontalOptions = LayoutOptions.Center
+                        },
+                        new Button
+                        {
+                            Text = "Close",
+                            BackgroundColor = Colors.Purple,
+                            TextColor = Colors.White,
+                            Command = new Command(() => Application.Current.MainPage.Navigation.PopModalAsync())
+                        }
+                    }
+                        }
+                    };
+
+                    Application.Current.MainPage.Navigation.PushModalAsync(qrPopup);
+                });
+            }
+            else
+            {
+                Debug.WriteLine("❌ Failed to generate QR code image.");
+            }
+        }
+
+        private ImageSource GenerateQRCode(string text)
+        {
+            try
+            {
+                var qrWriter = new BarcodeWriter
+                {
+                    Format = ZXing.BarcodeFormat.QR_CODE, // ✅ Correct
+                    Options = new QrCodeEncodingOptions
+                    {
+                        Width = 300,
+                        Height = 300,
+                        Margin = 1
+                    }
+                };
+
+                var generatedImage = qrWriter.Write(text); // ✅ This now works correctly
+                return ConvertToImageSource(generatedImage); // ✅ Convert for MAUI
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ QR Code generation failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        private ImageSource ConvertToImageSource(object image)
+        {
+#if ANDROID
+            if (image is Android.Graphics.Bitmap androidBitmap)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    androidBitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return ImageSource.FromStream(() => new MemoryStream(stream.ToArray()));
+                }
+            }
+#endif
+
+#if IOS || MACCATALYST
+    if (image is UIKit.UIImage iosImage)
+    {
+        using (var stream = new MemoryStream())
+        {
+            iosImage.AsPNG().AsStream().CopyTo(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            return ImageSource.FromStream(() => new MemoryStream(stream.ToArray()));
+        }
+    }
+#endif
+
+#if WINDOWS
+if (image is Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap windowsBitmap)
+{
+    using (var stream = new MemoryStream())
+    {
+        var encoder = Windows.Graphics.Imaging.BitmapEncoder.CreateAsync(
+            Windows.Graphics.Imaging.BitmapEncoder.PngEncoderId, 
+            stream.AsRandomAccessStream()).GetAwaiter().GetResult();
+
+        encoder.SetPixelData(
+            Windows.Graphics.Imaging.BitmapPixelFormat.Bgra8,
+            Windows.Graphics.Imaging.BitmapAlphaMode.Premultiplied,
+            (uint)windowsBitmap.PixelWidth,
+            (uint)windowsBitmap.PixelHeight,
+            96, 96,
+            ConvertIBufferToByteArray(windowsBitmap.PixelBuffer) // ✅ Fixed here
+        );
+
+        encoder.FlushAsync().GetAwaiter().GetResult();
+        return ImageSource.FromStream(() => new MemoryStream(stream.ToArray()));
+    }
+}
+#endif
+
+
+
+            Debug.WriteLine("❌ Unsupported image type.");
+            return null;
+        }
+
+#if WINDOWS
+private static byte[] ConvertIBufferToByteArray(Windows.Storage.Streams.IBuffer buffer)
+{
+    using (var dataReader = Windows.Storage.Streams.DataReader.FromBuffer(buffer))
+    {
+        byte[] bytes = new byte[buffer.Length];
+        dataReader.ReadBytes(bytes);
+        return bytes;
+    }
+}
+#endif
+
+
+
+
+        private string GeneratePasskey()
+        {
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                byte[] tokenData = new byte[8];
+                rng.GetBytes(tokenData);
+                return BitConverter.ToString(tokenData).Replace("-", "").Substring(0, 8);
             }
         }
 
@@ -162,6 +400,16 @@ namespace DigiLimbDesktop
                             // Optionally broadcast the chat to all clients (except sender)
                             await BroadcastMessage(message, webSocket);
                         }
+                        else if (message.StartsWith(CONTROLLER_PREFIX))
+                        {
+                            await ProcessControllerInput(webSocket, message);
+                        }
+#if WINDOWS
+                        else if (message.StartsWith("{"))
+                        {
+                            _controllerManager.HandleIncomingMessage(message);
+                        }
+#endif
                         else
                         {
                             // For any other text message, just broadcast to all connected clients
@@ -294,6 +542,20 @@ namespace DigiLimbDesktop
 
 
 
+        private async Task ProcessControllerInput(WebSocket webSocket, string message)
+        {
+#if WINDOWS
+            if (message.StartsWith("CONTROLLER:"))
+            {
+                string input = message.Substring("CONTROLLER:".Length);
+                _updateStatusCallback?.Invoke($"Game Controller Input: {input}", true);
+                Debug.WriteLine($"🎮 Received Controller Input: {input}");
+
+                await _controllerManager.ProcessControllerInput(input); // No error now
+            }
+#endif
+        }
+
         /// <summary>
         /// Broadcasts a given message to all connected clients (except the optional sender).
         /// </summary>
@@ -380,6 +642,9 @@ namespace DigiLimbDesktop
                         Debug.WriteLine($"❌ Error disconnecting client: {ex.Message}");
                     }
                 }
+                // Revert network changes
+                RunNetshCommand($"http delete urlacl url=http://+:{_port}/");
+                RunNetshCommand($"advfirewall firewall delete rule name=\"DigiLimb WebSocket\" protocol=TCP localport={_port}");
                 _clients.Clear();
 
                 // Update the UI to indicate the server session has ended.
@@ -391,7 +656,50 @@ namespace DigiLimbDesktop
                 Debug.WriteLine($"❌ Error stopping server: {ex.Message}");
             }
         }
+        private void RunNetshCommand(string command)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "netsh",
+                    Arguments = command,
+                    UseShellExecute = false,           // ❌ Do NOT request elevation
+                    RedirectStandardOutput = true,     // ✅ Optional: capture output
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
 
+                using (Process process = new Process { StartInfo = psi })
+                {
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    Debug.WriteLine($"✅ netsh output: {output}");
+                    if (!string.IsNullOrEmpty(error))
+                        Debug.WriteLine($"⚠️ netsh error: {error}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ netsh execution failed: {ex.Message}");
+            }
+        }
+
+        public void ShowQRCodePopupAgain()
+        {
+            if (!string.IsNullOrEmpty(_qrData))
+            {
+                ShowQRCodePopup(_qrData);
+            }
+            else
+            {
+                Debug.WriteLine("⚠️ No QR data available to show.");
+            }
+        }
         /// <summary>
         /// Attempts to get a non-loopback IPv4 address for the current machine.
         /// </summary>
@@ -399,12 +707,26 @@ namespace DigiLimbDesktop
         {
             try
             {
-                var host = Dns.GetHostEntry(Dns.GetHostName());
-                foreach (var ip in host.AddressList)
+                foreach (var ni in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
                 {
-                    if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !ip.ToString().StartsWith("127"))
+                    if (ni.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up ||
+                        ni.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback ||
+                        ni.Description.ToLower().Contains("virtual") ||
+                        ni.Description.ToLower().Contains("vmware") ||
+                        ni.Description.ToLower().Contains("hyper-v") ||
+                        ni.Description.ToLower().Contains("docker"))
                     {
-                        return ip.ToString();
+                        continue;
+                    }
+
+                    var ipProps = ni.GetIPProperties();
+                    foreach (var addr in ipProps.UnicastAddresses)
+                    {
+                        if (addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            Debug.WriteLine($"✅ Selected IP: {addr.Address}");
+                            return addr.Address.ToString(); // ✅ This is your actual LAN IP
+                        }
                     }
                 }
             }
@@ -412,7 +734,8 @@ namespace DigiLimbDesktop
             {
                 Debug.WriteLine($"❌ Error getting local IP: {ex.Message}");
             }
-            return "127.0.0.1";
+
+            return "127.0.0.1"; // ✅ Default fallback return
         }
     }
 }

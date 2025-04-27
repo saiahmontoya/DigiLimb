@@ -6,6 +6,14 @@
     <Application.Resources>
         <ResourceDictionary>
             <!-- 🔹 Global Button Style with Hover Effect & Rounded Shadow -->
+            <Color x:Key="PageBackgroundColor">White</Color>
+            <Color x:Key="CardBackgroundColor">LightBlue</Color>
+            <Color x:Key="PrimaryTextColor">#2D2D2D</Color>
+            <Color x:Key="SecondaryTextColor">DarkGray</Color>
+            <Color x:Key="EntryBackgroundColor">White</Color>
+            <Color x:Key="ShellColor">#C0C0C0</Color>
+            <!-- Light theme default -->
+
             <Style x:Key="HoverButtonStyle" TargetType="Button">
                 <Setter Property="BackgroundColor" Value="#037ffc"/>
                 <!-- Default color -->
@@ -48,6 +56,51 @@
                 </Setter>
             </Style>
 
+
+            <Style x:Key="SelectableButtonStyle" TargetType="Button">
+                <Setter Property="CornerRadius" Value="10"/>
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="MinimumHeightRequest" Value="55"/>
+                <Setter Property="MinimumWidthRequest" Value="120"/>
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="BackgroundColor" Value="#D3D3D3"/>
+                <Setter Property="Shadow">
+                    <Shadow Brush="Black" Opacity="0.2" Offset="3,3" Radius="10"/>
+                </Setter>
+
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+
+                            <!-- ✅ Normal (default, unselected, unhovered) -->
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#D3D3D3"/>
+                                    <Setter Property="TextColor" Value="Black"/>
+                                    <Setter Property="Shadow">
+                                        <Shadow Brush="Black" Opacity="0.2" Offset="3,3" Radius="10"/>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+
+                            <!-- ✅ Selected (hovering does NOT override this) -->
+                            <VisualState x:Name="Selected">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#037ffc"/>
+                                    <Setter Property="TextColor" Value="White"/>
+                                    <Setter Property="Shadow">
+                                        <Shadow Brush="Black" Opacity="0.5" Offset="4,4" Radius="12"/>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+
+
             <!-- 🔹 Quit Button Style (With Hover Effect & Rounded Shadow) -->
             <Style x:Key="QuitButtonStyle" TargetType="Button" BasedOn="{StaticResource HoverButtonStyle}">
                 <Setter Property="BackgroundColor" Value="#4e92bf"/>
@@ -78,6 +131,8 @@
                     </VisualStateGroupList>
                 </Setter>
             </Style>
+
+           
 
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />

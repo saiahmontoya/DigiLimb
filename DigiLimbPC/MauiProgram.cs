@@ -1,4 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Maui;
+using Microsoft.Maui.Hosting;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using ZXing.Net.Maui;
 
 namespace DigiLimbDesktop
 {
@@ -7,6 +13,12 @@ namespace DigiLimbDesktop
         
         public static MauiApp CreateMauiApp()
         {
+            Task.Run(async () =>
+            {
+                Debug.WriteLine("🔍 Checking for ViGEmBus installation...");
+                await ViGEmDriverManager.EnsureViGEmBusInstalled();
+            }).Wait(); // Block until installation is complete.
+
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()

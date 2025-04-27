@@ -34,6 +34,7 @@ namespace DigiLimbMobile
         private ICharacteristic? heartbeatCharacteristic;
         private ICharacteristic? rssiCharacteristic;
         public ICharacteristic? mouseCharacteristic { get; private set; }  // Store the characteristic
+        public bool BluetoothConnectionFlag; // flag to determine whether to send via bluetooth
         private bool _stopDataSending = false;
 
 
@@ -145,6 +146,8 @@ namespace DigiLimbMobile
                         await deviceInfoCharacteristic.StartUpdatesAsync();
                         deviceInfoCharacteristic.ValueUpdated += OnDeviceInfoUpdated;
 
+                        BluetoothConnectionFlag = true;
+
                         Console.WriteLine($"📡 Sent Device Info to PC: {mobileDeviceName}, {mobileDeviceId}, {manufacturerData}");
                     }
 
@@ -175,6 +178,7 @@ namespace DigiLimbMobile
             catch (DeviceConnectionException e)
             {
                 Console.WriteLine($"❌ Could not connect to device: {e.Message}");
+                BluetoothConnectionFlag = false;
                 return false;
             }
         }
@@ -234,7 +238,7 @@ namespace DigiLimbMobile
             if (message == "DISCONNECT")
             {
                 Console.WriteLine("📴 Received DISCONNECT from PC");
-
+                BluetoothConnectionFlag = false;
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     StopAllDataSending();
@@ -248,7 +252,7 @@ namespace DigiLimbMobile
         {
             _stopDataSending = true;
             Console.WriteLine("🛑 Data sending stopped.");
-
+              
             if (deviceInfoCharacteristic != null)
             {
                 deviceInfoCharacteristic.ValueUpdated -= OnDeviceInfoUpdated;
