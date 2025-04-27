@@ -15,6 +15,7 @@ namespace DigiLimbMobile
         private bool isShiftActive = false;
         private bool isCtrlActive = false;
         private bool isAltActive = false;
+        private bool isCapsActive = false; // ✅ Added Caps state
 
         public KeyboardPage()
         {
@@ -25,7 +26,7 @@ namespace DigiLimbMobile
 
         private void GenerateKeyboard()
         {
-            Grid keyboardGrid = KeyboardGrid; // Use the Grid from XAML
+            Grid keyboardGrid = KeyboardGrid;
 
             int maxColumns = 15;
             for (int i = 0; i < maxColumns; i++)
@@ -70,23 +71,59 @@ namespace DigiLimbMobile
 
         private Color GetKeyColor(string key)
         {
-            if (key == "Shift" || key == "Ctrl" || key == "Alt") return Colors.Gray;
+            if (key == "Shift" || key == "Ctrl" || key == "Alt" || key == "Caps") return Colors.Gray;
             if (key == "Backspace" || key == "Enter") return Colors.Red;
             return Colors.Blue;
         }
 
         private async void OnKeyPress(string key)
         {
-            if (key == "Shift") { isShiftActive = !isShiftActive; UpdateModifierKey("Shift", isShiftActive); return; }
-            if (key == "Ctrl") { isCtrlActive = !isCtrlActive; UpdateModifierKey("Ctrl", isCtrlActive); return; }
-            if (key == "Alt") { isAltActive = !isAltActive; UpdateModifierKey("Alt", isAltActive); return; }
+            if (key == "Shift")
+            {
+                isShiftActive = !isShiftActive;
+                UpdateModifierKey("Shift", isShiftActive);
+                return;
+            }
 
-            key = ApplyShiftModifiers(key);
+            if (key == "Ctrl")
+            {
+                isCtrlActive = !isCtrlActive;
+                UpdateModifierKey("Ctrl", isCtrlActive);
+                return;
+            }
 
-            string keyData = $"{(isCtrlActive ? "Ctrl+" : "")}{(isAltActive ? "Alt+" : "")}{(isShiftActive ? key.ToUpper() : key)}";
+            if (key == "Alt")
+            {
+                isAltActive = !isAltActive;
+                UpdateModifierKey("Alt", isAltActive);
+                return;
+            }
+
+            if (key == "Caps")
+            {
+                isCapsActive = !isCapsActive;
+                UpdateModifierKey("Caps", isCapsActive);
+                Console.WriteLine("📡 Sending Key: Caps");
+                await SendKeyPress("Caps");
+                return;
+            }
+
+            string keyData = $"{(isCtrlActive ? "Ctrl+" : "")}" +
+                             $"{(isAltActive ? "Alt+" : "")}" +
+                             $"{(isShiftActive ? "Shift+" : "")}" +
+                             key.ToLower(); // always lowercase for letter keys
 
             Console.WriteLine($"📡 Sending Key: {keyData}");
             await SendKeyPress(keyData);
+
+            // Flash the button
+            if (keyButtons.TryGetValue(key, out Button btn))
+            {
+                Color originalColor = btn.BackgroundColor;
+                btn.BackgroundColor = Colors.Black;
+                await Task.Delay(150);
+                btn.BackgroundColor = originalColor;
+            }
 
             if (isShiftActive && key.Length == 1)
             {
@@ -95,31 +132,12 @@ namespace DigiLimbMobile
             }
         }
 
-        private string ApplyShiftModifiers(string key)
-        {
-            Dictionary<string, string> shiftMap = new Dictionary<string, string>
-            {
-                { "1", "!" }, { "2", "@" }, { "3", "#" }, { "4", "$" }, { "5", "%" },
-                { "6", "^" }, { "7", "&" }, { "8", "*" }, { "9", "(" }, { "0", ")" },
-                { "-", "_" }, { "=", "+" }, { "[", "{" }, { "]", "}" }, { "\\", "|" },
-                { ";", ":" }, { "'", "\"" }, { ",", "<" }, { ".", ">" }, { "/", "?" }
-            };
-
-            if (isShiftActive)
-            {
-                if (shiftMap.ContainsKey(key))
-                    return shiftMap[key];
-
-                if (key.Length == 1 && char.IsLetter(key[0]))
-                    return key.ToUpper();
-            }
-
-            return key;
-        }
-
         private void UpdateModifierKey(string key, bool isActive)
         {
-            keyButtons[key].BackgroundColor = isActive ? Colors.DarkGray : Colors.Gray;
+            if (keyButtons.ContainsKey(key))
+            {
+                keyButtons[key].BackgroundColor = isActive ? Colors.DarkGray : Colors.Gray;
+            }
         }
 
         private async Task SendKeyPress(string keyData)
