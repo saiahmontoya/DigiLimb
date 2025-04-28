@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Input;
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -131,17 +132,18 @@ namespace DigiLimbDesktop.Platforms.Windows
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
         }
 
-        public static void SimulateMouseScroll(double scrollAmount)
+        public static void SimulateMouseScroll(int scrollAmount)
         {
-            const int WHEEL_DELTA = 120; // Standard Windows scroll step
+            //Debug.WriteLine($"hi {scrollAmount}");
+            //const int WHEEL_DELTA = 30; // Standard Windows scroll step
 
-            int scrollValue = (int)(scrollAmount * WHEEL_DELTA); // Scale based on input
+            //int scrollValue = (int)(scrollAmount * WHEEL_DELTA); // Scale based on input
 
             INPUT[] inputs = new INPUT[1];
             inputs[0] = new INPUT
             {
                 type = INPUT_MOUSE,
-                mi = new MOUSEINPUT { mouseData = scrollValue, dwFlags = MOUSEEVENTF_WHEEL }
+                mi = new MOUSEINPUT { mouseData = scrollAmount, dwFlags = MOUSEEVENTF_WHEEL }
             };
 
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));

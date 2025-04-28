@@ -42,5 +42,13 @@
             Text="Presentation Remote"
             TextColor="#517891"
             Clicked="OnPresentationClicked"/>
+                Clicked="OnScreenViewerClicked" />
+        <Button Margin="20,10,20,0"
+                BackgroundColor="#d9ecfa"
+                HeightRequest="60"
+                VerticalOptions="Start"
+                Text="Game Controller"
+                TextColor="#517891"
+                Clicked="OnGameControllerClicked" />
     </VerticalStackLayout>
 </ContentPage>

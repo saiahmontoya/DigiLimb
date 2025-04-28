@@ -9,7 +9,6 @@ namespace DigiLimbDesktop
         // Global instance of the ServerService to maintain connection state.
         public static ServerService GlobalServerService { get; private set; }
 
-
         private static BluetoothPeripheral? _globalPeripheral;
         public static BluetoothPeripheral? GlobalBluetoothPeripheral
         {
@@ -43,6 +42,8 @@ namespace DigiLimbDesktop
         public App()
         {
             InitializeComponent();
+
+           
 
             if (GlobalBluetoothPeripheral is not null)
             {
@@ -112,11 +113,46 @@ namespace DigiLimbDesktop
             }
         }
 
+        public static void ApplyThemeToPage(Page page)
+        {
+            try
+            {
+                string theme = Preferences.Get("AppTheme", "Light");
+                Debug.WriteLine($"🌗 Applying theme on app startup: {theme}");
+
+                Application.Current.Resources["PageBackgroundColor"] = theme == "Dark" ? Color.FromArgb("#3A3A3A") : Colors.White;
+                Application.Current.Resources["CardBackgroundColor"] = theme == "Dark" ? Colors.DarkGray : Colors.LightBlue;
+                Application.Current.Resources["PrimaryTextColor"] = theme == "Dark" ? Colors.White : Color.FromArgb("#2D2D2D");
+                Application.Current.Resources["SecondaryTextColor"] = theme == "Dark" ? Colors.LightGray : Colors.DarkGray;
+                Application.Current.Resources["EntryBackgroundColor"] = theme == "Dark" ? Color.FromArgb("#787878") : Colors.White;
+                Application.Current.Resources["ShellColor"] = theme == "Dark"
+                ? Color.FromArgb("#2A2A2A")  // Darker shade for dark theme
+                : Color.FromArgb("#C0C0C0"); // Light gray for light theme
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Error applying theme to page: {ex.Message}");
+            }
+        }
+
+
+
+
 
         [STAThread]
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell()); // This ensures AppShell is the entry point
+            var shell = new AppShell();
+
+            // ✅ Apply theme here — safe because AppShell is now constructed
+            ApplyThemeToPage(shell);
+
+           
+            return new Window(shell);
         }
+
     }
 }
