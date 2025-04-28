@@ -1,4 +1,4 @@
-﻿using DigiLimbDesktop.Platforms.Windows;
+﻿//using DigiLimbDesktop.Platforms.Windows;
 using System.Diagnostics;
 
 namespace DigiLimbDesktop;
@@ -191,7 +191,5 @@ public partial class ConnectionDashboard : ContentPage
         _durationTokenSource?.Cancel();
         _bluetoothPeripheral.RssiUpdated -= OnRssiUpdated;
     }
-
-   
 
 }

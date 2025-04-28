@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
-using DigiLimbDesktop.Platforms.Windows;
 
 namespace DigiLimbDesktop
 {
@@ -9,48 +8,28 @@ namespace DigiLimbDesktop
         // Global instance of the ServerService to maintain connection state.
         public static ServerService GlobalServerService { get; private set; }
 
-        private static BluetoothPeripheral? _globalPeripheral;
-        public static BluetoothPeripheral? GlobalBluetoothPeripheral
-        {
-            get => _globalPeripheral;
-            set
-            {
-                if (_globalPeripheral is not null)
-                    _globalPeripheral!.DeviceConnectionChanged -= OnGlobalDeviceConnectionChanged;
+        // Global instance of BluetoothPeripheral (EXTERNAL class now, not nested inside App)
+        public static BluetoothPeripheral? GlobalBluetoothPeripheral { get; set; }
 
-                _globalPeripheral = value;
-
-                if (_globalPeripheral is not null)
-                    _globalPeripheral!.DeviceConnectionChanged += OnGlobalDeviceConnectionChanged;
-            }
-        }
-
-
-
-
-
-        // Global variables to check connection
+        // Global variables to track connection info
         public static bool GlobalIsConnected { get; set; } = false;
         public static string GlobalDeviceName { get; set; } = "";
         public static string GlobalConnectionType { get; set; } = "";
-
         public static DateTime? GlobalConnectionStartTime { get; set; } = null;
 
-        // Global log collection for server connection messages.
+        // Global log collection for server connection messages
         public static ObservableCollection<string> GlobalConnectionLog { get; private set; } = new ObservableCollection<string>();
 
         public App()
         {
             InitializeComponent();
 
-           
-
             if (GlobalBluetoothPeripheral is not null)
             {
-                GlobalBluetoothPeripheral!.DeviceConnectionChanged += OnGlobalDeviceConnectionChanged;
+                GlobalBluetoothPeripheral.DeviceConnectionChanged += OnGlobalDeviceConnectionChanged;
             }
 
-            // Initialize the global server service with a callback that adds messages to the global log.
+            // Initialize the global server service with a callback that adds messages to the global log
             GlobalServerService = new ServerService((message, isRunning) =>
             {
                 GlobalConnectionLog.Add(message);
@@ -70,11 +49,6 @@ namespace DigiLimbDesktop
                     GlobalDeviceName = "No Device";
                     GlobalConnectionType = "";
 
-                    if (GlobalBluetoothPeripheral is not null)
-                    {
-                        Debug.WriteLine("the gatt still there, you good.");
-                    }
-
                     var navStack = Shell.Current?.Navigation?.NavigationStack;
                     var currentPage = navStack?.LastOrDefault();
 
@@ -86,19 +60,19 @@ namespace DigiLimbDesktop
                     {
                         Debug.WriteLine("❌ Could not determine current visible page. Navigation stack was empty or null.");
                     }
-                    // ✅ If we're on ConnectionDashboard, navigate away
+
+                    // If we're on ConnectionDashboard, navigate away
                     if (currentPage is ConnectionDashboard)
                     {
                         Debug.WriteLine("📦 User is on ConnectionDashboard, navigating to ConnectionsPage.");
                         await Shell.Current.GoToAsync("//MainPage", true);
                         await Task.Delay(100);
-                        await Shell.Current.GoToAsync("//ConnectionsPage", true); // true = reset nav stack
+                        await Shell.Current.GoToAsync("//ConnectionsPage", true);
                     }
                     else
                     {
-                        // If not on dashboard, still navigate to keep user flow consistent
                         await Shell.Current.GoToAsync("ConnectionsPage");
-                        Debug.WriteLine("AHHHHHHHHHHHHHHHHH");
+                        Debug.WriteLine("Navigated back to ConnectionsPage.");
                     }
 
                     try
@@ -126,11 +100,8 @@ namespace DigiLimbDesktop
                 Application.Current.Resources["SecondaryTextColor"] = theme == "Dark" ? Colors.LightGray : Colors.DarkGray;
                 Application.Current.Resources["EntryBackgroundColor"] = theme == "Dark" ? Color.FromArgb("#787878") : Colors.White;
                 Application.Current.Resources["ShellColor"] = theme == "Dark"
-                ? Color.FromArgb("#2A2A2A")  // Darker shade for dark theme
-                : Color.FromArgb("#C0C0C0"); // Light gray for light theme
-
-
-
+                    ? Color.FromArgb("#2A2A2A")
+                    : Color.FromArgb("#C0C0C0");
             }
             catch (Exception ex)
             {
@@ -138,21 +109,15 @@ namespace DigiLimbDesktop
             }
         }
 
-
-
-
-
         [STAThread]
         protected override Window CreateWindow(IActivationState? activationState)
         {
             var shell = new AppShell();
 
-            // ✅ Apply theme here — safe because AppShell is now constructed
+            // Apply theme after shell is constructed
             ApplyThemeToPage(shell);
 
-           
             return new Window(shell);
         }
-
     }
 }

@@ -125,14 +125,6 @@
                                BackgroundColor="{DynamicResource EntryBackgroundColor}"
                                Margin="0" />
 
-                        <Button x:Name="btnSendChat"
-                                Text="Send"
-                                Clicked="OnSendChatClicked"
-                                Style="{StaticResource HoverButtonStyle}"
-                                TextColor="White"
-                                HorizontalOptions="FillAndExpand"
-                                MaximumWidthRequest="450"
-                                MaximumHeightRequest="70"/>
                     </VerticalStackLayout>
 
 

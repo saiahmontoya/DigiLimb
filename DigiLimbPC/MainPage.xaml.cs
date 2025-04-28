@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using Plugin.BLE.Abstractions;
 using System.Diagnostics;
-using DigiLimbDesktop.Platforms.Windows;
+//using DigiLimbDesktop.Platforms.Windows;
 
 namespace DigiLimbDesktop
 {
