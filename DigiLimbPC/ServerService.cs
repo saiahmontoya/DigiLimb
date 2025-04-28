@@ -6,6 +6,9 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
+using InputSimulatorEx;
+using InputSimulatorEx.Native;
 
 namespace DigiLimbDesktop
 {
@@ -15,6 +18,7 @@ namespace DigiLimbDesktop
         private CancellationTokenSource _cancellationTokenSource;
         private readonly Action<string, bool> _updateStatusCallback;
         private readonly List<WebSocket> _clients;
+        private readonly InputSimulator _inputSimulator = new();
         private readonly int _port = 8080; // Fixed port for WebSocket server
 
         public bool IsRunning { get; private set; } = false;
@@ -114,10 +118,45 @@ namespace DigiLimbDesktop
                 Debug.WriteLine($"❌ Error processing WebSocket request: {ex.Message}");
             }
         }
+        private void HandlePresentationCommand(string command)
+        {
+            switch (command)
+            {
+                case "next":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RIGHT);
+                    break;
+                case "previous":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                    break;
+                case "start":
+                    _inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.F5);
+                    break;
+                case "end":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
+                    break;
+                case "playMedia":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_K); 
+                    break;
+                case "pauseMedia":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_K);
+                    break;
+                case "fullscreenMedia":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_F); // Common key is F for YouTube, VLC, Slides
+                    break;
+                case "exitFullscreen":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE); // Standard fullscreen exit
+                    break;
+                default:
+                    Debug.WriteLine($"⚠️ Unknown presentation command: {command}");
+                    break;
+
+            }
+        }
+
 
         private async Task ReceiveLoop(WebSocket webSocket)
         {
-            var buffer = new byte[1024];
+            var buffer = new byte[4096];
             try
             {
                 while (webSocket.State == WebSocketState.Open)
@@ -135,6 +174,21 @@ namespace DigiLimbDesktop
                     else if (result.MessageType == WebSocketMessageType.Text)
                     {
                         string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                        try
+                        {
+                            var json = JsonDocument.Parse(message);
+                            if (json.RootElement.TryGetProperty("type", out var typeElement) && typeElement.GetString() == "presentation")
+                            {
+                                var command = json.RootElement.GetProperty("command").GetString();
+                                HandlePresentationCommand(command);
+                                continue; // stay on loop for more inputs
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"❌ Failed to parse presentation command: {ex.Message}");
+                        }
+
                         Debug.WriteLine($"📥 Received: {message}");
 
                         if (message == HEARTBEAT_PONG)

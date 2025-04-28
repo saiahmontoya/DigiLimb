@@ -356,10 +356,8 @@ namespace DigiLimbDesktop
                 return;
 
             string chatMessage = $"CHAT:{message}";
-            await _serverService.SendChatMessage(chatMessage); // ✅ Correct way to call it
+            await _serverService.SendChatMessage(chatMessage);
         }
-
-    }
 
         protected override void OnDisappearing()
         {
@@ -373,10 +371,6 @@ namespace DigiLimbDesktop
             }
 #endif
         }
-
-
-
-
 
     }
 

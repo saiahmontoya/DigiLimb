@@ -77,14 +77,14 @@ namespace DigiLimbDesktop
                 int screenHeight = GetSystemMetrics(1);
 
                 // Set a reasonable streaming resolution
-                int targetWidth = 960;
-                int targetHeight = (int)(screenHeight * (960.0 / screenWidth)); // Maintain aspect ratio
+                //int targetWidth = 960;
+                //int targetHeight = (int)(screenHeight * (960.0 / screenWidth)); // Maintain aspect ratio
 
                 using Bitmap original = new Bitmap(screenWidth, screenHeight);
                 using Graphics g = Graphics.FromImage(original);
                 g.CopyFromScreen(0, 0, 0, 0, original.Size);
 
-                using Bitmap resized = new Bitmap(original, new Size(targetWidth, targetHeight));
+                using Bitmap resized = new Bitmap(original);
                 using MemoryStream ms = new MemoryStream();
                 resized.Save(ms, Imaging.ImageFormat.Jpeg); // Use JPEG for smaller payloads
 
@@ -143,7 +143,7 @@ namespace DigiLimbDesktop
                     string base64Image = await CaptureScreenBase64Async();
                     if (!string.IsNullOrEmpty(base64Image))
                     {
-                        await _serverService.BroadcastScreenFrame(base64Image); // ✅ No "FRAME:" prefix here
+                        await _serverService.BroadcastScreenFrame(base64Image); 
                     }
 
                     await Task.Delay(30);

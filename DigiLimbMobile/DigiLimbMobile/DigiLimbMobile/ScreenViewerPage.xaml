@@ -1,14 +1,17 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage 
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
     x:Class="DigiLimbMobile.ScreenViewerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Screen Viewer">
+
     <Grid>
-        <Image x:Name="imgScreen"
-               Aspect="AspectFit"
-               HorizontalOptions="Fill"
-               VerticalOptions="Fill" />
+        <ScrollView Orientation="Both" HorizontalScrollBarVisibility="Always" VerticalScrollBarVisibility="Always">
+            <Image x:Name="imgScreen"
+                   Aspect="AspectFit"
+                   BackgroundColor="Black"
+                   WidthRequest="{OnPlatform Android=1000, iOS=1000, Default=1000}" />
+        </ScrollView>
+
         <Label x:Name="lblStatus"
                Text="Status"
                BackgroundColor="Black"
@@ -16,4 +19,5 @@
                HorizontalOptions="Center"
                VerticalOptions="End"
                Padding="10"/>
-    </Grid></ContentPage>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,105 @@
+<ContentPage 
+    x:Class="DigiLimbMobile.PresentationMode"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#F2F2F7"
+    Title="Presentation Mode">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30,10,30,20" Spacing="10" VerticalOptions="StartAndExpand">
+
+            <!-- Framed Container -->
+            <Frame BackgroundColor="#d9ecfa"
+                   CornerRadius="20"
+                   Padding="25"
+                   HasShadow="True"
+                   Margin="0,20">
+
+                <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+
+                    <!-- Title -->
+                    <Label Text="Presentation Remote"
+                           FontSize="26"
+                           FontAttributes="Bold"
+                           TextColor="#1C1C1E"
+                           HorizontalOptions="Center" />
+
+                    <Label Text="Control your slides, media, and more!"
+                           FontSize="15"
+                           TextColor="#6E6E73"
+                           HorizontalTextAlignment="Center"
+                           LineHeight="1.3"
+                           Margin="0,0,0,10"/>
+                    
+                    <Frame CornerRadius="16" Padding="0" HasShadow="True" Margin="0,6" BackgroundColor="Transparent">
+                        <Button Text="▶ Start Slideshow"
+                                Clicked="OnStartClicked"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                BackgroundColor="#0A84FF"
+                                CornerRadius="16"
+                                HeightRequest="55"/>
+                    </Frame>
+
+                    <Frame CornerRadius="16" Padding="0" HasShadow="True" Margin="0,6" BackgroundColor="Transparent">
+                        <Button Text="➡ Next Slide"
+                            Clicked="OnNextClicked"
+                            TextColor="#1C1C1E"
+                            BackgroundColor="#E5E5EA"
+                            CornerRadius="16"
+                            HeightRequest="55"/>
+                    </Frame>
+                    <Frame CornerRadius="16" Padding="0" HasShadow="True" Margin="0,6" BackgroundColor="Transparent">
+                        <Button Text="⬅ Previous Slide"
+                                Clicked="OnPreviousClicked"
+                                TextColor="#1C1C1E"
+                                BackgroundColor="#E5E5EA"
+                                CornerRadius="16"
+                                HeightRequest="55"/>
+                    </Frame>
+
+                    <Frame CornerRadius="16" Padding="0" HasShadow="True" Margin="0,6" BackgroundColor="Transparent">
+                        <Button Text="▶ Play Media"
+                                Clicked="OnPlayMediaClicked"
+                                BackgroundColor="#32D74B"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                HeightRequest="55"/>
+                    </Frame>
+
+                    <Frame CornerRadius="16" Padding="0" HasShadow="True" Margin="0,6" BackgroundColor="Transparent">
+                        <Button Text="⏸ Pause Media"
+                                Clicked="OnPauseMediaClicked"
+                                BackgroundColor="#FF9F0A"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                HeightRequest="55"/>
+                    </Frame>
+
+                    <Frame CornerRadius="16" Padding="0" HasShadow="True" Margin="0,6" BackgroundColor="Transparent">
+                        <Button Text="🖥 Fullscreen Video"
+                                Clicked="OnFullscreenMediaClicked"
+                                BackgroundColor="#BF5AF2"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                HeightRequest="55"/>
+                    </Frame>
+
+                    <Frame CornerRadius="16" Padding="0" HasShadow="True" Margin="0,6" BackgroundColor="Transparent">
+                        <Button Text="⏹ Exit Fullscreen"
+                                Clicked="OnExitFullscreenClicked"
+                                BackgroundColor="#FF453A"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                CornerRadius="16"
+                                HeightRequest="55"/>
+                    </Frame>
+
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

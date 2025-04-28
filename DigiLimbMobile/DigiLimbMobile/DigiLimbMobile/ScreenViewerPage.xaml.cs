@@ -44,7 +44,7 @@ namespace DigiLimbMobile
 
         private async Task ReceiveScreenFrames(CancellationToken token)
         {
-            byte[] buffer = new byte[5 * 1024 * 1024];
+            byte[] buffer = new byte[10 * 1024 * 1024];
 
             try
             {
@@ -85,7 +85,9 @@ namespace DigiLimbMobile
             {
                 try
                 {
-                    string base64String = Encoding.UTF8.GetString(imageData).Trim();
+                    string base64String = Encoding.UTF8.GetString(imageData)
+                    .Replace("\r", "")
+                    .Replace("\n", "");
 
                     // ✅ Ensure we only decode full frames
                     if (base64String.StartsWith("FRAME_START:") && base64String.EndsWith(":FRAME_END"))

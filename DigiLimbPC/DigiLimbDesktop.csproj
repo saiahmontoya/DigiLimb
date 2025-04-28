@@ -52,6 +52,7 @@
 
 	<ItemGroup>
 		<!-- Ensure you have the System.Drawing.Common package -->
+		<PackageReference Include="InputSimulatorEx" Version="2.1.1" />
 		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
 		
 		<!-- App Icon -->

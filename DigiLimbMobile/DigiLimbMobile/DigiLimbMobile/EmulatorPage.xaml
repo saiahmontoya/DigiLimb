@@ -34,5 +34,13 @@
                 Text="Screen Viewer"
                 TextColor="#517891"
                 Clicked="OnScreenViewerClicked"/>
+
+        <Button Margin="20,10,20,0"
+            BackgroundColor="#d9ecfa"
+            HeightRequest="60"
+            VerticalOptions="Start"
+            Text="Presentation Remote"
+            TextColor="#517891"
+            Clicked="OnPresentationClicked"/>
     </VerticalStackLayout>
 </ContentPage>
