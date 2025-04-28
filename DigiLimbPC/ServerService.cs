@@ -44,7 +44,6 @@ namespace DigiLimbDesktop
         private readonly List<WebSocket> _clients;
         private readonly InputSimulator _inputSimulator = new();
         private readonly int _port = 8080; // Fixed port for WebSocket server
-        private readonly int _port = 8080; // Fixed port for the WebSocket server
         private string _qrData;
 #if WINDOWS
         private readonly GameControllerManager _controllerManager;
