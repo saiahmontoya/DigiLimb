@@ -10,16 +10,22 @@ using System.Diagnostics;
 using System.Collections.Specialized;
 using Microsoft.Maui.Devices;
 
+#if WINDOWS
+using DigiLimbDesktop.Platforms.Windows;
+#endif
+
+
 namespace DigiLimbDesktop
 {
     public partial class ConnectionsPage : ContentPage
     {
-       
+
         // Reference to the global ServerService
         private ServerService _serverService;
         private bool _isServerRunning = false;   // Tracks server status
-
+#if WINDOWS
         private BluetoothPeripheral _bluetoothPeripheral;
+#endif
 
         public ConnectionsPage()
         {
@@ -33,7 +39,7 @@ namespace DigiLimbDesktop
 
             // Subscribe to changes in the global log.
             App.GlobalConnectionLog.CollectionChanged += GlobalLog_CollectionChanged;
-
+#if WINDOWS
             if (App.GlobalBluetoothPeripheral != null) // ✅ Only create GATT server if it doesn't exist
             {
                 _bluetoothPeripheral = App.GlobalBluetoothPeripheral;
@@ -65,6 +71,7 @@ namespace DigiLimbDesktop
             {
                 Debug.WriteLine("NO GLOBAL GATT");
             }
+#endif
         }
 
 
@@ -128,6 +135,7 @@ namespace DigiLimbDesktop
 
         private void btnAllowIncomingConnection_Click(object sender, EventArgs e)
         {
+#if WINDOWS
             if (btnAllowIncomingConnection.Text == "Allow Incoming Bluetooth Connection")
             {
 
@@ -173,7 +181,11 @@ namespace DigiLimbDesktop
                     btnAllowIncomingConnection.Text = "Allow Incoming Bluetooth Connection";
                 }
             }
+#else
+            Debug.WriteLine("BLE Peripheral mode not available");
+#endif
         }
+
 
         private async void RequestBluetoothPermissions()
         {
@@ -215,7 +227,7 @@ namespace DigiLimbDesktop
             });
         }
 
-
+#if WINDOWS
         private void OnDeviceInfoReceived(object sender, ReceivedDeviceInfo deviceInfo)
         {
             MainThread.BeginInvokeOnMainThread(async () =>
@@ -252,7 +264,7 @@ namespace DigiLimbDesktop
             });
             Console.WriteLine($"📡 UI Updated: Connected to {deviceInfo.DeviceName} (ID: {deviceInfo.DeviceId})");
         }
-
+#endif
         private void btnStartServer_Click(object sender, EventArgs e)
         {
             if (!_isServerRunning)
@@ -276,7 +288,7 @@ namespace DigiLimbDesktop
                 btnShowQR.IsVisible = false;
             }
         }
-        
+
         private void OnShowQRCodeClicked(object sender, EventArgs e)
         {
             _serverService?.ShowQRCodePopupAgain();
@@ -356,14 +368,14 @@ namespace DigiLimbDesktop
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-
+#if WINDOWS
             if (_bluetoothPeripheral != null)
             {
                 _bluetoothPeripheral.DeviceInfoReceived -= OnDeviceInfoReceived;
                 _bluetoothPeripheral.DeviceConnectionChanged -= OnDeviceConnectionChanged;
             }
+        #endif
+
         }
-
     }
-
 }

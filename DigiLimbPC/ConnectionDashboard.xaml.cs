@@ -1,20 +1,25 @@
 ﻿//using DigiLimbDesktop.Platforms.Windows;
 using System.Diagnostics;
-
+#if WINDOWS
+using DigiLimbDesktop.Platforms.Windows;
+#endif
 namespace DigiLimbDesktop;
 
 public partial class ConnectionDashboard : ContentPage
 {
     private CancellationTokenSource? _strengthTokenSource; // ✅ Separate token for RSSI tracking
     private CancellationTokenSource? _durationTokenSource; // ✅ Separate token for connection duration
+#if WINDOWS
     private BluetoothPeripheral _bluetoothPeripheral;
+#endif
 
     public ConnectionDashboard()
     {
         InitializeComponent();
-
+#if WINDOWS
         _bluetoothPeripheral = App.GlobalBluetoothPeripheral; // ✅ Use global instance
         _bluetoothPeripheral.RssiUpdated += OnRssiUpdated; // ✅ Subscribe to RSSI updates
+#endif
 
   
 
@@ -39,7 +44,9 @@ public partial class ConnectionDashboard : ContentPage
             {
                 while (!token.IsCancellationRequested)
                 {
+#if WINDOWS
                     var rssi = await _bluetoothPeripheral?.GetConnectionStrengthAsync();
+
                     if (rssi != null)
                     {
                         Debug.WriteLine($"Obtained rssi: {rssi}");
@@ -58,6 +65,7 @@ public partial class ConnectionDashboard : ContentPage
                     }
 
                     await Task.Delay(5000, token); // ✅ Throws if cancelled
+#endif
                 }
             }
             catch (TaskCanceledException)
@@ -154,6 +162,7 @@ public partial class ConnectionDashboard : ContentPage
     {
         try
         {
+
             // ✅ Stop updating RSSI and connection duration
             _strengthTokenSource?.Cancel();
             _durationTokenSource?.Cancel();
@@ -170,8 +179,9 @@ public partial class ConnectionDashboard : ContentPage
             Debug.WriteLine("ENDING CONNECTION TO DEVICE");
 
             // ✅ Send disconnect signal to mobile
+#if WINDOWS
             await _bluetoothPeripheral.SendDisconnectSignalAsync();
-
+#endif
             await DisplayAlert("Connection Ended", "The connection has been terminated.", "OK");
             await Navigation.PopAsync();
         }
@@ -189,7 +199,9 @@ public partial class ConnectionDashboard : ContentPage
         base.OnDisappearing();
         _strengthTokenSource?.Cancel();
         _durationTokenSource?.Cancel();
+#if WINDOWS
         _bluetoothPeripheral.RssiUpdated -= OnRssiUpdated;
+#endif
     }
 
 }

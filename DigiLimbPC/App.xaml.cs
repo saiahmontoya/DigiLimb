@@ -1,5 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+#if WINDOWS
+using DigiLimbDesktop.Platforms.Windows;
+#endif
 
 namespace DigiLimbDesktop
 {
@@ -9,7 +12,25 @@ namespace DigiLimbDesktop
         public static ServerService GlobalServerService { get; private set; }
 
         // Global instance of BluetoothPeripheral (EXTERNAL class now, not nested inside App)
-        public static BluetoothPeripheral? GlobalBluetoothPeripheral { get; set; }
+
+#if WINDOWS
+        private static BluetoothPeripheral? _globalPeripheral;
+        public static BluetoothPeripheral? GlobalBluetoothPeripheral
+        {
+            get => _globalPeripheral;
+            set
+            {
+                if (_globalPeripheral is not null)
+                    _globalPeripheral!.DeviceConnectionChanged -= OnGlobalDeviceConnectionChanged;
+
+                _globalPeripheral = value;
+
+                if (_globalPeripheral is not null)
+                    _globalPeripheral!.DeviceConnectionChanged += OnGlobalDeviceConnectionChanged;
+            }
+        }
+#endif
+
 
         // Global variables to track connection info
         public static bool GlobalIsConnected { get; set; } = false;
@@ -23,11 +44,12 @@ namespace DigiLimbDesktop
         public App()
         {
             InitializeComponent();
-
+#if WINDOWS
             if (GlobalBluetoothPeripheral is not null)
             {
                 GlobalBluetoothPeripheral.DeviceConnectionChanged += OnGlobalDeviceConnectionChanged;
             }
+#endif
 
             // Initialize the global server service with a callback that adds messages to the global log
             GlobalServerService = new ServerService((message, isRunning) =>
