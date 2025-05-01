@@ -99,6 +99,9 @@
 	  <MauiXaml Update="ConnectionPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="PresentationMode.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="GameControllerPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

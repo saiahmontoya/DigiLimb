@@ -2,9 +2,6 @@
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Microsoft.Maui.Controls;
-#if WINDOWS
-using DigiLimbDesktop.Platforms.Windows;
-#endif
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,15 +10,19 @@ using System.Diagnostics;
 using System.Collections.Specialized;
 using Microsoft.Maui.Devices;
 
+#if WINDOWS
+using DigiLimbDesktop.Platforms.Windows;
+#endif
+
+
 namespace DigiLimbDesktop
 {
     public partial class ConnectionsPage : ContentPage
     {
-       
+
         // Reference to the global ServerService
         private ServerService _serverService;
         private bool _isServerRunning = false;   // Tracks server status
-
 #if WINDOWS
         private BluetoothPeripheral _bluetoothPeripheral;
 #endif
@@ -38,7 +39,6 @@ namespace DigiLimbDesktop
 
             // Subscribe to changes in the global log.
             App.GlobalConnectionLog.CollectionChanged += GlobalLog_CollectionChanged;
-
 #if WINDOWS
             if (App.GlobalBluetoothPeripheral != null) // ✅ Only create GATT server if it doesn't exist
             {
@@ -182,9 +182,10 @@ namespace DigiLimbDesktop
                 }
             }
 #else
-            Debug.WriteLine("BLE Peripheral Mode is not available on this platform.");
+            Debug.WriteLine("BLE Peripheral mode not available");
 #endif
         }
+
 
         private async void RequestBluetoothPermissions()
         {
@@ -205,8 +206,6 @@ namespace DigiLimbDesktop
                 Debug.WriteLine("Bluetooth is off. Please enable it.");
             }
         }
-
-#if WINDOWS
         private void OnDeviceConnectionChanged(object sender, bool isConnected)
         {
             MainThread.BeginInvokeOnMainThread(() =>
@@ -227,9 +226,6 @@ namespace DigiLimbDesktop
                 }
             });
         }
-#endif
-
-
 
 #if WINDOWS
         private void OnDeviceInfoReceived(object sender, ReceivedDeviceInfo deviceInfo)
@@ -269,9 +265,6 @@ namespace DigiLimbDesktop
             Console.WriteLine($"📡 UI Updated: Connected to {deviceInfo.DeviceName} (ID: {deviceInfo.DeviceId})");
         }
 #endif
-       
-
-
         private void btnStartServer_Click(object sender, EventArgs e)
         {
             if (!_isServerRunning)
@@ -295,7 +288,7 @@ namespace DigiLimbDesktop
                 btnShowQR.IsVisible = false;
             }
         }
-        
+
         private void OnShowQRCodeClicked(object sender, EventArgs e)
         {
             _serverService?.ShowQRCodePopupAgain();
@@ -308,25 +301,25 @@ namespace DigiLimbDesktop
         }
 
         // New event handler for sending chat messages from desktop to mobile.
-        private async void OnSendChatClicked(object sender, EventArgs e)
-        {
-            string chatMessage = entryChatMessage.Text;
-            if (string.IsNullOrWhiteSpace(chatMessage))
-            {
-                await DisplayAlert("Error", "Please enter a message.", "OK");
-                return;
-            }
-            try
-            {
-                await _serverService.SendChatMessage(chatMessage);
-                txtLogs.Text += $"\n[Desktop]: {chatMessage}";
-                entryChatMessage.Text = "";
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", $"Failed to send chat message: {ex.Message}", "OK");
-            }
-        }
+        //private async void OnSendChatClicked(object sender, EventArgs e)
+        //{
+        //    string chatMessage = entryChatMessage.Text;
+        //    if (string.IsNullOrWhiteSpace(chatMessage))
+        //    {
+        //        await DisplayAlert("Error", "Please enter a message.", "OK");
+        //        return;
+        //    }
+        //    try
+        //    {
+        //        await _serverService.SendChatMessage(chatMessage);
+        //        txtLogs.Text += $"\n[Desktop]: {chatMessage}";
+        //        entryChatMessage.Text = "";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await DisplayAlert("Error", $"Failed to send chat message: {ex.Message}", "OK");
+        //    }
+        //}
 
         // Update UI when the server starts, stops, or a client joins / sends chat messages.
         private void UpdateServerStatus(string message, bool isRunning)
@@ -360,23 +353,29 @@ namespace DigiLimbDesktop
             Debug.WriteLine($"📡 Server Status: {message}");
         }
 
+        /// <summary>
+        /// Sends a chat message to all connected clients.
+        /// </summary>
+        //public async Task SendChatMessage(string message)
+        //{
+        //    if (string.IsNullOrWhiteSpace(message))
+        //        return;
+
+        //    string chatMessage = $"CHAT:{message}";
+        //    await _serverService.SendChatMessage(chatMessage);
+        //}
+
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-
 #if WINDOWS
             if (_bluetoothPeripheral != null)
             {
                 _bluetoothPeripheral.DeviceInfoReceived -= OnDeviceInfoReceived;
                 _bluetoothPeripheral.DeviceConnectionChanged -= OnDeviceConnectionChanged;
             }
-#endif
+        #endif
+
         }
-
-
-
-
-
     }
-
 }

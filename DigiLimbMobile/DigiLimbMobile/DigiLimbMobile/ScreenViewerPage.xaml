@@ -1,25 +1,23 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage 
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
     x:Class="DigiLimbMobile.ScreenViewerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Screen Viewer">
 
-    <VerticalStackLayout Padding="20" Spacing="20">
-        <!-- Connection Info Section -->
-        <Label Text="WiFi Connection:" FontSize="18" />
-        <!-- This label will show the desktop IP/port info -->
-        <Label x:Name="lblConnectionInfo" Text="Connected to: 192.168.1.15:8080" FontSize="16" TextColor="Green" />
+    <Grid>
+        <ScrollView Orientation="Both" HorizontalScrollBarVisibility="Always" VerticalScrollBarVisibility="Always">
+            <Image x:Name="imgScreen"
+                   Aspect="AspectFit"
+                   BackgroundColor="Black"
+                   WidthRequest="{OnPlatform Android=1000, iOS=1000, Default=1000}" />
+        </ScrollView>
 
-        <!-- Screen Viewer Control -->
-        <Label Text="Screen Viewer:" FontSize="18" />
-        <!-- Switch to start/stop screen sharing -->
-        <Switch x:Name="swScreenViewer" Toggled="OnScreenViewerToggled" />
-
-        <!-- Status Display -->
-        <Label x:Name="lblStatus" Text="Status: Idle" FontSize="16" TextColor="Gray" />
-
-        <!-- Image to display captured screen frames -->
-        <Image x:Name="imgScreen" Aspect="AspectFit" HeightRequest="400" />
-    </VerticalStackLayout>
+        <Label x:Name="lblStatus"
+               Text="Status"
+               BackgroundColor="Black"
+               TextColor="White"
+               HorizontalOptions="Center"
+               VerticalOptions="End"
+               Padding="10"/>
+    </Grid>
 </ContentPage>

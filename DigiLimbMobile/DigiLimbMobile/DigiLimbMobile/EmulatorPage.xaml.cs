@@ -21,6 +21,11 @@ namespace DigiLimbMobile
         {
             await Navigation.PushAsync(new RealMousePage());
         }
+
+        private async void OnPresentationClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new PresentationMode());
+        }
         private async void OnGameControllerClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new GameControllerPage());

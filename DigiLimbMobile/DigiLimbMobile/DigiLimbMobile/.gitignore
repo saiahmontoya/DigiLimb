@@ -366,3 +366,6 @@ FodyWeavers.xsd
 
 # Obj folder - auto generated on startup
 obj/
+
+#include info.plist
+!Platforms/iOS/Info.plist

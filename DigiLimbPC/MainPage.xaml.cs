@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using Plugin.BLE.Abstractions;
 using System.Diagnostics;
+#if WINDOWS
 using DigiLimbDesktop.Platforms.Windows;
+#endif
 
 namespace DigiLimbDesktop
 {
@@ -14,8 +16,9 @@ namespace DigiLimbDesktop
         private string _email; // Store user's email
         private readonly IMongoCollection<BsonDocument> _usersCollection;
         private ObjectId? _userID;
-
+#if WINDOWS
         private BluetoothPeripheral _bluetoothPeripheral; // ✅ Reference to BluetoothPeripheral
+#endif
 
         private bool _isConnectedValue = false;
 
@@ -49,6 +52,7 @@ namespace DigiLimbDesktop
             // ✅ Subscribe to Bluetooth connection updates
             // ✅ Prevent event duplication & ensure object is not null
             // ✅ Prevent event duplication & ensure object is not null
+#if WINDOWS
             if (App.GlobalBluetoothPeripheral is not null)
             {
                 // ✅ Retrieve global BluetoothPeripheral instance
@@ -60,6 +64,7 @@ namespace DigiLimbDesktop
             {
                 Debug.WriteLine("⚠️ BluetoothPeripheral is still null after initialization.");
             }
+#endif
 
             // Initialize MongoDB connection
             var client = new MongoClient("mongodb+srv://saiahmontoya01:AQfSCJE5bfDnhYSh@digilimbdatabase.mneoe.mongodb.net/?authSource=admin&w=majority&appName=DigilimbDatabase");
@@ -194,8 +199,9 @@ namespace DigiLimbDesktop
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 Debug.WriteLine($"🔄 Updating Connection Status: isConnected = {_isConnected}");
-
+#if WINDOWS
                 _bluetoothPeripheral = App.GlobalBluetoothPeripheral;
+#endif
                 _isConnected = App.GlobalIsConnected;
                 _deviceName = App.GlobalDeviceName;
                 _connectionType = App.GlobalConnectionType;
