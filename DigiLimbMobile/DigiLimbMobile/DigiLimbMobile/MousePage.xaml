@@ -60,16 +60,7 @@
                 Pressed="RightPressed"
                 Released="RightReleased">
         </Button> 
-        <Image x:Name="legoat"
-               Grid.Row="2" 
-               Grid.ColumnSpan="3"
-               HorizontalOptions="Center"
-               VerticalOptions="End"
-               Aspect="AspectFill"
-               HeightRequest="150"
-               WidthRequest="300"
-               Source="legoat.png"
-               IsVisible="True"/>
+    
             
         <StackLayout x:Name="SettingsPanel"
                      Grid.ColumnSpan="3"

@@ -118,7 +118,7 @@ public partial class Login : ContentPage
             {
                 await UpdateDeviceInfo(user.Id);
 
-                await DisplayAlert("Success", "Login Successful!", "OK");
+                //await DisplayAlert("Success", "Login Successful!", "OK");
                 await Shell.Current.GoToAsync("//ConnectionPage");
             }
             else

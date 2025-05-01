@@ -34,17 +34,8 @@ public partial class MousePage : ContentPage
     private async void OnSettingsClicked(object sender, EventArgs e)
     {
 
-        SettingsPanel.IsVisible = !SettingsPanel.IsVisible;
-       if (!legoat.IsVisible)
-       {
-            legoat.IsVisible = true;
-            await legoat.FadeTo(1, 2500);
-        }
-        else
-        {
-            legoat.IsVisible = false;
-            await legoat.FadeTo(0, 1500);
-        }
+       SettingsPanel.IsVisible = !SettingsPanel.IsVisible;
+
 
     }
 
@@ -155,18 +146,9 @@ public partial class MousePage : ContentPage
             message.Add(0x04);
             message.Add(1); // 1 = Press
         }
-        if (_bluetoothManager.BluetoothConnectionFlag == true)
-        {
-            if (_bluetoothManager.mouseCharacteristic != null)
-            {
-                if (message.Count > 0)
-                {
-                    await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
-                    Console.WriteLine($"Sent Press: Left={leftPress}, Right={rightPress}");
-                }
-            }
-        }
-        else if (App.GlobalWebSocket?.State == WebSocketState.Open)
+
+        
+        if (App.GlobalWebSocket?.State == WebSocketState.Open)
         {
             var ws = App.GlobalWebSocket;
             byte[] messageArray = message.ToArray();
@@ -183,6 +165,17 @@ public partial class MousePage : ContentPage
             catch (Exception ex)
             {
                 Console.WriteLine($"Send error: {ex.Message}");
+            }
+        }
+        else if (_bluetoothManager.BluetoothConnectionFlag == true)
+        {
+            if (_bluetoothManager.mouseCharacteristic != null)
+            {
+                if (message.Count > 0)
+                {
+                    await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
+                    Console.WriteLine($"Sent Press: Left={leftPress}, Right={rightPress}");
+                }
             }
         }
         else
@@ -207,20 +200,7 @@ public partial class MousePage : ContentPage
             message.Add(0); // 0 = Release
         }
 
-        if (_bluetoothManager.BluetoothConnectionFlag == true)
-        {
-            if (_bluetoothManager.mouseCharacteristic != null)
-            {
-
-
-                if (message.Count > 0)
-                {
-                    await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
-                    Console.WriteLine($"Sent Release: Left={leftRelease}, Right={rightRelease}");
-                }
-            }
-        }
-        else if (App.GlobalWebSocket?.State == WebSocketState.Open)
+        if (App.GlobalWebSocket?.State == WebSocketState.Open)
         {
             var ws = App.GlobalWebSocket;
             byte[] messageArray = message.ToArray();
@@ -237,6 +217,19 @@ public partial class MousePage : ContentPage
             catch (Exception ex)
             {
                 Console.WriteLine($"Send error: {ex.Message}");
+            }
+        }
+        else if (_bluetoothManager.BluetoothConnectionFlag == true)
+        {
+            if (_bluetoothManager.mouseCharacteristic != null)
+            {
+
+
+                if (message.Count > 0)
+                {
+                    await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
+                    Console.WriteLine($"Sent Release: Left={leftRelease}, Right={rightRelease}");
+                }
             }
         }
         else
@@ -329,6 +322,8 @@ public partial class MousePage : ContentPage
             SendMouseMovement(e.TotalX, e.TotalY);
         }
     }
+
+
     // send movements to PC
     double scaleFactor = 2;
     double sensitivity = 1;
@@ -346,30 +341,7 @@ public partial class MousePage : ContentPage
         double moveX = scaledX / scaleFactor * sensitivity;
         double moveY = scaledY / scaleFactor * sensitivity;
 
-        if (_bluetoothManager.BluetoothConnectionFlag == true)
-        {
-            if (_bluetoothManager.mouseCharacteristic != null)
-            {
-                List<byte> message = new List<byte>();
-
-                // X Movement (Header 0x01 + 4 Bytes Integer)
-                message.Add(0x01);
-                message.AddRange(BitConverter.GetBytes(moveX).Reverse());
-
-                // Y Movement (Header 0x02 + 4 Bytes Integer)
-                message.Add(0x02);
-                message.AddRange(BitConverter.GetBytes(moveY).Reverse());
-
-                await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
-                //Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");
-                //Console.WriteLine($"Sent Mouse Movement: X={moveX}, Y={moveY}");
-            }
-            else
-            {
-                Console.WriteLine("Send failed (mouse): no connection");
-            }
-        }
-        else if (App.GlobalWebSocket?.State == WebSocketState.Open)
+        if (App.GlobalWebSocket?.State == WebSocketState.Open)
         {
             List<byte> message = new List<byte>();
 
@@ -394,6 +366,29 @@ public partial class MousePage : ContentPage
             catch (Exception ex)
             {
                 Console.WriteLine($"Send error: {ex.Message}");
+            }
+        }
+        else if (_bluetoothManager.BluetoothConnectionFlag == true)
+        {
+            if (_bluetoothManager.mouseCharacteristic != null)
+            {
+                List<byte> message = new List<byte>();
+
+                // X Movement (Header 0x01 + 4 Bytes Integer)
+                message.Add(0x01);
+                message.AddRange(BitConverter.GetBytes(moveX).Reverse());
+
+                // Y Movement (Header 0x02 + 4 Bytes Integer)
+                message.Add(0x02);
+                message.AddRange(BitConverter.GetBytes(moveY).Reverse());
+
+                await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
+                //Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");
+                //Console.WriteLine($"Sent Mouse Movement: X={moveX}, Y={moveY}");
+            }
+            else
+            {
+                Console.WriteLine("Send failed (mouse): no connection");
             }
         }
         else
@@ -435,26 +430,8 @@ public partial class MousePage : ContentPage
     private async void SendScrollEvent(double scrollValue)
     {
         int scrollAmount = (int)(scrollValue * WHEEL_DELTA); 
-        if (_bluetoothManager.BluetoothConnectionFlag == true)
-        {
-            List<byte> message = new List<byte>();
-
-            // scroll Movement (Header 0x05 + 4 Bytes Integer)
-            message.Add(0x05);
-            message.AddRange(BitConverter.GetBytes(scrollAmount).Reverse());
-            // send scroll data via bluetooth
-            if (_bluetoothManager.mouseCharacteristic != null)
-            {
-                await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
-                Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");
-                //Console.WriteLine($"Sent Mouse Movement: X={x}, Y={y}");
-            }
-            else
-            {
-                Console.WriteLine("Send failed (scroll): no connection");
-            }
-        }
-        else if (App.GlobalWebSocket?.State == WebSocketState.Open)
+        
+        if (App.GlobalWebSocket?.State == WebSocketState.Open)
         {
             List<byte> message = new List<byte>();
 
@@ -476,6 +453,25 @@ public partial class MousePage : ContentPage
             catch (Exception ex)
             {
                 Console.WriteLine($"Send error: {ex.Message}");
+            }
+        }
+        else if (_bluetoothManager.BluetoothConnectionFlag == true)
+        {
+            List<byte> message = new List<byte>();
+
+            // scroll Movement (Header 0x05 + 4 Bytes Integer)
+            message.Add(0x05);
+            message.AddRange(BitConverter.GetBytes(scrollAmount).Reverse());
+            // send scroll data via bluetooth
+            if (_bluetoothManager.mouseCharacteristic != null)
+            {
+                await _bluetoothManager.mouseCharacteristic.WriteAsync(message.ToArray());
+                Console.WriteLine($"Message bytes: {BitConverter.ToString(message.ToArray())}");
+                //Console.WriteLine($"Sent Mouse Movement: X={x}, Y={y}");
+            }
+            else
+            {
+                Console.WriteLine("Send failed (scroll): no connection");
             }
         }
         else
