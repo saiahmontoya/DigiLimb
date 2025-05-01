@@ -264,7 +264,7 @@ public partial class RealMousePage : ContentPage
     int WHEEL_DELTA = 30;
     private async void SendScrollEvent(double scrollValue)
     {
-        int scrollAmount = (int)(scrollValue * WHEEL_DELTA);
+        int scrollAmount = (int)(scrollValue * WHEEL_DELTA) * -1;
 
         if (App.GlobalWebSocket?.State == WebSocketState.Open)
         {
@@ -375,8 +375,8 @@ public partial class RealMousePage : ContentPage
     {
         var data = e.Reading;
         // data.AngularVelocity is a Vector3: (X, Y, Z)
-        double deltaX = data.AngularVelocity.X; //in radians/sec
-        double deltaY = data.AngularVelocity.Y;
+        double deltaY = data.AngularVelocity.X * 30.0; //in radians/sec
+        double deltaX = data.AngularVelocity.Y * 30.0;
 
         if (_gyroEnabled)
         {

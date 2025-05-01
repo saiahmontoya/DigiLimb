@@ -110,7 +110,7 @@ namespace DigiLimbDesktop
                     // Navigate to MainPage
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
-                        DisplayAlert("Success", "Login Successful!", "OK");
+                        //DisplayAlert("Success", "Login Successful!", "OK");
                         Navigation.PushAsync(new MainPage());
                         Debug.WriteLine("Successfully logged in.");
                     });
