@@ -215,6 +215,21 @@ namespace DigiLimbDesktop
                     {
                         string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
                         Debug.WriteLine($"📥 Received: {message}");
+                        try
+                        {
+                            var json = JsonDocument.Parse(message);
+                            if (json.RootElement.TryGetProperty("type", out var typeElement) && typeElement.GetString() == "presentation")
+                            {
+                                var command = json.RootElement.GetProperty("command").GetString();
+                                HandlePresentationCommand(command);
+                                continue; // stay on loop for more inputs
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"❌ Failed to parse presentation command: {ex.Message}");
+                        }
+
 
                         if (message == HEARTBEAT_PONG)
                         {
@@ -497,15 +512,15 @@ namespace DigiLimbDesktop
 #endif
 
 #if IOS || MACCATALYST
-    if (image is UIKit.UIImage iosImage)
-    {
-        using (var stream = new MemoryStream())
-        {
-            iosImage.AsPNG().AsStream().CopyTo(stream);
-            stream.Seek(0, SeekOrigin.Begin);
-            return ImageSource.FromStream(() => new MemoryStream(stream.ToArray()));
-        }
-    }
+            if (image is UIKit.UIImage iosImage)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    iosImage.AsPNG().AsStream().CopyTo(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return ImageSource.FromStream(() => new MemoryStream(stream.ToArray()));
+                }
+            }
 #endif
 
 #if WINDOWS
@@ -655,6 +670,40 @@ private static byte[] ConvertIBufferToByteArray(IBuffer buffer)
             }
 
             return "127.0.0.1";
+        }
+
+        private void HandlePresentationCommand(string command)
+        {
+            switch (command)
+            {
+                case "next":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RIGHT);
+                    break;
+                case "previous":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                    break;
+                case "start":
+                    _inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.F5);
+                    break;
+                case "end":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
+                    break;
+                case "playMedia":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_K);
+                    break;
+                case "pauseMedia":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_K);
+                    break;
+                case "fullscreenMedia":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_F); // Common key is F for YouTube, VLC, Slides
+                    break;
+                case "exitFullscreen":
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE); // Standard fullscreen exit
+                    break;
+                default:
+                    Debug.WriteLine($"⚠️ Unknown presentation command: {command}");
+                    break;
+            }
         }
     }
 }
