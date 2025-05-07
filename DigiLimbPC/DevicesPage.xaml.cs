@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
+using MongoDB.Bson.Serialization.Attributes;
 using DigiLimbDesktop.Models;
 using System;
 

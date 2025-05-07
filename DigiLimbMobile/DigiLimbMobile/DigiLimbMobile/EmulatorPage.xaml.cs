@@ -1,11 +1,11 @@
-namespace DigiLimbMobile;
-
-public partial class EmulatorPage : ContentPage
+namespace DigiLimbMobile
 {
-    public EmulatorPage()
+    public partial class EmulatorPage : ContentPage
     {
-        InitializeComponent();
-    }
+        public EmulatorPage()
+        {
+            InitializeComponent();
+        }
 
         // New event handler for the Screen Viewer button
         private async void OnScreenViewerClicked(object sender, EventArgs e)
