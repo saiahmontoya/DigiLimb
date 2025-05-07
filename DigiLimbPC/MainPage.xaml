@@ -3,105 +3,164 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DigiLimbDesktop.MainPage"
              Title="Main Menu"
-             BackgroundColor="#EAEAEA">
-    <!-- 🔹 Light Gray Background -->
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
 
     <!-- Wrap everything in a ScrollView to ensure full scrolling -->
-    <ScrollView>
-        <VerticalStackLayout Padding="30,50" Spacing="25" HorizontalOptions="Center">
+    <ScrollView HorizontalScrollBarVisibility="Never">
+        <VerticalStackLayout Padding="0,20" Spacing="25">
 
-            <!-- 🔹 Title Box (Fixed Shape & Visibility) -->
-            <Frame BackgroundColor="White"
-                   CornerRadius="15"
-                   HeightRequest="80"  
-                   Margin="30,50,30,20"
-                   Padding="15"
-                   HasShadow="True"
-                   HorizontalOptions="Fill"
-                   VerticalOptions="Start">
+            <!-- 🔹 Title Box (Replaced Frame with Border) -->
+            <Border Background="{DynamicResource CardBackgroundColor}"
+                    Stroke="Gray"
+                    StrokeShape="RoundRectangle 15"
+                    Padding="0, 15"
+                    Margin="30,50,30,20"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand"
+                    MinimumWidthRequest="400"
+                    MaximumWidthRequest="700">
+
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Offset="4,4"/>
+                </Border.Shadow>
+
                 <Label x:Name="lblDeviceName"
                        Text="DigiLimb Dashboard"
-                       FontSize="30"
+                       FontSize="40"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center"
-                       TextColor="#2D2D2D"
+                       TextColor="{DynamicResource PrimaryTextColor}"
                        VerticalOptions="Center"/>
-            </Frame>
+            </Border>
 
-            <!-- 🔹 Menu Container -->
-            <Frame Margin="30"
-                   Padding="40,30,40,40"
-                   CornerRadius="20"
-                   BackgroundColor="White"
-                   HasShadow="True"
-                   HorizontalOptions="Fill">
+            <!-- 🔹 Connection Status Box (Replaced Frame with Border) -->
+            <Border x:Name="connectionStatusBox"
+                    IsVisible="False"
+                    HorizontalOptions="FillAndExpand"
+                    Background="{DynamicResource CardBackgroundColor}"
+                    Stroke="Gray"
+                    StrokeShape="RoundRectangle 15"
+                    Padding="0, 15"
+                    Margin="0,15,0,10"
+                    MinimumHeightRequest="120"
+                    MaximumWidthRequest="400"
+                    >
 
-                <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Offset="4,4"/>
+                </Border.Shadow>
+
+                <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *">
+                    <!-- Bluetooth/WiFi Icon -->
+                    <Image x:Name="connectionIcon"
+                           WidthRequest="50"
+                           HeightRequest="50"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Start"
+                           Grid.Row="0"
+                           Grid.Column="0"
+                           Margin="5,0,10,0"/>
+
+                    <!-- Device Name & Connection Type -->
+                    <StackLayout Grid.Row="0" Grid.Column="1">
+                        <Label Text="Paired Device:" 
+                               FontAttributes="Bold"
+                               FontSize="24"
+                               TextColor="Black"/>
+                        <Label x:Name="lblPairedDevice"
+                               FontSize="20"
+                               TextColor="DarkGray"/>
+                    </StackLayout>
+
+                    <!-- View Dashboard Button -->
+                    <Button Text="View Dashboard"
+                            Clicked="OnViewConnectionDashboardClicked"
+                            Style="{StaticResource HoverButtonStyle}"
+                            FontSize="14"
+                            Padding="0"
+                            TextColor="{DynamicResource PrimaryTextColor}"
+                            HorizontalOptions="End"
+                            VerticalOptions="EndAndExpand"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="0,20,10,0"/>
+                </Grid>
+            </Border>
+
+            <!-- 🔹 Menu Container (Replaced Frame with Border) -->
+            <Border Margin="30"
+                    Padding="40,40,40,40"
+                    Stroke="Gray"
+                    StrokeShape="RoundRectangle 20"
+                    Background="{DynamicResource CardBackgroundColor}"
+                    MinimumWidthRequest="450"
+                    MaximumWidthRequest="800"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Offset="4,4"/>
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="50"  
+                                     Padding="30,30"
+                                     HorizontalOptions="FillAndExpand"
+                                     VerticalOptions="FillAndExpand"
+                                     MinimumWidthRequest="360">
 
                     <!-- Connections Button -->
                     <Button Text="Connections"
                             Clicked="OnConnectionsClicked"
-                            BackgroundColor="#57b9FF"
-                            TextColor="White"
-                            HeightRequest="55"
-                            FontSize="18"
-                            CornerRadius="10"
-                            WidthRequest="250"/>
+                            Style="{StaticResource HoverButtonStyle}"
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
+                            MaximumWidthRequest="325"
+                            MaximumHeightRequest="80"
+                            />
 
                     <!-- Emulation Button -->
                     <Button Text="Emulation"
                             Clicked="OnEmulationClicked"
-                            BackgroundColor="#57b9FF"
-                            TextColor="White"
-                            HeightRequest="55"
-                            FontSize="18"
-                            CornerRadius="10"
-                            WidthRequest="250"/>
+                            Style="{StaticResource HoverButtonStyle}"
+                            HorizontalOptions="FillAndExpand"
+                            MaximumWidthRequest="325"
+                            MaximumHeightRequest="80"
+                            />
 
                     <!-- Settings Button -->
                     <Button Text="Settings"
                             Clicked="OnSettingsClicked"
-                            BackgroundColor="#57b9FF"
-                            TextColor="White"
-                            HeightRequest="55"
-                            FontSize="18"
-                            CornerRadius="10"
-                            WidthRequest="250"/>
+                            Style="{StaticResource HoverButtonStyle}"
+                            HorizontalOptions="FillAndExpand"
+                            MaximumWidthRequest="325"
+                            MaximumHeightRequest="80"
+                            />
 
                     <!-- Devices Button -->
                     <Button Text="Devices"
                             Clicked="OnDevicesClicked"
-                            BackgroundColor="#57b9FF"
-                            TextColor="White"
-                            BorderWidth="2"
-                            FontSize="18"
-                            HeightRequest="60"
-                            WidthRequest="250"
-                            HorizontalOptions="Center"/>
+                            Style="{StaticResource HoverButtonStyle}"
+                            HorizontalOptions="FillAndExpand"
+                            MaximumWidthRequest="325"
+                            MaximumHeightRequest="80"
+                            />
 
                     <!-- Support Button -->
                     <Button Text="Support"
                             Clicked="OnSupportClicked"
-                            BackgroundColor="#57b9FF"
-                            TextColor="White"
-                            HeightRequest="55"
-                            FontSize="18"
-                            CornerRadius="10"
-                            WidthRequest="250"/>
+                            Style="{StaticResource HoverButtonStyle}"
+                            HorizontalOptions="FillAndExpand"
+                            MaximumWidthRequest="325"
+                            MaximumHeightRequest="80"
+                            />
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- 🔹 Quit Button -->
             <Button Text="Quit"
                     Clicked="OnQuitClicked"
-                    BackgroundColor="#d9534f"
-                    TextColor="White"
-                    HeightRequest="50"
-                    FontSize="18"
-                    CornerRadius="10"
-                    WidthRequest="250"
-                    HorizontalOptions="Center"/>
-
+                    Style="{StaticResource QuitButtonStyle}"
+                    HorizontalOptions="CenterAndExpand"/>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

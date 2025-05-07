@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml.Input;
+using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -33,6 +35,7 @@ namespace DigiLimbDesktop.Platforms.Windows
         const int MOUSEEVENTF_LEFTUP = 0x0004;
         const int MOUSEEVENTF_RIGHTDOWN = 0x0008;
         const int MOUSEEVENTF_RIGHTUP = 0x0010;
+        const int MOUSEEVENTF_WHEEL = 0x0800;
 
         private static bool isMoving = false;
 
@@ -84,7 +87,7 @@ namespace DigiLimbDesktop.Platforms.Windows
             currentX = moveX;
             currentY = moveY;
             */
-            double distance = Math.Sqrt(deltaX * deltaY + deltaY * deltaY);
+            double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
             double steps = Math.Ceiling(distance / maxSpeed);
 
             double stepsX = deltaX / steps;
@@ -103,14 +106,6 @@ namespace DigiLimbDesktop.Platforms.Windows
             }
         }
 
-        public static void SimulateLeftClick()
-        {
-            INPUT[] inputs = new INPUT[2];
-            inputs[0] = new INPUT { type = INPUT_MOUSE, mi = new MOUSEINPUT { dwFlags = MOUSEEVENTF_LEFTDOWN } };
-            inputs[1] = new INPUT { type = INPUT_MOUSE, mi = new MOUSEINPUT { dwFlags = MOUSEEVENTF_LEFTUP } };
-            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
-        }
-
         public static void SimulateLeftPress()
         {
             INPUT[] inputs = new INPUT[1];
@@ -121,14 +116,6 @@ namespace DigiLimbDesktop.Platforms.Windows
         {
             INPUT[] inputs = new INPUT[1];
             inputs[0] = new INPUT { type = INPUT_MOUSE, mi = new MOUSEINPUT { dwFlags = MOUSEEVENTF_LEFTUP } };
-            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
-        }
-
-        public static void SimulateRightClick()
-        {
-            INPUT[] inputs = new INPUT[2];
-            inputs[0] = new INPUT { type = INPUT_MOUSE, mi = new MOUSEINPUT { dwFlags = MOUSEEVENTF_RIGHTDOWN } };
-            inputs[1] = new INPUT { type = INPUT_MOUSE, mi = new MOUSEINPUT { dwFlags = MOUSEEVENTF_RIGHTUP } };
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
         }
 
@@ -145,5 +132,21 @@ namespace DigiLimbDesktop.Platforms.Windows
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
         }
 
+        public static void SimulateMouseScroll(int scrollAmount)
+        {
+            //Debug.WriteLine($"hi {scrollAmount}");
+            //const int WHEEL_DELTA = 30; // Standard Windows scroll step
+
+            //int scrollValue = (int)(scrollAmount * WHEEL_DELTA); // Scale based on input
+
+            INPUT[] inputs = new INPUT[1];
+            inputs[0] = new INPUT
+            {
+                type = INPUT_MOUSE,
+                mi = new MOUSEINPUT { mouseData = scrollAmount, dwFlags = MOUSEEVENTF_WHEEL }
+            };
+
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+        }
     }
 }

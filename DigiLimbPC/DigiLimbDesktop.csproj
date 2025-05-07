@@ -54,9 +54,14 @@
     <ProvisioningType>manual</ProvisioningType>
   </PropertyGroup>
 
-  <ItemGroup>
-    <!-- App Icon -->
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+<ItemGroup>
+	<!-- Ensure you have the System.Drawing.Common package -->
+	<PackageReference Include="InputSimulatorEx" Version="2.1.1" />
+	<PackageReference Include="Nefarius.ViGEm.Client" Version="1.21.256" />
+	<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+		
+	<!-- App Icon -->
+	<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 
     <!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -68,9 +73,10 @@
     <!-- Custom Fonts -->
     <MauiFont Include="Resources\Fonts\*" />
 
-    <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-  </ItemGroup>
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+		<PackageReference Include="System.Text.Json" Version="9.0.3" />
+	</ItemGroup>
 
   <ItemGroup>
     <AndroidResource Remove="DigiLimbMobile\**" />
@@ -86,39 +92,57 @@
     <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.40" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.2" />
     <PackageReference Include="Plugin.BLE" Version="3.1.0" />
+	<PackageReference Include="WebRTCme" Version="2.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Save Palisades\" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Save Palisades\" />
+	  <Folder Include="Views\" />
+	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="3.2.1" />
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
+	<PackageReference Include="ZXing.Net.Maui" Version="0.4.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="ConnectionsPage.xaml.cs">
-      <DependentUpon>ConnectionsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="DevicesPage.xaml.cs">
-      <DependentUpon>DevicesPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="SupportPage.xaml.cs">
-      <DependentUpon>SupportPage.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+	  <Compile Update="ConnectionsPage.xaml.cs">
+	    <DependentUpon>ConnectionsPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="DevicesPage.xaml.cs">
+	    <DependentUpon>DevicesPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="ConnectionDashboard.xaml.cs">
+	    <DependentUpon>ConnectionDashboard.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="ScreenViewer.xaml.cs">
+	    <DependentUpon>ScreenViewer.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="SupportPage.xaml.cs">
+	    <DependentUpon>SupportPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <MauiXaml Update="ConnectionsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="DevicesPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="SupportPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-  </ItemGroup>
+	<ItemGroup>
+	  <MauiXaml Update="ConnectionsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="DevicesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="EmulationsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="ConnectionDashboard.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="ScreenViewer.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="SupportPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
 
 </Project>

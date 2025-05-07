@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DigiLimbDesktop.DevicesPage"
-             Title="My Devices"
-             BackgroundColor="Black">
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="DigiLimbDesktop.DevicesPage"
+    Title="My Devices"
+    BackgroundColor="Black">
 
     <VerticalStackLayout Padding="20">
 
@@ -11,7 +12,8 @@
                FontSize="24"
                TextColor="Cyan"
                FontAttributes="Bold"
-               HorizontalTextAlignment="Center"/>
+               HorizontalTextAlignment="Center"
+               Margin="0,0,0,10"/>
 
         <!-- Device List -->
         <ListView x:Name="devicesListView"
@@ -20,28 +22,56 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Border Padding="10"
-                                BackgroundColor="Gray"
-                                StrokeShape="RoundRectangle 10">
+                        <Frame Padding="15"
+                               BackgroundColor="Gray"
+                               CornerRadius="10"
+                               BorderColor="Lime"
+                               HasShadow="True"
+                               Margin="0,10,0,10">
 
-                            <StackLayout>
-                                <Label Text="{Binding DeviceModel}" FontSize="18" TextColor="White"/>
-                                <Label Text="{Binding Manufacturer}" FontSize="14" TextColor="LightGray"/>
-                                <Label Text="{Binding Platform}" FontSize="14" TextColor="LightGray"/>
-                                <Label Text="{Binding OsVersion}" FontSize="14" TextColor="LightGray"/>
+                            <VerticalStackLayout Spacing="5">
 
-                                <!-- Connect Button -->
-                                <Button Text="Connect"
-                                        BackgroundColor="Black"
-                                        TextColor="White"
-                                        BorderColor="Lime"
-                                        BorderWidth="2"
-                                        HorizontalOptions="Center"
-                                        Clicked="OnConnectClicked"
-                                        CommandParameter="{Binding Id}"/>
-                            </StackLayout>
+                                <!-- Model -->
+                                <Label Text="{Binding DeviceModel, StringFormat='Model: {0}'}"
+                                       FontSize="18"
+                                       TextColor="White"
+                                       FontAttributes="Bold"/>
 
-                        </Border>
+                                <!-- Manufacturer -->
+                                <Label Text="{Binding Manufacturer, StringFormat='Manufacturer: {0}'}"
+                                       FontSize="14"
+                                       TextColor="LightGray"/>
+
+                                <!-- Platform -->
+                                <Label Text="{Binding Platform, StringFormat='Platform: {0}'}"
+                                       FontSize="14"
+                                       TextColor="LightGray"/>
+
+                                <!-- OS Version -->
+                                <Label Text="{Binding OsVersion, StringFormat='OS Version: {0}'}"
+                                       FontSize="14"
+                                       TextColor="LightGray"/>
+
+                                <!-- Device Type -->
+                                <Label Text="{Binding DeviceType, StringFormat='Device Type: {0}'}"
+                                       FontSize="14"
+                                       TextColor="LightGray"/>
+
+                                <!-- CreatedAt (DateTime) -->
+                                <Label Text="{Binding CreatedAt, StringFormat='Created At: {0:yyyy-MM-dd HH:mm:ss}'}"
+                                       FontSize="14"
+                                       TextColor="Cyan"
+                                       FontAttributes="Italic"/>
+
+                                <!-- MAC Address -->
+                                <Label Text="{Binding MacAddress, StringFormat='MAC Address: {0}'}"
+                                       FontSize="14"
+                                       TextColor="Cyan"
+                                       FontAttributes="Italic"/>
+
+                            </VerticalStackLayout>
+
+                        </Frame>
                     </ViewCell>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -56,7 +86,6 @@
                 BorderWidth="2"
                 HorizontalOptions="Center"
                 Margin="0,20,0,0"/>
-
     </VerticalStackLayout>
 
 </ContentPage>

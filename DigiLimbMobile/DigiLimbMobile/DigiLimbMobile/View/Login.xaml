@@ -37,6 +37,7 @@
                            Aspect="AspectFill"
                            HeightRequest="50"
                            WidthRequest="50"
+                           Opacity="0.6"
                            Source="accountimage.png" />
                     <Entry x:Name="Username"
                            Grid.Column="1"
@@ -55,6 +56,7 @@
                            Aspect="AspectFill"
                            HeightRequest="40"
                            WidthRequest="40"
+                           Opacity="0.6"
                            Source="keyimage.png" />
                     <Entry x:Name="Password"
                            Grid.Column="1"

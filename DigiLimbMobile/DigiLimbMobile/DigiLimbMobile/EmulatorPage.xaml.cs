@@ -7,13 +7,31 @@ public partial class EmulatorPage : ContentPage
         InitializeComponent();
     }
 
-    private async void OnMouseClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new MousePage());
-    }
+        // New event handler for the Screen Viewer button
+        private async void OnScreenViewerClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new ScreenViewerPage());
+        }
 
-    private async void OnKeyboardClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new KeyboardPage());
+        private async void OnTrackClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new MousePage());
+        }
+        private async void OnMouseClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new RealMousePage());
+        }
+        private async void OnKeyboardClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new KeyboardPage());
+        }
+        private async void OnPresentationClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new PresentationMode());
+        }
+        private async void OnGameControllerClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new GameControllerPage());
+        }
     }
 }

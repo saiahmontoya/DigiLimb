@@ -17,17 +17,15 @@
 
     <ShellContent
         Title="Connect"
-        ContentTemplate="{DataTemplate local:ConnectionPage }"
+        ContentTemplate="{DataTemplate local:ConnectionPage}"
         Route="ConnectionPage" />
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
     <ShellContent
         Title="Emulators"
         ContentTemplate="{DataTemplate local:EmulatorPage}"
         Route="EmulatorPage" />
-    
-    
+    <ShellContent
+        Title="WiFi-Connect"
+        ContentTemplate="{DataTemplate local:WiFiConnectPage}"
+        Route="WiFiConnectPage" />
 
 </Shell>

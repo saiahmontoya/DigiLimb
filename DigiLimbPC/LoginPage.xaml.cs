@@ -1,14 +1,16 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Bson.Serialization.Attributes;
 using System.Security.Cryptography;
 using System.Text;
 using System;
 using System.Diagnostics;
-
-
-using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.Maui.Devices;
+using Microsoft.Maui.Controls;
+using DigiLimbDesktop.Models;
+using System.Linq;
+using System.Net.NetworkInformation;
+using DeviceModel = DigiLimbDesktop.Models.Device;
 
 namespace DigiLimbDesktop
 {
@@ -17,68 +19,12 @@ namespace DigiLimbDesktop
         private MongoClient client;
         private IMongoDatabase database;
         private IMongoCollection<User> userCollection;
-        private IMongoCollection<Device> deviceCollection;
+        private IMongoCollection<DeviceModel> deviceCollection;
 
         public LoginPage()
         {
             InitializeComponent();
             InitializeMongoDbConnection();
-        }
-
-        // 📌 User Schema
-        public class User
-        {
-            [BsonId]
-            [BsonRepresentation(BsonType.ObjectId)]
-            public string Id { get; set; }
-
-            [BsonElement("email")]
-            public string Email { get; set; }
-
-            [BsonElement("passwordHash")]
-            public string PasswordHash { get; set; }
-
-            [BsonElement("salt")]
-            public string Salt { get; set; }
-
-            [BsonElement("deviceIds")]
-            public List<string> DeviceIds { get; set; } = new List<string>();
-
-            [BsonElement("createdAt")]
-            public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        }
-
-        // 📌 Device Schema
-        public class Device
-        {
-            [BsonId]
-            [BsonRepresentation(BsonType.ObjectId)]
-            public string Id { get; set; }
-
-            [BsonElement("userId")]
-            [BsonRepresentation(BsonType.ObjectId)]
-            public string UserId { get; set; }
-
-            [BsonElement("deviceModel")]
-            public string DeviceModel { get; set; }
-
-            [BsonElement("manufacturer")]
-            public string Manufacturer { get; set; }
-
-            [BsonElement("platform")]
-            public string Platform { get; set; }
-
-            [BsonElement("osVersion")]
-            public string OsVersion { get; set; }
-
-            [BsonElement("idiom")]
-            public string Idiom { get; set; }
-
-            [BsonElement("deviceType")]
-            public string DeviceType { get; set; }
-
-            [BsonElement("createdAt")]
-            public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         }
 
         private async void InitializeMongoDbConnection()
@@ -89,7 +35,7 @@ namespace DigiLimbDesktop
                 client = new MongoClient(connectionUri);
                 database = client.GetDatabase("DigilimbDatabase");
                 userCollection = database.GetCollection<User>("Users");
-                deviceCollection = database.GetCollection<Device>("Devices");
+                deviceCollection = database.GetCollection<DeviceModel>("Devices");
 
                 await TestConnectionAsync();
             }
@@ -114,7 +60,7 @@ namespace DigiLimbDesktop
 
         private async void OnLoginClicked(object sender, EventArgs e)
         {
-            string email = txtEmail.Text.Trim();
+            string email = txtEmail.Text?.Trim();
             string password = txtPassword.Text;
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
@@ -135,18 +81,40 @@ namespace DigiLimbDesktop
 
                 if (VerifyPassword(password, user.PasswordHash, user.Salt))
                 {
-                    // 📌 Store user email globally
+                    // Get MAC Address
+                    string macAddress = GetMacAddress();
+
+                    // Store device info in database
+                    var existingDevice = await deviceCollection.Find(d => d.MacAddress == macAddress).FirstOrDefaultAsync();
+                    if (existingDevice == null)
+                    {
+                        var newDevice = new DeviceModel
+                        {
+                            UserId = ObjectId.Parse(user.Id),  // ✅ Convert user.Id (string) to ObjectId
+                            DeviceModel = DeviceInfo.Model,
+                            Manufacturer = DeviceInfo.Manufacturer,
+                            Platform = DeviceInfo.Platform.ToString(),  // ✅ Correct: Convert enum to string
+                            OsVersion = DeviceInfo.VersionString,
+                            DeviceType = DeviceInfo.DeviceType.ToString(),
+                            MacAddress = macAddress,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+
+                        await deviceCollection.InsertOneAsync(newDevice);
+                    }
+
+                    // Store user email globally
                     AppShell.UserEmail = email;
 
-                    // 📌 Navigate to MainPage
+                    // Navigate to MainPage
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
-                        DisplayAlert("Success", "Login Successful!", "OK");
+                        //DisplayAlert("Success", "Login Successful!", "OK");
                         Navigation.PushAsync(new MainPage());
                         Debug.WriteLine("Successfully logged in.");
                     });
                 }
-
                 else
                 {
                     await DisplayAlert("Login Error", "Invalid password.", "OK");
@@ -158,48 +126,9 @@ namespace DigiLimbDesktop
             }
         }
 
-        private async Task CheckAndSaveDevice(string userId)
-        {
-            var deviceInfo = new Device
-            {
-                UserId = userId,
-                DeviceModel = DeviceInfo.Current.Model,
-                Manufacturer = DeviceInfo.Current.Manufacturer,
-                Platform = DeviceInfo.Current.Platform.ToString(),
-                OsVersion = DeviceInfo.Current.VersionString,
-                Idiom = DeviceInfo.Current.Idiom.ToString(),
-                DeviceType = DeviceInfo.Current.DeviceType.ToString(),
-                CreatedAt = DateTime.UtcNow
-            };
-
-            // 📌 Check if the device already exists
-            var existingDevice = await deviceCollection.Find(d =>
-                d.UserId == userId &&
-                d.DeviceModel == deviceInfo.DeviceModel &&
-                d.Platform == deviceInfo.Platform &&
-                d.OsVersion == deviceInfo.OsVersion).FirstOrDefaultAsync();
-
-            if (existingDevice == null)
-            {
-                // 📌 Save new device to database
-                await deviceCollection.InsertOneAsync(deviceInfo);
-
-                // 📌 Update the user with the new device ID
-                var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
-                var update = Builders<User>.Update.Push(u => u.DeviceIds, deviceInfo.Id);
-                await userCollection.UpdateOneAsync(filter, update);
-
-                Console.WriteLine("New device registered!");
-            }
-            else
-            {
-                Console.WriteLine("Device already registered!");
-            }
-        }
-
         private async void OnRegisterClicked(object sender, EventArgs e)
         {
-            string email = txtEmail.Text.Trim();
+            string email = txtEmail.Text?.Trim();
             string password = txtPassword.Text;
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
@@ -263,5 +192,17 @@ namespace DigiLimbDesktop
             string hashedPassword = HashPassword(password, salt);
             return hashedPassword == storedHash;
         }
+        private string GetMacAddress()
+        {
+            return NetworkInterface.GetAllNetworkInterfaces()
+                .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
+                .Select(nic => nic.GetPhysicalAddress().ToString())
+                .FirstOrDefault() ?? "Unknown";
+        }
+
+    
+
+
+
     }
 }

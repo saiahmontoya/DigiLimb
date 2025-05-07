@@ -37,6 +37,34 @@
 	<string>YOUR CUSTOM MESSAGE</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>YOUR CUSTOM MESSAGE</string>
+
+	<key>NSCameraUsageDescription</key>
+	<string>We need to use your camera to scan QR codes.</string>
+	
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>192.168.1.15</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>192.168.1.202</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 	<key>CFBundleIdentifier</key>
 	<string>Mobile.Digilimb</string>
 	<key>NSAppTransportSecurity</key>

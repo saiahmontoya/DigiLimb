@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiLimbMobile.RealMousePage"
+             Title="Mouse">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Calibrate" Clicked="OnSettingsClicked"/>
+    </ContentPage.ToolbarItems>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height=".5*"/>
+            <RowDefinition Height=".73*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width=".3*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Button Grid.Column="0"
+                Grid.RowSpan="3"
+                Margin="0,0,0,0"
+                CornerRadius="0"
+                BackgroundColor="#d9ecfa"
+                Pressed="LeftPressed"
+                Released="LeftReleased">
+        </Button>
+
+        <Rectangle Grid.Column="1" Grid.RowSpan="3"  Background="#d9ecfa" Stroke="#d9ecfa" />
+        
+        <Button Grid.Column="1"
+                Grid.Row="0"
+                BackgroundColor="#d9ecfa"
+                Pressed="OnGyroButtonPressed"
+                Released="OnGyroButtonReleased"/>  
+        
+        <BoxView Grid.Column="1"
+                 Grid.Row="1"
+                 HeightRequest="100"
+                 WidthRequest="50"
+                 VerticalOptions="End"
+                 CornerRadius="19"
+                 BackgroundColor="#77B1D4">
+            <BoxView.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+        <Button Grid.Column="1"
+                Grid.Row="2"
+                BackgroundColor="#d9ecfa"
+                Pressed="OnGyroButtonPressed"
+                Released="OnGyroButtonReleased"/>
+
+
+        <Button Grid.Column="2"
+                Grid.RowSpan="3"
+                Margin="0,0,0,0"
+                CornerRadius="0"
+                BackgroundColor="#d9ecfa"
+                Pressed="RightPressed"
+                Released="RightReleased">
+        </Button>
+        <StackLayout x:Name="SettingsPanel"
+             Grid.ColumnSpan="3"
+             Grid.Row="3"
+             Padding="10"
+             VerticalOptions="Start"
+             IsVisible="False">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Text="Mouse Sensitivity" FontSize="20" />
+                <Entry x:Name="MouseSensitivityEntry"
+               Keyboard="Numeric"
+               Placeholder="2"
+               Grid.Column="0"
+               Grid.Row="1"/>
+
+                <Button Grid.Column =" 1" Grid.Row="1" Text="Done" Margin="10,0,0,0" Clicked="OnMouseDoneClicked" />
+                <Label Grid.Column="0" Grid.Row="2" Text="Scroll Sensitivity" Margin="0,20,0,0" FontSize="20" />
+                <Entry x:Name="ScrollSensitivityEntry"
+               Keyboard="Numeric"
+               Placeholder="30"
+               Grid.Column="0"
+               Grid.Row="3"/>
+
+                <Button Grid.Column =" 1" Grid.Row="3" Text="Done" Margin="10,0,0,0" Clicked="OnScrollDoneClicked" />
+            </Grid>
+
+        </StackLayout>
+
+    </Grid>
+</ContentPage>
