@@ -248,7 +248,7 @@ namespace DigiLimbDesktop.Platforms.Windows
             };
 
             var characteristicResult = await _gattServiceProvider.Service.CreateCharacteristicAsync(
-                new Guid("0000FFF4-0000-1000-8000-00805F9B34FB"), characteristicParameters);
+                new Guid("0000FFF5-0000-1000-8000-00805F9B34FB"), characteristicParameters);
 
             if (characteristicResult.Error == BluetoothError.Success)
             {

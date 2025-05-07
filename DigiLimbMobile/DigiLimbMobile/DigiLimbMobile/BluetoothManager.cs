@@ -129,7 +129,7 @@ namespace DigiLimbMobile
                 {
                     deviceInfoCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF2-0000-1000-8000-00805F9B34FB"));
                     heartbeatCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF6-0000-1000-8000-00805F9B34FB")); // ✅ Heartbeat characteristic
-                    rssiCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF4-0000-1000-8000-00805F9B34FB")); // ✅ RSSI characteristic
+                    rssiCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF5-0000-1000-8000-00805F9B34FB")); // ✅ RSSI characteristic
                     mouseCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF3-0000-1000-8000-00805F9B34FB"));
                     keyboardCharacteristic = await service.GetCharacteristicAsync(Guid.Parse("0000FFF4-0000-1000-8000-00805F9B34FB")); // Keyboard Characteristic
 
