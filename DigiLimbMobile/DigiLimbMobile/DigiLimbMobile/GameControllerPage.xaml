@@ -55,13 +55,13 @@
               RowDefinitions="Auto,Auto,Auto"
               ColumnDefinitions="Auto,Auto,Auto"
               Margin="0,0,10,0">
-                <Button Text="⬆" WidthRequest="85" HeightRequest="85" Grid.Row="0" Grid.Column="1" 
+                <Button Text="UP" WidthRequest="85" HeightRequest="85" Grid.Row="0" Grid.Column="1" 
                         CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp"/>
-                <Button Text="⬅" WidthRequest="85" HeightRequest="85" Grid.Row="1" Grid.Column="0" 
+                <Button Text="LEFT" WidthRequest="85" HeightRequest="85" Grid.Row="1" Grid.Column="0" 
                         CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp"/>
-                <Button Text="⬇" WidthRequest="85" HeightRequest="85" Grid.Row="2" Grid.Column="1" 
+                <Button Text="DOWN" WidthRequest="85" HeightRequest="85" Grid.Row="2" Grid.Column="1" 
                         CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp"/>
-                <Button Text="➡" WidthRequest="85" HeightRequest="85" Grid.Row="1" Grid.Column="2" 
+                <Button Text="RIGHT" WidthRequest="85" HeightRequest="85" Grid.Row="1" Grid.Column="2" 
                         CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp"/>
             </Grid>
 

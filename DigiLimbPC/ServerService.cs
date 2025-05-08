@@ -46,7 +46,7 @@ namespace DigiLimbDesktop
 #if WINDOWS
         private readonly GameControllerManager _controllerManager;
 #endif
-
+        private DateTime _lastControllerLogTime = DateTime.MinValue;
         public bool IsRunning { get; private set; } = false;
         public int ConnectedClientCount => _clients.Count;
 
@@ -71,7 +71,20 @@ namespace DigiLimbDesktop
             _controllerManager = new GameControllerManager();
 #endif
         }
-
+        private void ThrottledLog(string message)
+        {
+            {
+                const int throttleMs = 100;
+                var now = DateTime.Now;
+                if ((now - _lastControllerLogTime).TotalMilliseconds > throttleMs)
+                {
+                    {
+                        _lastControllerLogTime = now;
+                        _updateStatusCallback?.Invoke(message, true);
+                    }
+                }
+            }
+        }
         public void StartServer()
         {
             if (IsRunning)
@@ -376,16 +389,18 @@ namespace DigiLimbDesktop
 
         private async Task ProcessControllerInput(WebSocket webSocket, string message)
         {
+            {
 #if WINDOWS
             if (message.StartsWith("CONTROLLER:"))
-            {
+            {{
                 string input = message.Substring("CONTROLLER:".Length);
-                _updateStatusCallback?.Invoke($"Game Controller Input: {input}", true);
-                Debug.WriteLine($"🎮 Controller Input: {input}");
+                ThrottledLog($"Game Controller Input: {{input}}");
+                Debug.WriteLine($"🎮 Received Controller Input: {{input}}");
 
                 await _controllerManager.ProcessControllerInput(input);
-            }
+            }}
 #endif
+            }
         }
 
         public async Task BroadcastScreenFrame(string base64Image)
