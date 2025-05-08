@@ -141,40 +141,49 @@ namespace DigiLimbMobile
             }
         }
 
-        private async Task SendKeyPress(string keyData)
+        public async Task SendKeyPress(string key)
         {
-            List<byte> message = new List<byte> { 0x06 };
-            message.AddRange(Encoding.UTF8.GetBytes(keyData));
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+            List<byte> message = new List<byte> { 0x05 }; // 0x05 = header for keyboard input
+            message.AddRange(keyBytes);
+
+            // ✅ Try WebSocket first if it's connected
             if (App.GlobalWebSocket?.State == WebSocketState.Open)
             {
-                var ws = App.GlobalWebSocket;
-                byte[] messageArray = message.ToArray();
-                if (ws == null || ws.State != WebSocketState.Open)
-                {
-                    Console.WriteLine("Not connected to server.");
-                    return;
-                }
                 try
                 {
-                    await ws.SendAsync(new ArraySegment<byte>(messageArray), WebSocketMessageType.Binary, true, CancellationToken.None);
-                    //Console.WriteLine($"Message sent.{BitConverter.ToString(messageArray)}");
+                    await App.GlobalWebSocket.SendAsync(
+                        new ArraySegment<byte>(message.ToArray()),
+                        WebSocketMessageType.Binary,
+                        true,
+                        CancellationToken.None);
+
+                    Console.WriteLine($"[WiFi] Sent key '{key}' over WebSocket");
+                    return;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Send error: {ex.Message}");
+                    Console.WriteLine($"[WiFi] Send failed: {ex.Message}");
                 }
             }
-            else if (_bluetoothManager.keyboardCharacteristic != null)
-            {
-                
-                
 
-                await _bluetoothManager.keyboardCharacteristic.WriteAsync(message.ToArray());
-                Console.WriteLine($"📡 Sent Key Press: {keyData}");
+            // ✅ Fallback to Bluetooth if connected
+            if (_bluetoothManager.BluetoothConnectionFlag == true &&
+                _bluetoothManager.keyboardCharacteristic != null)
+            {
+                try
+                {
+                    await _bluetoothManager.keyboardCharacteristic.WriteAsync(message.ToArray());
+                    Console.WriteLine($"[Bluetooth] Sent key '{key}' over BLE");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Bluetooth] Send failed: {ex.Message}");
+                }
             }
             else
             {
-                Console.WriteLine("❌ No connection to PC.");
+                Console.WriteLine("❌ No connection available to send key press.");
             }
         }
 
