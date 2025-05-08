@@ -13,15 +13,15 @@
         <Label Text="Passkey:" FontSize="18" />
         <Entry x:Name="entryPasskey" Placeholder="Enter passkey from desktop" />
 
-        <Button Text="Connect" Clicked="OnConnectClicked" />
-        <Button Text="Scan QR Code" Clicked="OnScanQRCodeClicked"/>
+        <Button Text="Connect" Clicked="OnConnectClicked" BackgroundColor="#57b9FF" TextColor="White"/>
+        <Button Text="Scan QR Code" Clicked="OnScanQRCodeClicked" BackgroundColor="#57b9FF" TextColor="White"/>
 
         <Label x:Name="lblStatus" Text="Status: Not connected" FontSize="16" TextColor="Gray" />
 
-        <Label Text="Send a message:" FontSize="18" />
-        <Entry x:Name="entrySendMessage" Placeholder="Enter message to send" />
-        <Button Text="Send Message" Clicked="OnSendMessageClicked" />
+        <Label Text="Send a message:" FontSize="18" IsVisible="False"/>
+        <Entry x:Name="entrySendMessage" Placeholder="Enter message to send" IsVisible="False"/>
+        <Button Text="Send Message" Clicked="OnSendMessageClicked" IsVisible="False"/>
 
-        <Label x:Name="lblReceived" Text="Received:" FontSize="16" TextColor="Black" />
+        <Label x:Name="lblReceived" Text="Received:" FontSize="16" TextColor="Black" IsVisible="False"/>
     </VerticalStackLayout>
 </ContentPage>

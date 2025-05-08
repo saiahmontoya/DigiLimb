@@ -34,18 +34,18 @@
                      AbsoluteLayout.LayoutBounds="0.5,1,-1,-1"
                      AbsoluteLayout.LayoutFlags="PositionProportional"
                      Spacing="15">
-                <Button Text="LT" WidthRequest="110" HeightRequest="40" Pressed="OnButtonDown" Released="OnButtonUp"/>
-                <Button Text="LB" WidthRequest="110" HeightRequest="40" Pressed="OnButtonDown" Released="OnButtonUp"/>
-                <Button Text="RB" WidthRequest="110" HeightRequest="40" Pressed="OnButtonDown" Released="OnButtonUp"/>
-                <Button Text="RT" WidthRequest="110" HeightRequest="40" Pressed="OnButtonDown" Released="OnButtonUp"/>
+                <Button Text="LT" WidthRequest="110" HeightRequest="40" Pressed="OnButtonDown" Released="OnButtonUp"  BackgroundColor="#77B1D4" TextColor="White"/>
+                <Button Text="LB" WidthRequest="110" HeightRequest="40" Pressed="OnButtonDown" Released="OnButtonUp"  BackgroundColor="#77B1D4" TextColor="White"/>
+                <Button Text="RB" WidthRequest="110" HeightRequest="40" Pressed="OnButtonDown" Released="OnButtonUp"  BackgroundColor="#77B1D4" TextColor="White"/>
+                <Button Text="RT" WidthRequest="110" HeightRequest="40" Pressed="OnButtonDown" Released="OnButtonUp"  BackgroundColor="#77B1D4" TextColor="White"/>
             </StackLayout>
 
             <!-- Back & Start (Top Left Corner) -->
             <StackLayout AbsoluteLayout.LayoutBounds="0.05,0.05,-1,-1"
                      AbsoluteLayout.LayoutFlags="PositionProportional"
                      Spacing="5">
-                <Button Text="Back" WidthRequest="60" HeightRequest="35" Pressed="OnButtonDown" Released="OnButtonUp"/>
-                <Button Text="Start" WidthRequest="60" HeightRequest="35" Pressed="OnButtonDown" Released="OnButtonUp"/>
+                <Button Text="Back" WidthRequest="60" HeightRequest="35" Pressed="OnButtonDown" Released="OnButtonUp" BackgroundColor="#90D5FF" TextColor="White"/>
+                <Button Text="Start" WidthRequest="60" HeightRequest="35" Pressed="OnButtonDown" Released="OnButtonUp"  BackgroundColor="#90D5FF" TextColor="White"/>
             </StackLayout>
 
             <!-- D-Pad (Left Center) -->
@@ -56,13 +56,13 @@
               ColumnDefinitions="Auto,Auto,Auto"
               Margin="0,0,10,0">
                 <Button Text="UP" WidthRequest="85" HeightRequest="85" Grid.Row="0" Grid.Column="1" 
-                        CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp"/>
+                        CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp" BackgroundColor="#57b9FF" TextColor="White"/>
                 <Button Text="LEFT" WidthRequest="85" HeightRequest="85" Grid.Row="1" Grid.Column="0" 
-                        CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp"/>
+                        CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp" BackgroundColor="#57b9FF" TextColor="White"/>
                 <Button Text="DOWN" WidthRequest="85" HeightRequest="85" Grid.Row="2" Grid.Column="1" 
-                        CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp"/>
+                        CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp" BackgroundColor="#57b9FF" TextColor="White"/>
                 <Button Text="RIGHT" WidthRequest="85" HeightRequest="85" Grid.Row="1" Grid.Column="2" 
-                        CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp"/>
+                        CornerRadius ="42" Pressed="OnButtonDown" Released="OnButtonUp" BackgroundColor="#57b9FF" TextColor="White"/>
             </Grid>
 
             <!-- Action Buttons (Right Center) - Now more compact -->
@@ -75,19 +75,19 @@
 
                 <Button Text="Y" Grid.Row="0" Grid.Column="1"
                     WidthRequest="85" HeightRequest="85" CornerRadius="42"
-                    Pressed="OnButtonDown" Released="OnButtonUp"/>
+                    Pressed="OnButtonDown" Released="OnButtonUp" BackgroundColor="#57b9FF" TextColor="White"/>
 
                 <Button Text="X" Grid.Row="1" Grid.Column="0"
                     WidthRequest="85" HeightRequest="85" CornerRadius="42"
-                    Pressed="OnButtonDown" Released="OnButtonUp"/>
+                    Pressed="OnButtonDown" Released="OnButtonUp" BackgroundColor="#57b9FF" TextColor="White"/>
 
                 <Button Text="B" Grid.Row="1" Grid.Column="2"
                     WidthRequest="85" HeightRequest="85" CornerRadius="42"
-                    Pressed="OnButtonDown" Released="OnButtonUp"/>
+                    Pressed="OnButtonDown" Released="OnButtonUp" BackgroundColor="#57b9FF" TextColor="White"/>
 
                 <Button Text="A" Grid.Row="2" Grid.Column="1"
                     WidthRequest="85" HeightRequest="85" CornerRadius="42"
-                    Pressed="OnButtonDown" Released="OnButtonUp"/>
+                    Pressed="OnButtonDown" Released="OnButtonUp" BackgroundColor="#57b9FF" TextColor="White"/>
             </Grid>
 
 

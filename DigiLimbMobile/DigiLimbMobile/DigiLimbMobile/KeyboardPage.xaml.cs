@@ -24,7 +24,6 @@ namespace DigiLimbMobile
             _bluetoothManager = App.BluetoothManager;
             GenerateKeyboard();
         }
-
         private void GenerateKeyboard()
         {
             Grid keyboardGrid = KeyboardGrid;
@@ -52,6 +51,7 @@ namespace DigiLimbMobile
                         BackgroundColor = GetKeyColor(actualKey),
                         FontSize = 14,
                         HeightRequest = 50,
+                        TextColor = Colors.White,
                         HorizontalOptions = LayoutOptions.Fill,
                         VerticalOptions = LayoutOptions.Fill
                     };
@@ -72,9 +72,9 @@ namespace DigiLimbMobile
 
         private Color GetKeyColor(string key)
         {
-            if (key == "Shift" || key == "Ctrl" || key == "Alt" || key == "Caps") return Colors.Gray;
-            if (key == "Backspace" || key == "Enter") return Colors.Red;
-            return Colors.Blue;
+            if (key == "Shift" || key == "Ctrl" || key == "Alt" || key == "Caps" || key == "Tab" || key == "Space") return Color.FromArgb("#77B1D4");
+            if (key == "Backspace" || key == "Enter") return Color.FromArgb("#517891");
+            return Color.FromArgb("#57b9FF");
         }
 
         private async void OnKeyPress(string key)
@@ -121,7 +121,7 @@ namespace DigiLimbMobile
             if (keyButtons.TryGetValue(key, out Button btn))
             {
                 Color originalColor = btn.BackgroundColor;
-                btn.BackgroundColor = Colors.Black;
+                btn.BackgroundColor = Colors.Gray;
                 await Task.Delay(150);
                 btn.BackgroundColor = originalColor;
             }

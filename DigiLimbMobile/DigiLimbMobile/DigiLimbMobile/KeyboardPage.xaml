@@ -5,25 +5,15 @@
              Title="Virtual Keyboard">
 
     <VerticalStackLayout>
-        <Label 
-            Text="DigiLimb Keyboard"
-            FontSize="24"
-            HorizontalOptions="Center"
-            Padding="10"/>
+        
 
         <!-- Keyboard Layout -->
         <Grid x:Name="KeyboardGrid"
-              Padding="10"
+              Padding="10,30,10,10"
               ColumnSpacing="5"
               RowSpacing="5">
         </Grid>
 
-        <Button Text="Close Keyboard"
-                Clicked="OnCloseKeyboard"
-                BackgroundColor="Red"
-                TextColor="White"
-                HorizontalOptions="Center"
-                Margin="10"/>
     </VerticalStackLayout>
 
 </ContentPage>

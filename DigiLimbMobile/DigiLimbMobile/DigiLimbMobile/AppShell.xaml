@@ -19,6 +19,7 @@
         Title="Connect"
         ContentTemplate="{DataTemplate local:ConnectionPage}"
         Route="ConnectionPage" />
+   
     <ShellContent
         Title="Emulators"
         ContentTemplate="{DataTemplate local:EmulatorPage}"
