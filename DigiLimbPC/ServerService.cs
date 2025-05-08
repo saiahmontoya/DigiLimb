@@ -22,7 +22,6 @@ using ZXing.Net.Maui;
 using ZXing.Rendering;
 #if ANDROID
 using Android.Graphics;
-using WindowsInput;
 #endif
 #if IOS || MACCATALYST
 using UIKit;
@@ -231,12 +230,22 @@ namespace DigiLimbDesktop
                         Debug.WriteLine($"📥 Received: {message}");
                         try
                         {
-                            var json = JsonDocument.Parse(message);
-                            if (json.RootElement.TryGetProperty("type", out var typeElement) && typeElement.GetString() == "presentation")
+                            if (message.TrimStart().StartsWith("{"))
                             {
-                                var command = json.RootElement.GetProperty("command").GetString();
-                                HandlePresentationCommand(command);
-                                continue; // stay on loop for more inputs
+                                try
+                                {
+                                    var json = JsonDocument.Parse(message);
+                                    if (json.RootElement.TryGetProperty("type", out var typeElement) && typeElement.GetString() == "presentation")
+                                    {
+                                        var command = json.RootElement.GetProperty("command").GetString();
+                                        HandlePresentationCommand(command);
+                                        return; // handled
+                                    }
+                                }
+                                catch (JsonException ex)
+                                {
+                                    Debug.WriteLine($"❌ Failed to parse presentation command: {ex.Message}");
+                                }
                             }
                         }
                         catch (Exception ex)
@@ -265,6 +274,13 @@ namespace DigiLimbDesktop
                             _controllerManager.HandleIncomingMessage(message);
                         }
 #endif
+                        else if (message.StartsWith("KEY:"))
+                        {
+                            string keyData = message.Substring("KEY:".Length).Trim();
+#if WINDOWS
+KeyboardEmulator.ProcessKeyPress(keyData);
+#endif
+                        }
                         else
                         {
                             await BroadcastMessage(message, webSocket);
@@ -273,30 +289,19 @@ namespace DigiLimbDesktop
                     else if (result.MessageType == WebSocketMessageType.Binary)
                     {
                         byte[] rawBytes = buffer[..result.Count];
-                        if (rawBytes.Length == 0)
+
+                        if (rawBytes.Length > 0 && rawBytes[0] == 0x05) // 0x05 = keyboard header
                         {
-                            Debug.WriteLine("⚠️ Empty binary message received.");
-                            return;
+                            string keyData = Encoding.UTF8.GetString(rawBytes, 1, rawBytes.Length - 1).Trim();
+                            Debug.WriteLine($"[WiFi] Keyboard Input: '{keyData}'");
+#if WINDOWS
+KeyboardEmulator.ProcessKeyPress(keyData);
+#endif
+
                         }
-
-                        byte header = rawBytes[0];
-                        switch (header)
+                        else
                         {
-                            case 0x01: // Mouse movement X (or handled inside full buffer)
-                            case 0x02: // Mouse movement Y
-                            case 0x03: // Mouse click
-                            case 0x04: // Right click
-                            case 0x05: // Scroll
-                                HandleMouseData(rawBytes);
-                                break;
-
-                            case 0x06: // Keyboard input
-                                HandleKeyboardData(rawBytes);
-                                break;
-
-                            default:
-                                Debug.WriteLine($"⚠️ Unknown binary header: 0x{header:X2}");
-                                break;
+                            HandleMouseData(rawBytes);
                         }
                     }
                 }
