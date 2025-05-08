@@ -9,9 +9,12 @@ namespace DigiLimbDesktop
         [DllImport("user32.dll", SetLastError = true)]
         private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
 
+        [DllImport("user32.dll")]
+        private static extern short VkKeyScan(char ch);
+
         private const uint KEYEVENTF_KEYUP = 0x0002;
-        private const byte VK_CAPITAL = 0x14;
         private const byte VK_SHIFT = 0x10;
+        private const byte VK_CAPITAL = 0x14;
 
         private static bool isShiftPressed = false;
         private static bool isCapsToggled = false;
@@ -20,7 +23,8 @@ namespace DigiLimbDesktop
         {
             Debug.WriteLine($"⌨️ Processing Key: {keyData}");
 
-            // Handle toggles
+            if (string.IsNullOrWhiteSpace(keyData)) return;
+
             if (keyData.ToUpper() == "SHIFT")
             {
                 isShiftPressed = !isShiftPressed;
@@ -30,54 +34,64 @@ namespace DigiLimbDesktop
 
             if (keyData.ToUpper() == "CAPS")
             {
-                keybd_event(VK_CAPITAL, 0, 0, UIntPtr.Zero); // CapsLock Down
-                keybd_event(VK_CAPITAL, 0, KEYEVENTF_KEYUP, UIntPtr.Zero); // CapsLock Up
+                keybd_event(VK_CAPITAL, 0, 0, UIntPtr.Zero);
+                keybd_event(VK_CAPITAL, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
                 isCapsToggled = !isCapsToggled;
                 Debug.WriteLine($"🔁 Caps Lock toggled: {isCapsToggled}");
                 return;
             }
 
-            // Parse modifiers from keyData
+            // Support modifiers like Ctrl+Alt+Shift
             bool useCtrl = keyData.Contains("Ctrl+");
             bool useAlt = keyData.Contains("Alt+");
             bool useShiftExplicit = keyData.Contains("Shift+");
 
-            // Strip modifiers
-            string key = keyData.Replace("Ctrl+", "")
-                                .Replace("Alt+", "")
-                                .Replace("Shift+", "");
+            string key = keyData.Replace("Ctrl+", "").Replace("Alt+", "").Replace("Shift+", "");
 
-            byte virtualKey = GetVirtualKeyCode(key);
-            if (virtualKey == 0)
+            // Fallback to virtual key code mapping if special key
+            byte directVk = GetVirtualKeyCode(key);
+            if (directVk != 0)
             {
-                Debug.WriteLine($"❌ Unrecognized key: {key}");
+                SimulateKeyPress(directVk, useCtrl, useAlt, useShiftExplicit);
                 return;
             }
 
-            bool isLetter = key.Length == 1 && char.IsLetter(key[0]);
-            bool applyShift =
-                isShiftPressed ||
-                useShiftExplicit ||
-                (isCapsToggled && isLetter && !useShiftExplicit);
+            // Otherwise try character-based simulation using VkKeyScan
+            char character = key.Length == 1 ? key[0] : '\0';
+            if (character == '\0') return;
 
-            // Press modifiers
-            if (useCtrl) keybd_event(0x11, 0, 0, UIntPtr.Zero); // Ctrl down
-            if (useAlt) keybd_event(0x12, 0, 0, UIntPtr.Zero);  // Alt down
-            if (applyShift) keybd_event(VK_SHIFT, 0, 0, UIntPtr.Zero); // Shift down
+            short vkey = VkKeyScan(character);
+            if (vkey == -1)
+            {
+                Debug.WriteLine($"❌ Invalid character: {character}");
+                return;
+            }
 
-            // Main key
+            byte vk = (byte)(vkey & 0xFF);
+            byte shiftState = (byte)((vkey >> 8) & 0xFF);
+
+            if ((shiftState & 1) != 0) keybd_event(VK_SHIFT, 0, 0, UIntPtr.Zero); // Shift down
+            keybd_event(vk, 0, 0, UIntPtr.Zero); // Key down
+            keybd_event(vk, 0, KEYEVENTF_KEYUP, UIntPtr.Zero); // Key up
+            if ((shiftState & 1) != 0) keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, UIntPtr.Zero); // Shift up
+
+            Debug.WriteLine($"✅ Simulated Character Input: {character}");
+        }
+
+        private static void SimulateKeyPress(byte virtualKey, bool ctrl, bool alt, bool shift)
+        {
+            if (ctrl) keybd_event(0x11, 0, 0, UIntPtr.Zero); // Ctrl down
+            if (alt) keybd_event(0x12, 0, 0, UIntPtr.Zero); // Alt down
+            if (shift || isShiftPressed) keybd_event(VK_SHIFT, 0, 0, UIntPtr.Zero); // Shift down
+
             keybd_event(virtualKey, 0, 0, UIntPtr.Zero);
             keybd_event(virtualKey, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
 
-            // Release modifiers
-            if (applyShift) keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
-            if (useAlt) keybd_event(0x12, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
-            if (useCtrl) keybd_event(0x11, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+            if (shift || isShiftPressed) keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, UIntPtr.Zero); // Shift up
+            if (alt) keybd_event(0x12, 0, KEYEVENTF_KEYUP, UIntPtr.Zero); // Alt up
+            if (ctrl) keybd_event(0x11, 0, KEYEVENTF_KEYUP, UIntPtr.Zero); // Ctrl up
 
-            Debug.WriteLine($"✅ Simulated Key Press: {keyData}");
-
-            if (isShiftPressed)
-                isShiftPressed = false;
+            Debug.WriteLine($"✅ Simulated Key Code: {virtualKey}");
         }
 
         private static byte GetVirtualKeyCode(string key)
