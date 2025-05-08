@@ -144,7 +144,7 @@ namespace DigiLimbMobile
         public async Task SendKeyPress(string key)
         {
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-            List<byte> message = new List<byte> { 0x05 }; // 0x05 = header for keyboard input
+            List<byte> message = new List<byte> { 0x06 }; // 0x06 = header for keyboard input
             message.AddRange(keyBytes);
 
             // ✅ Try WebSocket first if it's connected

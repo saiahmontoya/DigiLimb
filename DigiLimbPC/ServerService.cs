@@ -290,7 +290,7 @@ KeyboardEmulator.ProcessKeyPress(keyData);
                     {
                         byte[] rawBytes = buffer[..result.Count];
 
-                        if (rawBytes.Length > 0 && rawBytes[0] == 0x05) // 0x05 = keyboard header
+                        if (rawBytes.Length > 0 && rawBytes[0] == 0x06) // 0x06 = keyboard header
                         {
                             string keyData = Encoding.UTF8.GetString(rawBytes, 1, rawBytes.Length - 1).Trim();
                             Debug.WriteLine($"[WiFi] Keyboard Input: '{keyData}'");
