@@ -22,7 +22,6 @@ using ZXing.Net.Maui;
 using ZXing.Rendering;
 #if ANDROID
 using Android.Graphics;
-using WindowsInput;
 #endif
 #if IOS || MACCATALYST
 using UIKit;
