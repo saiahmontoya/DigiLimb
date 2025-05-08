@@ -217,12 +217,22 @@ namespace DigiLimbDesktop
                         Debug.WriteLine($"📥 Received: {message}");
                         try
                         {
-                            var json = JsonDocument.Parse(message);
-                            if (json.RootElement.TryGetProperty("type", out var typeElement) && typeElement.GetString() == "presentation")
+                            if (message.TrimStart().StartsWith("{"))
                             {
-                                var command = json.RootElement.GetProperty("command").GetString();
-                                HandlePresentationCommand(command);
-                                continue; // stay on loop for more inputs
+                                try
+                                {
+                                    var json = JsonDocument.Parse(message);
+                                    if (json.RootElement.TryGetProperty("type", out var typeElement) && typeElement.GetString() == "presentation")
+                                    {
+                                        var command = json.RootElement.GetProperty("command").GetString();
+                                        HandlePresentationCommand(command);
+                                        return; // handled
+                                    }
+                                }
+                                catch (JsonException ex)
+                                {
+                                    Debug.WriteLine($"❌ Failed to parse presentation command: {ex.Message}");
+                                }
                             }
                         }
                         catch (Exception ex)
@@ -251,6 +261,13 @@ namespace DigiLimbDesktop
                             _controllerManager.HandleIncomingMessage(message);
                         }
 #endif
+                        else if (message.StartsWith("KEY:"))
+                        {
+                            string keyData = message.Substring("KEY:".Length).Trim();
+#if WINDOWS
+KeyboardEmulator.ProcessKeyPress(keyData);
+#endif
+                        }
                         else
                         {
                             await BroadcastMessage(message, webSocket);
@@ -259,7 +276,20 @@ namespace DigiLimbDesktop
                     else if (result.MessageType == WebSocketMessageType.Binary)
                     {
                         byte[] rawBytes = buffer[..result.Count];
-                        HandleMouseData(rawBytes);
+
+                        if (rawBytes.Length > 0 && rawBytes[0] == 0x05) // 0x05 = keyboard header
+                        {
+                            string keyData = Encoding.UTF8.GetString(rawBytes, 1, rawBytes.Length - 1).Trim();
+                            Debug.WriteLine($"[WiFi] Keyboard Input: '{keyData}'");
+#if WINDOWS
+KeyboardEmulator.ProcessKeyPress(keyData);
+#endif
+
+                        }
+                        else
+                        {
+                            HandleMouseData(rawBytes);
+                        }
                     }
                 }
             }
