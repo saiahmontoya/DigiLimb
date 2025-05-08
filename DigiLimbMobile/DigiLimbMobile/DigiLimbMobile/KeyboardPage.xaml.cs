@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Net.WebSockets;
 
 namespace DigiLimbMobile
 {
@@ -142,10 +143,31 @@ namespace DigiLimbMobile
 
         private async Task SendKeyPress(string keyData)
         {
-            if (_bluetoothManager.keyboardCharacteristic != null)
+            List<byte> message = new List<byte> { 0x06 };
+            message.AddRange(Encoding.UTF8.GetBytes(keyData));
+            if (App.GlobalWebSocket?.State == WebSocketState.Open)
             {
-                List<byte> message = new List<byte> { 0x05 };
-                message.AddRange(Encoding.UTF8.GetBytes(keyData));
+                var ws = App.GlobalWebSocket;
+                byte[] messageArray = message.ToArray();
+                if (ws == null || ws.State != WebSocketState.Open)
+                {
+                    Console.WriteLine("Not connected to server.");
+                    return;
+                }
+                try
+                {
+                    await ws.SendAsync(new ArraySegment<byte>(messageArray), WebSocketMessageType.Binary, true, CancellationToken.None);
+                    //Console.WriteLine($"Message sent.{BitConverter.ToString(messageArray)}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Send error: {ex.Message}");
+                }
+            }
+            else if (_bluetoothManager.keyboardCharacteristic != null)
+            {
+                
+                
 
                 await _bluetoothManager.keyboardCharacteristic.WriteAsync(message.ToArray());
                 Console.WriteLine($"📡 Sent Key Press: {keyData}");

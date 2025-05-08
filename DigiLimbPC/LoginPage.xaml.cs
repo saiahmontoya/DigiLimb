@@ -114,7 +114,7 @@ namespace DigiLimbDesktop
                         Navigation.PushAsync(new MainPage());
                         Debug.WriteLine("Successfully logged in.");
                     });
-                }
+                } 
                 else
                 {
                     await DisplayAlert("Login Error", "Invalid password.", "OK");

@@ -22,6 +22,7 @@ using ZXing.Net.Maui;
 using ZXing.Rendering;
 #if ANDROID
 using Android.Graphics;
+using WindowsInput;
 #endif
 #if IOS || MACCATALYST
 using UIKit;
@@ -272,7 +273,31 @@ namespace DigiLimbDesktop
                     else if (result.MessageType == WebSocketMessageType.Binary)
                     {
                         byte[] rawBytes = buffer[..result.Count];
-                        HandleMouseData(rawBytes);
+                        if (rawBytes.Length == 0)
+                        {
+                            Debug.WriteLine("⚠️ Empty binary message received.");
+                            return;
+                        }
+
+                        byte header = rawBytes[0];
+                        switch (header)
+                        {
+                            case 0x01: // Mouse movement X (or handled inside full buffer)
+                            case 0x02: // Mouse movement Y
+                            case 0x03: // Mouse click
+                            case 0x04: // Right click
+                            case 0x05: // Scroll
+                                HandleMouseData(rawBytes);
+                                break;
+
+                            case 0x06: // Keyboard input
+                                HandleKeyboardData(rawBytes);
+                                break;
+
+                            default:
+                                Debug.WriteLine($"⚠️ Unknown binary header: 0x{header:X2}");
+                                break;
+                        }
                     }
                 }
             }
@@ -386,6 +411,32 @@ namespace DigiLimbDesktop
             }
 #endif
         }
+
+        private void HandleKeyboardData(byte[] data)
+        {
+            if (data.Length < 2)
+            {
+                Debug.WriteLine("❌ Received incomplete keyboard data.");
+                return;
+            }
+
+            // Strip header byte (0x06) and decode UTF-8 string
+            string keyData = Encoding.UTF8.GetString(data, 1, data.Length - 1).Trim();
+            Debug.WriteLine($"⌨️ [DEBUG] Extracted Keyboard Input: '{keyData}'");
+
+            if (string.IsNullOrEmpty(keyData))
+            {
+                Debug.WriteLine("❌ Received empty keyboard input.");
+                return;
+            }
+
+#if WINDOWS
+    // Send to your keyboard emulator
+    KeyboardEmulator.ProcessKeyPress(keyData);
+#endif
+        }
+
+
 
         private async Task ProcessControllerInput(WebSocket webSocket, string message)
         {

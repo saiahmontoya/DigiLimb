@@ -484,7 +484,7 @@ namespace DigiLimbDesktop.Platforms.Windows
                     return;
                 }
 
-                // ✅ Strip the first byte (header 0x05)
+                // ✅ Strip the first byte (header 0x06)
                 string keyData = Encoding.UTF8.GetString(receivedBytes, 1, receivedBytes.Length - 1).Trim();
                 Debug.WriteLine($"⌨️ [DEBUG] Extracted Keyboard Input: '{keyData}'");
 
