@@ -102,4 +102,5 @@ Prerequisites -
 
 #### Troubleshooting
 WebSocket error: Check that the firewall and port permissions are configured (port 8080)
+
 Bluetooth not connecting: Make sure the PC supports BLE Peripheral mode and is advertising
